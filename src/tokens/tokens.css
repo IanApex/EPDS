@@ -1,0 +1,326 @@
+/*
+ * Design tokens — sourced from Figma via get_variable_defs.
+ * This file is the single source of truth for all design decisions.
+ * Do not add raw values here that don't originate from Figma variables.
+ *
+ * Figma variable group → CSS custom property prefix:
+ *   "Base Colors/*"                → --color-base-*
+ *   "Accent Colors/*"              → --color-accent-*
+ *   "Neutral Colors/Neutral*"      → --color-neutral-*
+ *   "Neutral Colors/Secondary*"    → --color-neutral-secondary-*
+ *   "Neutral Colors/Tertiary*"     → --color-neutral-tertiary-*
+ *   "Feedback Colors/Warning*"     → --color-warning-*
+ *   "Feedback Colors/Alert*"       → --color-alert-*
+ *   "Feedback Colors/Acceess*"     → --color-accessibility-*
+ *   "System/Alert Colors/*"        → --color-system-*
+ *   "Base / ParkGray0"             → --color-parkgray-0  (alias of --color-neutral-0)
+ *   "Base / White"                 → --color-white       (alias of --color-neutral-100)
+ *   "$border-radius-*"             → --border-radius-*
+ *   "$border-width-*"              → --border-width-*
+ *   "$opacity-level-*"             → --opacity-level-*
+ *   "$shadow-level-*"              → --shadow-level-*
+ *   "Button/BTN"                   → --font-* (btn)
+ *   "Button/BTN SM"                → --font-* (btn-sm)
+ */
+
+:root {
+  /* ─── Base Colors ─────────────────────────────────────────────
+   * Primary green palette — used for actions, CTAs, brand elements.
+   * ----------------------------------------------------------- */
+  --color-base-primary-40: #326B00;
+  --color-base-primary-50: #3E8500;
+  --color-base-primary-55: #5C9C08;
+  --color-base-primary-60: #62A60A;
+  --color-base-primary-90: #EAF5DC;
+
+  /* ─── Accent Colors ───────────────────────────────────────────
+   * Blue accent palette — used sparingly for highlights and focus.
+   * ----------------------------------------------------------- */
+  --color-accent-30:  #004D80;
+  --color-accent-40:  #006FA6;
+  --color-accent-60:  #047FBD;
+  --color-accent-80:  #B2D4E1;
+  --color-accent-85:  #C8E0E9;
+  --color-accent-90:  #E6F1F5;
+
+  /* ─── Neutral Colors ──────────────────────────────────────────
+   * Core greyscale — backgrounds, borders, body text.
+   * ----------------------------------------------------------- */
+  --color-neutral-0:   #242C33;
+  --color-neutral-20:  #313D47;
+  --color-neutral-40:  #666B70;
+  --color-neutral-70:  #A2A6AB;
+  --color-neutral-80:  #BCBFC2;
+  --color-neutral-85:  #D4D7D9;
+  --color-neutral-90:  #E8E9EB;
+  --color-neutral-95:  #F4F5F7;
+  --color-neutral-100: #FFFFFF;
+
+  /* ─── Secondary Neutral Colors ────────────────────────────────
+   * Warm greyscale — cards, subtle backgrounds.
+   * ----------------------------------------------------------- */
+  --color-neutral-secondary-40: #85776F;
+  --color-neutral-secondary-70: #A39A93;
+  --color-neutral-secondary-80: #BDB7B3;
+  --color-neutral-secondary-85: #DAD6D3;
+  --color-neutral-secondary-90: #EEECEA;
+  --color-neutral-secondary-95: #F5F4F3;
+
+  /* ─── Tertiary Neutral Colors ─────────────────────────────────
+   * Warm cream/sand tones — decorative backgrounds.
+   * ----------------------------------------------------------- */
+  --color-neutral-tertiary-70: #E1D0A5;
+  --color-neutral-tertiary-80: #EBDDB9;
+  --color-neutral-tertiary-85: #F0E9DA;
+  --color-neutral-tertiary-90: #F5F1E9;
+  --color-neutral-tertiary-95: #FAF9F5;
+
+  /* ─── Named Aliases ───────────────────────────────────────────
+   * Convenience aliases used in Figma component tokens.
+   * ----------------------------------------------------------- */
+  --color-white:      #FFFFFF; /* Base / White     = --color-neutral-100 */
+  --color-parkgray-0: #242C33; /* Base / ParkGray0 = --color-neutral-0   */
+
+  /* ─── Feedback: Warning (red) ─────────────────────────────────
+   * Error and destructive action states.
+   * ----------------------------------------------------------- */
+  --color-warning-40: #B30715;
+  --color-warning-50: #F42434;
+  --color-warning-90: #FFEBEC;
+
+  /* ─── Feedback: Alert (amber/orange) ──────────────────────────
+   * Caution, informational and in-progress states.
+   * ----------------------------------------------------------- */
+  --color-alert-50: #AC6000;
+  --color-alert-70: #FF8500;
+  --color-alert-80: #FACD46;
+  --color-alert-90: #FEF6E7;
+
+  /* ─── Feedback: System ────────────────────────────────────────
+   * System-level alert red (inline errors, validation).
+   * ----------------------------------------------------------- */
+  --color-system-red-60: #F42434;
+
+  /* ─── Feedback: Accessibility ─────────────────────────────────
+   * Focus rings and high-contrast interactive indicators.
+   * ----------------------------------------------------------- */
+  --color-accessibility-80: #4095BF;
+
+  /* ─── Grid: Layout spacing per breakpoint ────────────────────
+   * Breakpoints (for @media queries) live in breakpoints.ts
+   * because CSS custom properties cannot be used in @media rules.
+   *
+   * sm  (0px+):    4 col,  padding: 24px, no margin
+   * md  (600px+):  12 col, padding: 24px, margin: 16px
+   * lg  (1024px+): 12 col, padding: 32px, margin: 16px
+   * xlg (1440px+): 12 col, padding: 32px, margin: 80px
+   * max (1920px):  12 col, padding: 32px, margin: 128px
+   * ------------------------------------------------------------ */
+  --grid-columns-sm:  4;
+  --grid-columns-md:  12;
+  --grid-columns-lg:  12;
+  --grid-columns-xlg: 12;
+  --grid-columns-max: 12;
+
+  --grid-padding-sm:  24px;
+  --grid-padding-md:  24px;
+  --grid-padding-lg:  32px;
+  --grid-padding-xlg: 32px;
+  --grid-padding-max: 32px;
+
+  --grid-margin-md:   16px;
+  --grid-margin-lg:   16px;
+  --grid-margin-xlg:  80px;
+  --grid-margin-max:  128px;
+
+  --grid-mini-unit:   8px;
+  --grid-side-rail:   281px;
+
+  /* ─── Spacing scale (stack & inline) ────────────────────────
+   * Used for vertical (stack) and horizontal (inline) gaps
+   * between components and UI elements.
+   * Figma tokens: $spacing_STACK-* / $spacing_INLINE-*
+   * ------------------------------------------------------------ */
+  --spacing-quarck: 4px;
+  --spacing-nano:   8px;
+  --spacing-micro:  12px;
+  --spacing-xxxs:   16px;
+  --spacing-xxs:    24px;
+  --spacing-xs:     32px;
+  --spacing-sm:     40px;
+  --spacing-md:     48px;
+  --spacing-lg:     56px;
+  --spacing-xl:     64px;
+  --spacing-xxl:    80px;
+  --spacing-xxxl:   120px;
+  --spacing-huge:   160px;
+  --spacing-giant:  200px;
+
+  /* ─── Inset spacing — default (equal all sides) ──────────────
+   * Used for padding within components.
+   * Figma tokens: $spacing_inset-*
+   * ------------------------------------------------------------ */
+  --spacing-inset-quarck: 4px;
+  --spacing-inset-nano:   8px;
+  --spacing-inset-xs:     16px;
+  --spacing-inset-sm:     24px;
+  --spacing-inset-md:     32px;
+  --spacing-inset-lg:     40px;
+
+  /* ─── Inset spacing — squish (L/R = 2× T/B) ─────────────────
+   * Reduced vertical padding; used for compact elements like
+   * tags, chips, and table cells.
+   * Figma tokens: $spacing_Squish-*  (T/B × L/R)
+   * ------------------------------------------------------------ */
+  --spacing-squish-quarck: 4px 8px;
+  --spacing-squish-nano:   8px 16px;
+  --spacing-squish-sm:     24px 32px;
+  --spacing-squish-md:     32px 40px;
+  --spacing-squish-lg:     40px 48px;
+
+  /* ─── Inset spacing — stretch (T/B = 2× L/R) ────────────────
+   * Increased vertical padding; used for tall elements like
+   * banners and page-level containers.
+   * Figma tokens: $spacing_Stretch-*  (T/B × L/R)
+   * ------------------------------------------------------------ */
+  --spacing-stretch-quarck: 8px 4px;
+  --spacing-stretch-nano:   16px 8px;
+  --spacing-stretch-xs:     24px 16px;
+  --spacing-stretch-sm:     32px 24px;
+  --spacing-stretch-md:     40px 32px;
+  --spacing-stretch-lg:     48px 40px;
+
+  /* ─── Border Radius ───────────────────────────────────────────  */
+  --border-radius-none:     0px;
+  --border-radius-sm:       4px;
+  --border-radius-md:       8px;
+  --border-radius-lg:       16px;
+  --border-radius-pill:     9999px;
+  --border-radius-circular: 50%;
+
+  /* ─── Border Width ────────────────────────────────────────────  */
+  --border-width-none:     0px;
+  --border-width-hairline: 1px;
+  --border-width-thin:     2px;
+  --border-width-thick:    4px;
+  --border-width-heavy:    8px;
+
+  /* ─── Opacity Levels ──────────────────────────────────────────  */
+  --opacity-level-semiopaque:      0.80;
+  --opacity-level-intense:         0.64;
+  --opacity-level-medium:          0.32;
+  --opacity-level-light:           0.16;
+  --opacity-level-semitransparent: 0.08;
+
+  /* ─── Drop Shadows ────────────────────────────────────────────  */
+  --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.20);
+  --shadow-level-2: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --shadow-level-3: 0 16px 32px rgba(0, 0, 0, 0.16);
+  --shadow-level-4: 0 16px 48px rgba(0, 0, 0, 0.24);
+
+  /* ─── Font Family ────────────────────────────────────────────
+   * Figma: $font-family-base — Roboto via Google Fonts
+   * ------------------------------------------------------------ */
+  --font-family-base: "Roboto", sans-serif;
+
+  /* ─── Font Weights ───────────────────────────────────────────
+   * Figma: $font-weight-*
+   * ------------------------------------------------------------ */
+  --font-weight-light:   300;
+  --font-weight-regular: 400;
+  --font-weight-medium:  500;
+  --font-weight-bold:    700;
+
+  /* ─── Line Height Scale ──────────────────────────────────────
+   * Figma: $line-height-* (as unitless ratios)
+   * ------------------------------------------------------------ */
+  --line-height-default: 1;     /* 100% */
+  --line-height-xs:      1.1;   /* 110% */
+  --line-height-sm:      1.2;   /* 120% */
+  --line-height-md:      1.4;   /* 140% */
+  --line-height-lg:      1.5;   /* 150% */
+
+  /* ─── Heading styles (Light) ─────────────────────────────────
+   * Figma: Heading/H1 – H5
+   * ------------------------------------------------------------ */
+  --text-h1-size:           64px;
+  --text-h1-weight:         var(--font-weight-light);
+  --text-h1-line-height:    var(--line-height-default);
+  --text-h1-letter-spacing: -0.8px;
+
+  --text-h2-size:           42px;
+  --text-h2-weight:         var(--font-weight-light);
+  --text-h2-line-height:    var(--line-height-sm);
+  --text-h2-letter-spacing: -0.4px;
+
+  --text-h3-size:           32px;
+  --text-h3-weight:         var(--font-weight-light);
+  --text-h3-line-height:    var(--line-height-sm);
+  --text-h3-letter-spacing: -0.4px;
+
+  --text-h4-size:           26px;
+  --text-h4-weight:         var(--font-weight-light);
+  --text-h4-line-height:    var(--line-height-sm);
+  --text-h4-letter-spacing: -0.2px;
+
+  --text-h5-size:           22px;
+  --text-h5-weight:         var(--font-weight-light);
+  --text-h5-line-height:    var(--line-height-sm);
+  --text-h5-letter-spacing: 0;
+
+  /* ─── Heading styles (Bold variants) ────────────────────────
+   * Figma: Heading / H*-Bold — collected across foundations pages
+   * ------------------------------------------------------------ */
+  --text-h2-bold-size:           32px;
+  --text-h2-bold-weight:         var(--font-weight-bold);
+  --text-h2-bold-line-height:    40px;
+  --text-h2-bold-letter-spacing: -0.4px;
+
+  --text-h5-bold-size:           26px;
+  --text-h5-bold-weight:         var(--font-weight-bold);
+  --text-h5-bold-line-height:    32px;
+  --text-h5-bold-letter-spacing: 0.4px;
+
+  --text-h6-bold-size:           22px;
+  --text-h6-bold-weight:         var(--font-weight-bold);
+  --text-h6-bold-line-height:    26px;
+  --text-h6-bold-letter-spacing: 0;
+
+  /* ─── Body & UI text styles ──────────────────────────────────
+   * Figma: Paragraph/*, Button/*, Heading/Subhead
+   * ------------------------------------------------------------ */
+  --text-subhead-size:           16px;
+  --text-subhead-weight:         var(--font-weight-bold);
+  --text-subhead-line-height:    var(--line-height-md);
+  --text-subhead-letter-spacing: 0;
+
+  --text-body-lg-size:           16px;
+  --text-body-lg-weight:         var(--font-weight-regular);
+  --text-body-lg-line-height:    var(--line-height-lg);
+  --text-body-lg-letter-spacing: 0;
+
+  --text-body-sm-size:           14px;
+  --text-body-sm-weight:         var(--font-weight-regular);
+  --text-body-sm-line-height:    var(--line-height-lg);
+  --text-body-sm-letter-spacing: 0;
+
+  --text-label-size:           12px;
+  --text-label-weight:         var(--font-weight-regular);
+  --text-label-line-height:    var(--line-height-lg);
+  --text-label-letter-spacing: 0.2px;
+
+  /* ─── Button text styles ─────────────────────────────────────
+   * Kept as flat properties so BaseButton can reference directly.
+   * Figma: Button/BTN, Button/BTN SM
+   * ------------------------------------------------------------ */
+  --font-family-btn:       var(--font-family-base);
+  --font-size-btn:         16px;
+  --font-weight-btn:       var(--font-weight-medium);
+  --line-height-btn:       var(--line-height-default);
+  --letter-spacing-btn:    0.4px;
+
+  --font-size-btn-sm:      14px;
+  --font-weight-btn-sm:    var(--font-weight-medium);
+  --line-height-btn-sm:    var(--line-height-default);
+  --letter-spacing-btn-sm: 0;
+}

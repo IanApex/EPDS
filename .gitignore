@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+storybook-static/
+
+# Vite / TypeScript
+*.local
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Storybook
+/storybook-static
+debug-storybook.log
+
+# Test coverage
+coverage/
+
+# Playwright
+/test-results/
+/playwright-report/

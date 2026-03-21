@@ -1,0 +1,18 @@
+/*
+ * Global resets and base styles only.
+ * Design tokens live in src/tokens/tokens.css
+ * Component styles are scoped inside each .vue file.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
