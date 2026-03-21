@@ -1,10 +1,10 @@
 ---
-description: EPDS design system — full project knowledge, token reference, component inventory, and Figma MCP workflow. Applied to every session.
+description: EchoPark Design System (EPDS) — full project knowledge, token reference, component inventory, and Figma MCP workflow. Applied to every session.
 globs: ["src/**/*.vue", "src/**/*.ts", "src/**/*.css", "src/**/*.stories.ts"]
 alwaysApply: true
 ---
 
-# EPDS Design System — Project Knowledge
+# EchoPark Design System (EPDS) — Project Knowledge
 
 ## Stack
 - **Framework**: Vue 3 with `<script setup>` + TypeScript (Composition API only — no Options API)
@@ -43,14 +43,30 @@ EPDS/
 
 ## Components Built
 
-### `BaseButton` — `src/components/BaseButton/`
-- **Figma**: "Buttons/Primary" (md) + "Buttons/Tertiary" (sm)
-- **Props**: `label?: string`, `size?: 'md' | 'sm'` (default `'md'`), `disabled?: boolean`
+### `LinkCta` — `src/components/LinkCta/`
+- **Figma**: "CommonInputs/TextLink" (light), "CommonInputs/TextLink Dark" (dark)
+- **Props**: `label?: string`, `arrow?: boolean` (default `false`), `theme?: 'light' | 'dark'` (default `'light'`), `href?: string`, `target?: string`, `disabled?: boolean`
 - **Emits**: `click: [event: MouseEvent]`
-- **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text
-- **States**: hover (darker bg + underline), active (bright green), focus-visible (accessibility blue ring), disabled (grey)
-- **Stories**: Default, Hover, Active, Focus, Disabled, SmallDefault, SmallHover, SmallActive, SmallFocus, SmallDisabled, SizeComparison
-- **Key tokens used**: `--color-base-primary-*`, `--color-accessibility-80`, `--color-neutral-*`, `--border-radius-pill`, `--border-width-thick`, `--font-*-btn*`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided
+- **Light states**: default/hover/focus = Accent40; pressed = Accent30; hover/pressed add underline
+- **Dark states**: default/hover/focus = Accent80; pressed = Accent90; hover/pressed add underline
+- **Focus ring**: 3px solid Accessibility80, outline-offset 2px, border-radius 2px (rectangular per Figma)
+- **Disabled**: opacity `--opacity-level-medium` (32%), pointer-events none
+- **Arrow icon**: inline SVG chevron-right (24×24, `currentColor`), Figma: "Icon/System/Arrows-No Tail/Right"
+- **Stories**: full Light×arrow×state + Dark×arrow×state coverage + AsAnchor + AllVariants
+- **Key tokens**: `--color-accent-30/40/80/90`, `--color-accessibility-80`, `--opacity-level-medium`, `--font-*-btn`
+
+### `BaseButton` — `src/components/BaseButton/`
+- **Figma**: "Buttons/Primary" (primary md), "Buttons/Tertiary" (primary sm), "Buttons/Secondary" (secondary light md), "Buttons/TertiaryOutlined" (secondary light sm), "Buttons/SecondaryDark" (secondary dark md), "Buttons/TertiaryDark" (secondary dark sm)
+- **Props**: `variant?: 'primary' | 'secondary'`, `size?: 'md' | 'sm'`, `theme?: 'light' | 'dark'`, `label?: string`, `disabled?: boolean`
+- **Emits**: `click: [event: MouseEvent]`
+- **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text. All sizes work with all variants/themes.
+- **Primary states**: hover (darker bg + underline), active (bright green), focus-visible (accessibility blue ring), disabled (grey). Theme prop has no effect.
+- **Secondary light states**: hover (border thin→thick), active (thick border + neutral-95 fill), focus-visible (thick accessibility-blue border), disabled (grey bg)
+- **Secondary dark states**: same border behaviour but white border/text; active fills with neutral-0 (dark); used on dark backgrounds
+- **Stories**: full coverage of variant×size×theme×state + VariantComparison, SizeComparison, AllVariants. Dark stories use `backgrounds: { default: 'dark' }` parameter.
+- **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
+- **Key tokens used**: `--color-base-primary-*`, `--color-neutral-0/95/100`, `--color-accessibility-80`, `--border-radius-pill`, `--border-width-thin/thick`, `--font-*-btn*`
 
 ## Token Reference
 

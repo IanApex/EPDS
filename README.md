@@ -1,4 +1,4 @@
-# EPDS — Enterprise Park Design System
+# EPDS — EchoPark Design System
 
 A Vue 3 component library built from Figma foundations using the Figma Dev Mode MCP.
 
