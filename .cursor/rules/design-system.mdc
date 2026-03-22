@@ -56,6 +56,112 @@ EPDS/
 
 ## Components Built
 
+### `BoxInputLG` — `src/components/BoxInputLG/`
+- **Figma**: "Inputs/BoxInputs/Large" — 132px vertical card-style selection box
+- **Props**: `value: string` (**required**), `name: string` (**required**), `label?: string` (bold header, 1–2 words), `description?: string` (body text), `modelValue?: string`, `disabled?: boolean`
+- **Slots**: `#label` (override header text), `#description` (override body text)
+- **Emits**: `update:modelValue: [value: string]`
+- **Layout**: `flex-direction: column` — header section (bold 16px) + divider + body section (14px regular)
+- **Divider**: `box-shadow: 0 Npx 0 0 color` on `.box-input-lg__header` — thickens with state (1px → 2px → 3px) without any layout shift
+- **Default border**: `--color-neutral-85` (#D4D7D9) — slightly darker than XS/SM/MD which use Neutral90
+- **Outer border**: same `inset box-shadow` pattern as other BoxInput sizes (1px neutral-85 → 2px Primary50 → 3px Accessibility80)
+- **`overflow: hidden`** on root clips the inner header shadow to the rounded corners
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, ConditionGroup, PaymentGroup, AllStates
+
+### `BoxInputMD` — `src/components/BoxInputMD/`
+- **Figma**: "Inputs/BoxInputs/Medium" — 86px location/store selection box with rich label layout
+- **Props**: `value: string` (**required**), `name: string` (**required**), `primaryLabel?: string` (bold, always shown), `secondaryLabel?: string`, `tertiaryLabel?: string`, `sideLabel?: string` (right-aligned, e.g. "4 mi"), `modelValue?: string`, `disabled?: boolean`
+- **Slots**: `#secondary-icon` (optional 16×16 icon before secondary text — **only shown in default state**, CSS hides it on hover/selected/focus)
+- **Emits**: `update:modelValue: [value: string]`
+- **Dimensions**: `height: 86px; padding: 24px; min-width: 126px; border-radius: --border-radius-md`
+- **Typography**:
+  - Primary: 16px bold / 24px line-height (`--font-weight-bold`)
+  - Secondary/tertiary: 12px regular / 16px line-height / 0.2px letter-spacing
+  - Side label: `--text-body-sm-size` (14px) / 22px line-height / right-aligned / `width: 77px`
+- **States**: same inset box-shadow pattern as XS/SM (1px neutral → 2px green → 3px blue focus)
+- **Icon hide behaviour**: `.box-input-md:hover`, `.box-input-md--selected`, and `:has(:focus-visible)` all set `.box-input-md__secondary-icon { display: none }`
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, WithSecondaryLabel, WithSecondarySelected, WithAllLines, NoSideLabel, LocationPicker (interactive), AllStates
+
+### `BoxInputSM` — `src/components/BoxInputSM/`
+- **Figma**: "Inputs/BoxInputs/Small" — identical API to BoxInputXS, visual differences only:
+  - Height: **64px** (XS = 48px)
+  - Padding: **24px uniform** (XS = 12px top/bottom, 16px left/right)
+  - Min-width: **140px** (XS = 175px)
+  - Icon left/top offset: **24px** from element edge (XS = 16px)
+- All other props, states, tokens, and patterns are identical to `BoxInputXS`
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, WithIcon, YesNoGroup, TimeSlotGroup, SizeComparison
+
+### `BoxInputXS` — `src/components/BoxInputXS/`
+- **Figma**: "Inputs/BoxInputs/XS" — 48px selection box, pick-one-from-several (styled radio button)
+- **Props**: `value: string` (**required** — this option's value), `name: string` (**required** — radio group name), `label?: string`, `modelValue?: string` (v-model), `disabled?: boolean`
+- **Slots**: `#icon` (optional 16×16 SVG pinned to left edge at `left: 16px`, import with `?raw`)
+- **Emits**: `update:modelValue: [value: string]`
+- **Renders as**: `<label>` wrapping a visually-hidden `<input type="radio">` — fully accessible, native keyboard nav
+- **States** (CSS `:has()` driven from native radio state):
+  - Default: white bg, `inset 0 0 0 1px --color-neutral-90`
+  - Hover: `--color-neutral-95` bg, 1px Neutral90
+  - Selected: white bg, `inset 0 0 0 2px --color-base-primary-50`
+  - Focus: `inset 0 0 0 3px --color-accessibility-80` (uses `:has(.box-input-xs__radio:focus-visible)`)
+- **Dimensions**: `height: 48px; min-width: 175px; border-radius: --border-radius-md (8px); padding: 12px 16px`
+- **Label typography**: `--text-body-lg-size` (16px) / `--text-body-lg-weight` (400) / `--text-body-lg-line-height` (1.5); centered
+- **Usage pattern**: wrap multiple instances in a `<fieldset>` with shared `name` prop + single `v-model`
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, WithIcon, YesNoGroup, TimeSlotGroup, CategoryGroup, AllStates
+
+### `VideoControlButton` — `src/components/VideoControlButton/`
+- **Figma**: "Buttons/VideoControls" — 40×40px circular media control button
+- **Props**: `ariaLabel: string` (**required**), `color?: 'dark' | 'light'` (default `'dark'`), `disabled?: boolean`, `href?: string`, `target?: string`
+- **Slots**: `#icon` (24×24 SVG — import with `?raw`, wrap in `<span v-html="..." style="display:contents">`)
+- **Emits**: `click: [event: MouseEvent]`
+- **Themes**:
+  - `dark`: Default `--color-neutral-20` (#313D47) → Hover/Press/Focus `--color-neutral-0` (#242C33); icon `--color-neutral-100` (white)
+  - `light`: Default `rgba(255,255,255,0.6)` → Hover/Press/Focus `--color-neutral-100` (full white); icon `--color-neutral-0` (dark)
+- **Focus border**: `border: 3px solid transparent` base + `box-sizing: border-box` → focus sets `border-color: --color-accessibility-80` (no layout shift)
+- **Available media icons**: Play, Pause, Stop, Skip-Forward, Skip-Backward, Fullscreen, Exit-Fullscreen, Refresh (all in `icon/Style=Media, Detail=*, Icon=NA.svg`)
+- **Stories**: DarkDefault, DarkHover, DarkPressed, DarkFocus, DarkDisabled, LightDefault, LightHover, LightFocus, AllStates, IconVariety
+
+### `ArrowCircleButton` — `src/components/ArrowCircleButton/`
+- **Figma**: "Buttons/ArrowCircle" — circular navigation/action button designed for image & carousel overlays
+- **Props**: `ariaLabel: string` (**required**), `direction?: 'right' | 'left' | 'expand'` (default `'right'`), `size?: 'sm' | 'lg'` (default `'sm'`), `disabled?: boolean`, `href?: string`, `target?: string`
+- **Emits**: `click: [event: MouseEvent]`
+- **No icon slot** — icons are bundled internally based on `direction` prop (no need for consumers to import SVGs)
+- **Theme is derived automatically** from `size` + `direction` — not a separate prop:
+  - `sm` + `right|left` → "dark": `rgba(36,44,51, 0.3→0.6→0.75)` background, white icon (`--color-neutral-100`)
+  - `sm` + `expand` → "green": Primary50→Primary40→Primary60 on hover/press, white icon
+  - `lg` + `right|left` → "white": `rgba(255,255,255, 0.6)` → full white on hover/press, dark icon (`--color-neutral-0`)
+- **Sizes**: sm = 32×32px circle; lg = 64×64px circle. Icon always 24×24px
+- **Border**: `border: 3px solid transparent` (always reserves focus-ring space, `box-sizing: border-box`). Focus state sets `border-color: --color-accessibility-80` — no layout shift
+- **Icons used**: `icon/Style=Arrows, Detail=Tail, Icon=Right.svg?raw`, `...Left.svg?raw`, `icon/Style=Media, Detail=Expand, Icon=NA.svg?raw`
+- **Stories**: SmallRight, SmallLeft, SmallExpand (+ hover/focus variants), LargeRight, LargeLeft, AllVariants
+
+### `SmallIconButton` — `src/components/SmallIconButton/`
+- **Figma**: "IconButtons/Favorite" (32×32 toggle button)
+- **Props**: `ariaLabel: string` (**required**), `selected?: boolean` (default `false`), `disabled?: boolean`
+- **Slots**: `#icon` (24×24 SVG — full size inside 32px circle)
+- **Emits**: `click: [event: MouseEvent]` — parent is responsible for toggling `selected`
+- **Shape**: Fixed 32×32px circle, `background: --color-neutral-100` (white)
+- **Key difference from other icon buttons**: white background + neutral grey border (NOT Accent blue)
+- **Border**: real `border` (not box-shadow inset) — `box-sizing: border-box` keeps outer size exactly 32px regardless of border-width, so no layout shift. 1px Neutral90 default, 2px Neutral90 hover, 3px Accessibility80 focus
+- **Icon colour via currentColor**:
+  - Unselected: `--color-neutral-70` (grey)
+  - Selected: `--color-base-primary-50` (green)
+  - Hover + selected: `--color-base-primary-55` (lighter green)
+  - Disabled: `--color-neutral-80` + `--opacity-level-medium`
+- **Accessibility**: `ariaLabel` → `aria-label`; `selected` → `aria-pressed` (browser announces both)
+- **Stories**: DefaultUnselected, DefaultSelected, HoverUnselected, HoverSelected, Focus, FocusSelected, Disabled, Interactive, AllStates, IconVariety
+
+### `MediumIconButton` — `src/components/MediumIconButton/`
+- **Figma**: "IconButtons/Calculator" (icon-only circular button)
+- **Props**: `ariaLabel: string` (**required** — no visible text), `href?: string`, `target?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (SVG rendered at 20×20 inside the 40×40 circle)
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided
+- **Shape**: Fixed 40×40px circle (`width: 40px; height: 40px; border-radius: var(--border-radius-pill)`)
+- **Icon size**: 20×20px (not 24×24) — the wrapper shrinks the icon to Figma spec
+- **Color scheme**: Accent (blue) — same as TileCta
+- **States**: same inset box-shadow pattern as TileCta (default=2px Accent40, hover=3px Accent30, active=3px Accent40+Accent90 bg, focus=3px Accessibility80, disabled=SecondaryNeutral90 bg+Neutral70)
+- **Accessibility**: `ariaLabel` prop is always rendered as `aria-label` — mandatory since there is no visible label
+- **Stories**: Default, Hover, Active, Focus, Disabled, AsAnchor, AllStates, IconVariety
+
 ### `TileCta` — `src/components/TileCta/`
 - **Figma**: "IconButtons/SrpTile"
 - **Props**: `label?: string`, `href?: string`, `target?: string`, `disabled?: boolean`
@@ -197,7 +303,10 @@ Breakpoints (JS only — see `breakpoints.ts`): sm=0 md=600 lg=1024 xlg=1440 max
 - Stories co-located in component folder, CSF3 format (`satisfies Meta<typeof Component>`)
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
-- Story titles mirror Figma hierarchy: e.g. `'Components/BaseButton'`
+- Story titles mirror Figma hierarchy and use Storybook folder grouping:
+  - **CTAs** (buttons): `'Components/CTAs/ComponentName'` — BaseButton, LinkCta, IconButton, TileCta, MediumIconButton, SmallIconButton, ArrowCircleButton, VideoControlButton
+  - **BoxInput** (selection boxes): `'Components/BoxInput/SizeName'` — e.g. `'Components/BoxInput/XS'`, `'Components/BoxInput/SM'`
+  - Other components: `'Components/ComponentName'`
 
 ## Figma MCP Workflow
 1. **Select node in Figma** (Figma must be open and the desktop app focused)

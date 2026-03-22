@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import LinkCta from './LinkCta.vue'
 
 const meta = {
-  title: 'Components/LinkCta',
+  title: 'Components/CTAs/LinkCta',
   component: LinkCta,
   tags: ['autodocs'],
   parameters: {

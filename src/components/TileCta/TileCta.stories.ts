@@ -20,7 +20,7 @@ const TestDriveIcon = makeIconSlot(testDriveSvg)
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/TileCta',
+  title: 'Components/CTAs/TileCta',
   component: TileCta,
   tags: ['autodocs'],
   parameters: {
