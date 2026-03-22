@@ -8,19 +8,28 @@ alwaysApply: true
 
 ## Stack
 - **Framework**: Vue 3 with `<script setup>` + TypeScript (Composition API only — no Options API)
-- **Build**: Vite 8, `@vitejs/plugin-vue`
+- **Build**: Vite 8, `@vitejs/plugin-vue`, `vite-svg-loader`
 - **Docs/Testing**: Storybook 10 (`@storybook/vue3-vite`) — addons: docs, a11y (errors on violation), vitest, pseudo-states, Chromatic
 - **Styling**: CSS custom properties in `src/tokens/tokens.css`, scoped `<style>` blocks in SFCs
 - **Token TS wrapper**: `src/tokens/tokens.ts`
 - **Breakpoints**: `src/tokens/breakpoints.ts` (JS constants — CSS vars can't be used in `@media`)
 - **Font**: Roboto via Google Fonts (weights 300/400/500/700) — loaded in `index.html` and `.storybook/preview-head.html`
-- **Path alias**: `@/` → `src/`
+- **Path aliases**: `@/` → `src/`, `@icons/` → `icon/`, `@logos/` → `Logos/`
 
 ## Project Structure
 
 ```
 EPDS/
 ├── index.html                        ← Google Fonts link lives here
+├── icon/                             ← All SVG icons (Figma exports, original names kept)
+│   ├── Style=Account, Detail=..., Icon=NA.svg   ← system icons (24×24, fill=#242C33)
+│   ├── Style=Arrows, Detail=No-Tail, Icon=Right.svg
+│   ├── Icon=Illustrative, Name=*.svg            ← multi-colour illustrative icons
+│   └── Icon Type=Vehicle Descriptors, *.svg     ← vehicle icons (Large/Medium/Small)
+├── Logos/                            ← Brand + 3rd-party logos (multi-colour SVGs)
+│   ├── Color=*.svg                   ← EchoPark brand logo variants
+│   ├── Property 1=*.svg
+│   └── 3rd Party/                   ← Partner/trust logos
 ├── src/
 │   ├── tokens/
 │   │   ├── tokens.css                ← ALL design tokens (source of truth)
@@ -31,6 +40,10 @@ EPDS/
 │   │       ├── ComponentName.vue
 │   │       ├── ComponentName.stories.ts
 │   │       └── index.ts
+│   ├── stories/                      ← Foundation/asset gallery stories
+│   │   ├── Icons.stories.ts
+│   │   └── Logos.stories.ts
+│   ├── vite-env.d.ts                 ← SVG import type declarations
 │   ├── App.vue
 │   ├── main.ts                       ← imports tokens.css + style.css
 │   └── style.css                     ← global resets only
@@ -43,6 +56,31 @@ EPDS/
 
 ## Components Built
 
+### `TileCta` — `src/components/TileCta/`
+- **Figma**: "IconButtons/SrpTile"
+- **Props**: `label?: string`, `href?: string`, `target?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (leading 24×24 SVG), default (label text)
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided
+- **Dimensions**: height 40px, `border-radius: var(--border-radius-pill)`, gap 8px, padding 0 12px
+- **Color scheme**: Accent (blue) — NOT primary green
+- **Base**: `border: 3px solid transparent` (space reserved) + `box-shadow: inset 0 0 0 2px --color-accent-40` for layout-stable 2px border
+- **States**: default=Accent40 2px border, hover=Accent30 3px border+text, active=Accent40 3px border+Accent90 bg, focus=Accessibility80 3px border, disabled=SecondaryNeutral90 bg+Neutral70 text
+- **Icon colour**: `.tile-cta__icon :deep(path/circle/rect/polygon) { fill: currentColor }` — inherits all state colour changes automatically
+- **Stories**: Default, Hover, Active, Focus, Disabled, AsAnchor, NoIcon, AllStates
+
+### `IconButton` — `src/components/IconButton/`
+- **Figma**: "IconButtons/SignIn"
+- **Props**: `label?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (leading 24×24 SVG — import from `@icons/` using `?component`), default (label text)
+- **Icon colour**: `.icon-button__icon :deep(path/circle/rect/polygon) { fill: currentColor }` in scoped CSS ensures the slotted SVG inherits the button colour automatically
+- **Always**: small (40px), primary green — no variant/size/theme props
+- **Layout**: `gap: 8px`, `padding: 4px 16px`, `border-radius: var(--border-radius-pill)`
+- **States**: default=Primary50, hover=Primary40+underline, pressed=Primary55, focus=3px Accessibility80 border, disabled=SecondaryNeutral90 bg + Neutral70 text
+- **Focus**: `border: 3px solid transparent` base, `border-color: --color-accessibility-80` on focus-visible (same overflow-clip technique as BaseButton primary)
+- **Key tokens**: `--color-base-primary-40/50/55`, `--color-accessibility-80`, `--color-neutral-secondary-90`, `--color-neutral-70/100`
+- **Stories**: Default, Hover, Active, Focus, Disabled, NoIcon, AllStates
+
 ### `LinkCta` — `src/components/LinkCta/`
 - **Figma**: "CommonInputs/TextLink" (light), "CommonInputs/TextLink Dark" (dark)
 - **Props**: `label?: string`, `arrow?: boolean` (default `false`), `theme?: 'light' | 'dark'` (default `'light'`), `href?: string`, `target?: string`, `disabled?: boolean`
@@ -52,7 +90,7 @@ EPDS/
 - **Dark states**: default/hover/focus = Accent80; pressed = Accent90; hover/pressed add underline
 - **Focus ring**: 3px solid Accessibility80, outline-offset 2px, border-radius 2px (rectangular per Figma)
 - **Disabled**: opacity `--opacity-level-medium` (32%), pointer-events none
-- **Arrow icon**: inline SVG chevron-right (24×24, `currentColor`), Figma: "Icon/System/Arrows-No Tail/Right"
+- **Arrow icon**: imported from `@icons/Style=Arrows, Detail=No-Tail, Icon=Right.svg?component` — `.link-cta__arrow :deep(path) { fill: currentColor }` makes it inherit the link colour
 - **Stories**: full Light×arrow×state + Dark×arrow×state coverage + AsAnchor + AllVariants
 - **Key tokens**: `--color-accent-30/40/80/90`, `--color-accessibility-80`, `--opacity-level-medium`, `--font-*-btn`
 
@@ -180,6 +218,34 @@ Breakpoints (JS only — see `breakpoints.ts`): sm=0 md=600 lg=1024 xlg=1440 max
 - Props: camelCase; emits: camelCase (`"update:modelValue"`, `"click"`, `"dismiss"`)
 - CSS custom properties: kebab-case matching Figma variable name pattern (see mapping above)
 - Story titles: `'Components/GroupName/ComponentName'`
+
+## Icon & Logo System
+
+### SVG loader setup
+- **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — imported in `vite.config.ts`
+- **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`
+- **Types**: `src/vite-env.d.ts` declares `*.svg?component` (Vue component) and `*.svg?url` (string URL)
+
+### System icons (`icon/Style=*.svg`)
+- 24×24, single-colour `fill="#242C33"`, always imported with `?component` query
+- Filenames: `Style=<Category>, Detail=<Name>, Icon=<Variant>.svg` (original Figma export names, keep as-is)
+- **In components that need colour inheritance**: use CSS `:deep()` combinator to override fill:
+  ```css
+  .my-wrapper :deep(path) { fill: currentColor; }
+  ```
+- **Gallery story**: `src/stories/Icons.stories.ts` (`Foundations/Icons`)
+
+### Illustrative icons (`icon/Icon=Illustrative, Name=*.svg`)
+- Multi-colour, used at larger display sizes — do NOT attempt to override colours
+
+### Vehicle Descriptor icons (`icon/Icon Type=Vehicle Descriptors, *.svg`)
+- Three size variants: Large (48px), Medium (32px), Small (16px)
+
+### Logos (`Logos/`)
+- Always import with `?url` to preserve multi-colour fills: `import epLogo from '@logos/Color=Default.svg?url'`
+- Use in `<img src="epLogo" alt="EchoPark" />` — NEVER as inline Vue component
+- **Gallery story**: `src/stories/Logos.stories.ts` (`Foundations/Logos`)
+- Subdirectory `Logos/3rd Party/` contains partner/trust badge logos (same `?url` approach)
 
 ## Accessibility
 - Semantic HTML first; ARIA only when native semantics are insufficient

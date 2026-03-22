@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import arrowRightSvg from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Right.svg?raw'
+
 withDefaults(defineProps<{
   /**
    * Link label text. Alternatively use the default slot.
@@ -49,23 +51,12 @@ defineEmits<{
       <slot>{{ label }}</slot>
     </span>
 
-    <svg
+    <span
       v-if="arrow"
       class="link-cta__arrow"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
       aria-hidden="true"
-    >
-      <path
-        d="M9.5 6l6 6-6 6"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+      v-html="arrowRightSvg"
+    />
   </component>
 </template>
 
@@ -136,5 +127,9 @@ defineEmits<{
 /* ─── Arrow icon ───────────────────────────────────────── */
 .link-cta__arrow {
   flex-shrink: 0;
+}
+
+.link-cta__arrow :deep(path) {
+  fill: currentColor;
 }
 </style>
