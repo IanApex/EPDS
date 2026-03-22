@@ -56,6 +56,108 @@ EPDS/
 
 ## Components Built
 
+### `ModalTabs` — `src/components/ModalTabs/`
+- **Figma**: "Navigation/ModalTabs" — horizontal tabs for modals and slide-in panels only (not used standalone on pages)
+- **Props**: `tabs: ModalTab[]` (**required**, `{ id, label }`), `modelValue?: string`, `showSeparator?: boolean` (default `true`)
+- **Emits**: `update:modelValue: [id: string]`
+- **Slot**: `#default="{ activeId }"` — parent shows/hides content with `v-show`
+- **Auto-select**: emits first tab's id on `onMounted` if `modelValue` is empty
+- **Keyboard**: roving tabindex; Left/Right arrows cycle between tabs
+- **Accessibility**: `role="tablist"` on bar, `role="tab"` on buttons, `aria-selected`, `role="tabpanel"` on content
+- **Tab anatomy**: `height: 34px` (16px label + 16px gap + 2px bar). `padding-right: 24px` creates spacing between tabs. Active indicator bar is `::after`, absolutely at `bottom: 0; right: 24px` so height transitions never shift layout.
+- **Bar states**: no bar (default) → 1px (hover inactive) → 2px (active) → 3px (active+hover). All `--color-accent-40`.
+- **Focus**: 2px `--color-accessibility-80` outline
+- **Separator**: 1px `--color-neutral-80` line below tab bar — always shown in modal context
+- **Overflow**: horizontal scroll on `.modal-tabs__bar`; right-edge white gradient fade via `.modal-tabs__fade` overlay
+- **Usage rules** (Figma): max one tab active; first tab auto-selected; tabs only change content below (header stays static); tabs must be parallel in nature (use different pattern for dissimilar navigation)
+- **Stories**: FeaturesAndSpecs, FirstTabAutoSelected, ManyTabsScrollable, TabBarOnly, NoSeparator, AllStates
+
+### `LogicSelector` — `src/components/LogicSelector/`
+- **Figma**: "Inputs/LogicSelectors" — compact inline single-choice picker that drives form logic (shows/hides fields)
+- **Props**: `options: LogicSelectorOption[]` (**required**, `{ value, label }`), `name: string` (**required**), `modelValue?: string`, `disabled?: boolean`, `error?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Key UX rules**: No default selection on load (user must choose). State persists when user returns to the step. No "Continue" button needed.
+- **Layout**: `inline-flex; flex-direction: column; gap: 4px`. Chip row uses `flex-wrap: wrap` so chips stack vertically on mobile. 8px gap between chips.
+- **Chip size**: `height: 44px`, `padding: 8px 12px`, `border-radius: 4px`
+- **Font**: Body SM (14px / 22px line-height, 400 weight)
+- **Hidden radio inputs** for accessibility (`role="group"` on container)
+- **States** (all via inset `box-shadow` — no layout shift):
+  - Unselected: white bg, 1px `--color-neutral-85` border, `--color-neutral-40` text
+  - Hover (unselected): `--color-neutral-90` bg, same border, same text + underline
+  - Selected: `--color-neutral-20` bg (#313D47), same 1px border (subtle highlight), white text
+  - Focus: 2px `#6fcfff` (Blue80) border on whichever chip has keyboard focus
+  - Disabled: `opacity: --opacity-level-medium; pointer-events: none` on container
+- **Error**: 12px `--color-warning-40` text below chip row, 4px gap (via `gap: 4px` on container)
+- **Stories**: Default, WithSelection, HoverState, FocusState, ErrorState, Disabled, AllStates, DrivesFormFields, TradeIn, PaymentType, MobileWrapping
+
+### `JourneySelector` — `src/components/JourneySelector/`
+- **Figma**: "Inputs/JourneySelectors" — one-click card that immediately routes the user into a flow
+- **Props**: `label: string` (**required**), `selected?: boolean`, `disabled?: boolean`, `href?: string`, `target?: string`
+- **Slots**: `#icon` — 24×24 SVG imported with `?raw` and wrapped in `<span v-html="..." style="display:contents" />`
+- **Emits**: `select: [event: MouseEvent]`
+- **Size**: `90px` height, `min-width: 120px`, `padding: 12px 16px`; use `style="flex:1"` on each card to fill equal widths in a flex container
+- **Usage**: 2–4 cards side-by-side in a flex row with `gap: 16px`. Parent manages `selected` state. **No "Continue" button** needed.
+- **UX guideline**: Allow a ~5-second delay in the parent between `select` emit and page navigation so the selected state is visible before the view changes.
+- **Background**: always `--color-accent-90` (#E6F1F5 blue tint)
+- **States** (all via CSS — inset box-shadow, no layout shift):
+  - Default: 1px `--color-accent-40` border, `--color-accent-40` text/icon
+  - Hover: 2px `--color-accent-40` border, `--color-accent-85` bg, `--color-accent-30` text, underline
+  - Selected: 2px `--color-accent-30` border, `--color-accent-30` text
+  - Focus: 3px `--color-accessibility-80` border
+  - Disabled: `opacity: --opacity-level-medium`, `pointer-events: none`
+- **Stories**: Default, Hover, Selected, Focus, Disabled, AllStates, TwoOptions, ThreeOptions, FourOptions, PaymentPaths
+
+### `SelectDropdown` — `src/components/SelectDropdown/`
+- **Figma**: "Inputs/Dropdowns" — underline-style native select with floating label
+- **Props**: `label: string` (**required**), `options: SelectOption[]` (**required**, `{ value, label }`), `modelValue?: string`, `theme?: 'light' | 'dark'`, `disabled?: boolean`, `error?: string`, `name?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Architecture**: Uses the device's **native `<select>`** element (`appearance: none`) per Figma build guideline ("Clicking the form will open that device's native menu/list")
+- **Floating label**: Sits at input text level when empty (acts as grey placeholder); floats 12px above the control when a value is selected (`hasValue` computed). CSS `transition` animates the movement.
+- **Underline only** — no box border. 2px line at bottom of the 34px control area.
+- **Fixed control height**: 34px regardless of state or error. Error text is `position: absolute; top: 38px` so it never shifts layout.
+- **Chevron**: `icon/Style=Arrows, Detail=No-Tail, Icon=Down.svg?raw` rendered with `v-html`, `fill: currentColor` via `:deep(path)`
+- **States**: Default (empty), Filled (has value), Focused (Accessibility80 line), Disabled, Error
+- **Light theme colors**: label grey=Neutral40 → float to Neutral70; value text Neutral0; line Neutral80; error `--color-warning-40` (#B30715)
+- **Dark theme colors**: label/line Neutral85; value text white; focused line Accessibility80; error `#fa848e`; disabled hides the line entirely
+- **Stories**: LightDefault, LightFilled, LightError, LightFilledError, LightDisabledFilled, DarkDefault, DarkFilled, DarkError, DarkDisabledFilled, AllStatesLight, AllStatesDark, WidthVariants, Interactive
+
+### `BaseCheckbox` — `src/components/BaseCheckbox/`
+- **Figma**: "Inputs/Checkboxes"
+- **Props**: `label?: string`, `modelValue?: boolean`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Renders as**: `<label>` wrapping a visually-hidden `<input type="checkbox">` + custom `.checkbox__box` span + `.checkbox__label` span
+- **Box**: 24×24px, `border-radius: 4px`, `box-sizing: border-box` (outer size constant despite border changes)
+- **Check icon**: `icon/Style=Display, Detail=Default, Icon=Check-Small.svg?raw` rendered via `v-html` inside `.checkbox__check`; `opacity: 0` by default, `opacity: 1` when `:checked`
+- **9 states**:
+  - Default: 2px Neutral0 border, white bg
+  - Hover: 3px Neutral0 border, label underline
+  - Pressed: 3px border + 14×14 Primary50 `::before` inner fill, label underline
+  - Focus: 2px Accessibility80 border
+  - Selected: Primary50 bg + white check
+  - Hover Selected: Primary40 bg + white check, label underline
+  - Focus Selected: Primary50 bg + `box-shadow: inset 0 0 0 2px --color-accessibility-80`
+  - Disabled: `opacity: --opacity-level-medium`; Neutral85 border
+  - Disabled Selected: Neutral85 bg + Neutral85 border + white check; opacity medium
+- **Build guidelines**: 12px gap (box ↔ label, built-in); 16px gap between list items (add `gap: 16px` to wrapper); long labels wrap and align under first line (box top-aligned via `align-items: flex-start`)
+- **Stories**: Default, Hover, Pressed, Focus, Selected, HoverSelected, FocusSelected, Disabled, DisabledSelected, AllStates, LongLabel, CheckboxList, MixedList
+
+### `BoxSelector` — `src/components/BoxSelector/`
+- **Figma**: "Inputs/Box Selectors/Sets" — segmented radio control for 2–4 closely related options
+- **Props**: `options: BoxSelectorOption[]` (**required**, 2–4 items `{ value, label }`), `name: string` (**required**), `modelValue?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: string]`
+- **Structure**: Container (`280px`, `border-radius: 4px`, `padding: 1px`, `bg: --color-neutral-85`, `overflow: hidden`) wraps chips with `gap: 1px` — the Neutral85 background *is* the 1px divider between chips
+- **Chip states**:
+  - Unselected: `bg: --color-neutral-100` (white), `color: --color-neutral-40`, regular weight
+  - Hover: `bg: --color-neutral-40`, white text, regular, **underline**
+  - Pressed/Active: `bg: --color-neutral-20` (dark), white text, regular, **underline**
+  - Selected: `bg: --color-neutral-20` (dark), white text, **bold** (no underline)
+  - Focus Selected: same as Selected + `box-shadow: inset 0 0 0 3px --color-accessibility-80`
+- **Chip dimensions**: `height: 42px`, `flex: 1 0 0`, `min-width: 68px`, `max-width: 140px`, `padding: 8px`
+- **Corner radius**: First chip `border-radius: 3px 0 0 3px`; last chip `border-radius: 0 3px 3px 0`
+- **Accessibility**: `role="radiogroup"` on container; hidden `<input type="radio">` per chip; `focus-visible` outline via `:has()`
+- **Typography**: 14px / 22px line-height; selected = `--font-weight-bold`, unselected = `--font-weight-regular`
+- **Stories**: TwoOptions, ThreeOptions, FourOptions, NoneSelected, Disabled, YesNo, VehicleCondition, PriceRange, TransmissionType, AllCounts
+
 ### `BoxInputLG` — `src/components/BoxInputLG/`
 - **Figma**: "Inputs/BoxInputs/Large" — 132px vertical card-style selection box
 - **Props**: `value: string` (**required**), `name: string` (**required**), `label?: string` (bold header, 1–2 words), `description?: string` (body text), `modelValue?: string`, `disabled?: boolean`
