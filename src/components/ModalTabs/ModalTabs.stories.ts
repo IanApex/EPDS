@@ -1,3 +1,7 @@
+// TODO: revisit the modal shell used in these stories (header, close button,
+// padding, border-radius, shadow) once the Modal component is built — replace
+// the hand-rolled div wrappers here with the real Modal component.
+
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import ModalTabs from './ModalTabs.vue'
