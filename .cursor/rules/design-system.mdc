@@ -56,6 +56,73 @@ EPDS/
 
 ## Components Built
 
+### `TextBoxSM` — `src/components/TextBoxSM/`
+- **Figma**: "Inputs/TextBoxSM" — single-line numeric/text input; 44px fixed height; ideal for price, payment, mileage entries
+- **Props**: `label: string` (**required**), `modelValue?: string`, `prefix?: string` (left symbol, e.g. `$`), `suffix?: string` (right unit, e.g. `mi`), `name?: string`, `type?: string` (default `text`), `inputmode?: string`, `maxlength?: number`, `disabled?: boolean`, `error?: string`, `autocomplete?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Anatomy**: 44px bordered box (`border-radius: 8px`, 2px border) · optional prefix span (Neutral40) · `<input>` flex-1 · optional suffix span (Neutral40) · floating label above · error below
+- **Border**: 2px `--color-neutral-85` default → `--color-accent-30` focused → `--color-warning-50` error
+- **Label**: `position: absolute; top: -20px; left: 0; font-size: 12px; letter-spacing: 0.2px; color: --color-neutral-40`; `opacity: 0` in empty+unfocused state, `opacity: 1` when focused or has value
+- **Placeholder**: `label` prop text, `--color-neutral-40` color — acts as visual label inside when unfocused/empty
+- **Input text**: 16px Roboto Regular `--color-neutral-0`, `text-align: right`; prefix/suffix always `--color-neutral-40`
+- **Error**: `position: absolute; top: 48px; left: 0; font-size: 12px; --color-warning-50`
+- **Disabled**: no "disabled filled" visual state — disabled prop applies `opacity: --opacity-level-medium` to the control
+- **Build notes**: Decimal commas auto-applied on 4/6-digit numbers (handled by consumer, not the component). 6-digit char max for numerics — pass `maxlength="6"`.
+- **Stories**: Default, Focused, Filled, WithPrefix, WithPrefixFilled, WithSuffix, DisabledFilled, WithError, AllStates, Interactive, NumericUseCases
+
+### `TextBoxLG` — `src/components/TextBoxLG/`
+- **Figma**: "Inputs/TextBoxLG" — multi-line textarea; 140px fixed height; ideal for open-ended text (experience, reviews)
+- **Props**: `label: string` (**required**), `modelValue?: string`, `name?: string`, `maxlength?: number` (default 500), `disabled?: boolean`, `error?: string`, `autocomplete?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Anatomy**: 140px bordered box (`border-radius: 8px`, 2px border, `padding: 16px`) · `<textarea>` fill · floating label above · footer row (error left + counter right)
+- **Border**: same as TextBoxSM
+- **Label**: same as TextBoxSM
+- **Textarea**: `resize: none`, `overflow-y: auto` (scroll appears after ~7 lines), 16px/20px Roboto Regular `--color-neutral-0`
+- **Character counter**: shown at bottom-right when focused; format `X/maxlength`; turns `--color-warning-50` at limit; stops typing at `maxlength`
+- **Error**: shown bottom-left; sits in the same footer row as counter, both at `margin-top: 4px`
+- **Disabled filled**: apply `opacity: --opacity-level-medium` on the control; `cursor: not-allowed`
+- **Stories**: Default, Filled, DisabledFilled, WithError, AllStates, Interactive, AtCharacterLimit, SideBySide
+
+### `BaseSlider` — `src/components/BaseSlider/`
+- **Figma**: "Inputs/Slider" — two variants: single-thumb (max only) and dual-thumb (range/min-max)
+- **Props**: `modelValue?: number` (single, v-model), `minValue?: number` / `maxValue?: number` (range, v-model:minValue / v-model:maxValue), `min?: number` (default 0), `max: number` (**required**), `step?: number` (default 1), `range?: boolean` (default false), `trackMinLabel?: string`, `trackMaxLabel?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue`, `update:minValue`, `update:maxValue`
+- **Track**: 4px height, `--color-neutral-80` unfilled, `--color-neutral-20` filled, 11px border-radius. Rendered as a custom div (not the native track) for full cross-browser control.
+- **Thumb**: 24×24px solid `--color-neutral-20` circle; `cursor: grab` on hover, `cursor: grabbing` on active; focus ring `box-shadow: 0 0 0 2px --color-accessibility-80`
+- **Labels below track**: 14px/22px Roboto Regular `--color-neutral-40`; `8px gap` from track area to labels
+- **Parent spacing**: parent should add `16px` gap between the companion label/input row and this component
+- **Range fill**: single = `left:0, width: singlePercent%`; range = `left: minPercent%, width: (maxPercent - minPercent)%`
+- **Dual-thumb overlap fix**: min input gets `z-index: 3` when `minPercent > 95%` so it remains reachable
+- **Usage rules**: always pair with a label + value input above (never standalone); step and range determined per use-case by designer
+- **Stories**: SingleDefault, SingleMidValue, SingleAtMax, SingleDisabled, RangeDefault, RangeMidValues, RangeDisabled, InteractiveSingle, InteractiveRange, InteractiveMonthlyPayment, InteractiveDownPayment, BothTypes
+
+### `SegmentedControl` — `src/components/SegmentedControl/`
+- **Figma**: "Inputs/SegmentedControl" — pill-shaped track of 2–3 mutually exclusive options for view/filter switching
+- **Props**: `options: SegmentedControlOption[]` (**required**, `{ value, label }`), `name: string` (**required**), `modelValue?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: string]`
+- **Auto-select**: emits `options[0].value` on `onMounted` if `modelValue` is empty (Figma: "first chip always auto-selected on page arrival")
+- **Container**: `height: 38px`, `padding: 4px`, `border-radius: 42px`, `border: 1px solid --color-neutral-85`, `background: --color-neutral-100`, `gap: 1px` between chips
+- **Chip**: `height: 30px`, `padding: 8px 16px`, `border-radius: 69px`, 14px/500 Roboto text
+- **Chip states**: Default (no fill, Neutral0 text) → Hover (Neutral90 fill) → Selected (Primary50 fill, white text) → Focus (Selected + `box-shadow: 0 0 0 2px --color-accessibility-80`)
+- **Accessibility**: visually hidden `<input type="radio">`, `:has(:focus-visible)` for focus ring, `role="group"` on container
+- **Usage rules**: max 3 options; always one selected; never use for dissimilar actions (use tabs or separate buttons instead)
+- **Stories**: TwoOptions, TwoOptionsSecond, ThreeOptions, ThreeOptionsMiddle, Disabled, AllChipStates, Interactive, AutoSelect, SRPSortFilter
+
+### `BaseRadio` — `src/components/BaseRadio/`
+- **Figma**: "Inputs/RadioButton" — single radio button; compose multiples into a group with a shared `name`
+- **Props**: `value: string` (**required**), `name: string` (**required**), `modelValue?: string`, `label?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: string]`
+- **Anatomy**: 24×24px circle (outer ring) + 12×12px inner dot (shown when checked) + optional label text. Gap circle↔label: 12px.
+- **List spacing**: 16px `gap` between radio items in a group.
+- **Outer ring states**: Default 2px `--color-neutral-40` → Hover(unselected) 3px `--color-neutral-40` → Checked 2px `--color-base-primary-50` → Hover+Checked 2px `--color-base-primary-40` → Disabled 2px `--color-neutral-85`
+- **Inner dot**: `--color-base-primary-50` (checked), `--color-neutral-85` (disabled+checked), hidden otherwise. Scale-in transition (0→1) on check.
+- **Focus**: `box-shadow: 0 0 0 2px --color-accessibility-80` on the circle (2px outside ring per Figma)
+- **Hover text**: `text-decoration: underline` on label in hover state (both checked and unchecked)
+- **Disabled**: `opacity: --opacity-level-medium`; never remove from DOM
+- **Accessibility**: visually hidden `<input type="radio">` provides all semantics; parent should wrap group in `role="radiogroup"` with an `aria-label`
+- **Label wrapping**: `align-items: flex-start` on the wrapper — long labels wrap and indent under the first character, not under the circle
+- **Stories**: Default, Selected, Disabled, DisabledSelected, NoLabel, AllStates, RadioGroup, TwoColumn, LongLabel, WithDefaultSelection
+
 ### `ModalTabs` — `src/components/ModalTabs/`
 - **Figma**: "Navigation/ModalTabs" — horizontal tabs for modals and slide-in panels only (not used standalone on pages)
 - **Props**: `tabs: ModalTab[]` (**required**, `{ id, label }`), `modelValue?: string`, `showSeparator?: boolean` (default `true`)
