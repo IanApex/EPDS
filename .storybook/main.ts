@@ -13,7 +13,6 @@ const config: StorybookConfig = {
   ],
   addons: [
     '@chromatic-com/storybook',
-    '@storybook/addon-vitest',
     '@storybook/addon-a11y',
     '@storybook/addon-docs',
     '@storybook/addon-onboarding',
@@ -23,6 +22,7 @@ const config: StorybookConfig = {
   async viteFinal(config) {
     const { mergeConfig } = await import('vite');
     return mergeConfig(config, {
+      base: process.env.STORYBOOK_BASE || '/',
       resolve: {
         alias: {
           '@icons': path.resolve(dirname, '../icon'),
