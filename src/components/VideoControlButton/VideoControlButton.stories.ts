@@ -24,7 +24,7 @@ function iconSlot(svg: string) {
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/CTAs/VideoControlButton',
+  title: 'Components/Buttons/VideoControlButton',
   component: VideoControlButton,
   tags: ['autodocs'],
   parameters: {

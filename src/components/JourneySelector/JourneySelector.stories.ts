@@ -10,7 +10,7 @@ import cardSvg     from '../../../icon/Style=Finance, Detail=Payment, Icon=Card-
 import bankSvg     from '../../../icon/Style=Finance, Detail=Payment, Icon=Bank.svg?raw'
 
 const meta: Meta<typeof JourneySelector> = {
-  title: 'Components/JourneySelector',
+  title: 'Components/Buttons/JourneySelector',
   component: JourneySelector,
   parameters: {
     backgrounds: { default: 'light' },

@@ -291,9 +291,11 @@ Breakpoints (JS only — `breakpoints.ts`): sm=0 md=600 lg=1024 xlg=1440 max=192
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
 - Story title grouping:
-  - **CTAs** (buttons): `'Components/CTAs/ComponentName'`
-  - **BoxInput**: `'Components/BoxInput/SizeName'` (e.g. `'Components/BoxInput/XS'`)
-  - Other components: `'Components/ComponentName'`
+  - **Buttons**: `'Components/Buttons/ComponentName'` — all button/CTA/link components + JourneySelector
+  - **Inputs**: `'Components/Inputs/ComponentName'` — all form controls (checkbox, toggle, radio, slider, selectors, text inputs, dropdowns)
+  - **Box Inputs** (sub-group): `'Components/Inputs/Box Input/SizeName'` (e.g. `'Components/Inputs/Box Input/XS'`)
+  - **Navigation**: `'Components/Navigation/ComponentName'` — ModalTabs and future nav components
+  - **Foundations**: `'Foundations/ComponentName'` — Icons, Logos
 
 ## Icon & Logo System
 

@@ -5,7 +5,7 @@ import BaseCheckbox from './BaseCheckbox.vue'
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/BaseCheckbox',
+  title: 'Components/Inputs/BaseCheckbox',
   component: BaseCheckbox,
   tags: ['autodocs'],
   parameters: {

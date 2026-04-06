@@ -17,7 +17,7 @@ const CalculatorIcon = makeIconSlot(calculatorSvg)
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/CTAs/MediumIconButton',
+  title: 'Components/Buttons/MediumIconButton',
   component: MediumIconButton,
   tags: ['autodocs'],
   parameters: {

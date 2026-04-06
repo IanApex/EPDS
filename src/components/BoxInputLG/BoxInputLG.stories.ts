@@ -5,7 +5,7 @@ import BoxInputLG from './BoxInputLG.vue'
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/BoxInput/LG',
+  title: 'Components/Inputs/Box Input/LG',
   component: BoxInputLG,
   tags: ['autodocs'],
   parameters: {

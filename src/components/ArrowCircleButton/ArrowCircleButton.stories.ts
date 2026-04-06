@@ -4,7 +4,7 @@ import ArrowCircleButton from './ArrowCircleButton.vue'
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/CTAs/ArrowCircleButton',
+  title: 'Components/Buttons/ArrowCircleButton',
   component: ArrowCircleButton,
   tags: ['autodocs'],
   parameters: {

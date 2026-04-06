@@ -5,7 +5,7 @@ import BaseToggle from './BaseToggle.vue'
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/BaseToggle',
+  title: 'Components/Inputs/BaseToggle',
   component: BaseToggle,
   tags: ['autodocs'],
   parameters: {

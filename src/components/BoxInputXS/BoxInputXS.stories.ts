@@ -8,7 +8,7 @@ import calendarSvg from '../../../icon/Style=Location, Detail=Calendar, Icon=NA.
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/BoxInput/XS',
+  title: 'Components/Inputs/Box Input/XS',
   component: BoxInputXS,
   tags: ['autodocs'],
   parameters: {

@@ -7,7 +7,7 @@ const props = withDefaults(
     modelValue?: string
     name?: string
     type?: string
-    inputmode?: string
+    inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'
     maxlength?: number
     disabled?: boolean
     error?: string
