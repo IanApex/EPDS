@@ -211,6 +211,19 @@ EPDS/
 - **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text
 - **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
 
+### `BaseAccordion` — `src/components/BaseAccordion/`
+- **Figma**: "Components/Accordion" — expandable disclosure with animated expand/collapse
+- **Props**: `label: string` (**required**), `size?: 'sm' | 'lg'` (default `'sm'`), `modelValue?: boolean`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Sizes**: `sm` = 16px Light label, 12px gap to body; `lg` = 22px Light (H5) label, 24px gap to body
+- **Padding**: 24px all sides (`--spacing-xxs`); border: 1px `--color-neutral-85`; radius: `--border-radius-lg` (16px)
+- **Chevron**: Down arrow rotates 180° when open; 0.25s ease transition
+- **Body**: slides in with height animation (0 → scrollHeight → auto), 0.25s ease
+- **Hover**: border transitions to `--color-neutral-80`
+- **Focus**: `outline: 2px solid --color-accessibility-80` on trigger
+- **Rules**: allow multiple items open simultaneously; do not nest; entire header row is clickable
+- **Uncontrolled mode**: works without v-model (internal state); pass v-model to control externally
+
 ### `BaseModal` — `src/components/BaseModal/`
 - **Figma**: "UI Components/Modal base" — full-screen overlay dialog
 - **Props**: `modelValue: boolean` (**required**, v-model), `size?: 'sm' | 'lg'` (default `'lg'`), `theme?: 'light' | 'dark'` (default `'light'`), `ariaLabel?: string`
