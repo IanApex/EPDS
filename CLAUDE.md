@@ -211,6 +211,23 @@ EPDS/
 - **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text
 - **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
 
+### `BaseModal` — `src/components/BaseModal/`
+- **Figma**: "UI Components/Modal base" — full-screen overlay dialog
+- **Props**: `modelValue: boolean` (**required**, v-model), `size?: 'sm' | 'lg'` (default `'lg'`), `theme?: 'light' | 'dark'` (default `'light'`), `ariaLabel?: string`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Sizes**: `sm` = 500px max-width, `lg` = 800px max-width
+- **Themes**: light = `--color-neutral-100` bg; dark = `--color-neutral-20` bg
+- **Overlay**: `rgba(36,44,51,0.5)` fixed backdrop; click-outside closes
+- **Behaviour**: ESC closes, body scroll locked while open, Teleport to `<body>`
+- **Content padding**: `--spacing-xxs` (24px) built in; `border-radius: --border-radius-lg` (16px)
+
+### `BaseCard` — `src/components/BaseCard/`
+- **Figma**: "UI Components/Card base" — structured content container
+- **Props**: `size?: 'min' | 'max'` (default `'min'`)
+- **Sizes**: `min` = 280px wide, `max` = 420px wide; height always content-driven
+- **Visual**: white bg, 1px `--color-neutral-90` border, `border-radius: --border-radius-md` (8px), `overflow: hidden`
+- **Content padding**: `--spacing-xxs` (24px) built in on all sides
+
 ### `BaseToggle` — `src/components/BaseToggle/`
 - **Figma**: "Inputs/Toggle" — 48×28px pill switch; immediate-effect setting control
 - **Props**: `modelValue?: boolean`, `disabled?: boolean`, `label?: string`, `name?: string`
