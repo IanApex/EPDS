@@ -264,6 +264,20 @@ EPDS/
 ### `TextField` — `src/components/TextField/`
 - Most recently added component (see latest commit)
 
+### `ContentTile` — `src/components/ContentTile/`
+- **Figma**: "Content Tiles" — marketing tiles and banners with decorative circular image
+- **Props**: `heading: string` (**required**), `body?: string`, `type?: 'tile' | 'banner'` (default `'tile'`), `size?: 'sm' | 'md' | 'lg' | 'xl'` (default `'lg'`; `xl` banner only), `imageLocation?: 'top' | 'bottom'` (default `'top'`), `imageUrl?: string`, `linkLabel?: string`, `linkHref?: string`, `linkTarget?: string`
+- **Tile sizes**: sm=280px, md=327px, lg=420px; always 460px tall
+- **Banner sizes**: sm=280px, md=327px, lg=420px (196px tall); xl=690px (106px tall, row layout)
+- **Heading**: tiles use H2 (42px Light, `--color-neutral-20`); banners use H5 (22px Light)
+- **Body**: 14px Regular, `--color-neutral-0`
+- **Decorative circle**: absolutely positioned, `overflow: hidden`, `border-radius: 50%`. Tiles: 308px; banners sm/md/lg: 191px; banner xl: 124px. Shows `--color-neutral-90` placeholder if no `imageUrl`.
+- **Tile circle position**: `left: 136px`; top → `top: -87px`; bottom → `bottom: -78px`
+- **Banner sm/md/lg circle**: `right: -16px`; bottom → `bottom: -133px`; top → `top: -133px`
+- **Banner XL circle**: `left: -62px; top: -9px`; card has extra 80px left padding
+- **XL banner layout**: row — text column takes `flex: 1`, LinkCta is fixed to the right
+- **Reuses**: `LinkCta` component (with `arrow: true`, `theme: 'light'`)
+
 ## Token Reference
 
 ### Figma variable name → CSS custom property convention
