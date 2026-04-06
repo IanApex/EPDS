@@ -15,6 +15,7 @@ const config: StorybookConfig = {
     '@chromatic-com/storybook',
     '@storybook/addon-a11y',
     '@storybook/addon-docs',
+    '@storybook/addon-onboarding',
     'storybook-addon-pseudo-states',
   ],
   framework: '@storybook/vue3-vite',
