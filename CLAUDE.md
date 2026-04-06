@@ -211,6 +211,16 @@ EPDS/
 - **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text
 - **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
 
+### `BaseToggle` — `src/components/BaseToggle/`
+- **Figma**: "Inputs/Toggle" — 48×28px pill switch; immediate-effect setting control
+- **Props**: `modelValue?: boolean`, `disabled?: boolean`, `label?: string`, `name?: string`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Track**: 48×28px, `border-radius: 18px` — Off: `--color-neutral-70` → On: `--color-base-primary-55`
+- **Thumb**: 24×24px white circle; slides `left: 2px` (off) → `left: 22px` (on) via CSS transition
+- **Check icon**: `Check-Small.svg?raw` shown in thumb when on, colour `--color-base-primary-55`
+- **Focus ring**: `box-shadow: 0 0 0 2px --color-accessibility-80` on `focus-visible`
+- **Disabled**: `opacity: --opacity-level-medium`
+
 ### `TextField` — `src/components/TextField/`
 - Most recently added component (see latest commit)
 
