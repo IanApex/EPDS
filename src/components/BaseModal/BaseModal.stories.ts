@@ -31,7 +31,7 @@ const meta = {
     ariaLabel:  { control: 'text' },
   },
   args: {
-    modelValue: true,
+    modelValue: false,
     size: 'lg',
     theme: 'light',
     ariaLabel: 'Example dialog',
@@ -41,96 +41,10 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-// ─── Static previews (modal open, fixed canvas) ───────────────────────────────
-
-const placeholderContent = `
-  <div style="display:flex;flex-direction:column;gap:16px;">
-    <h2 style="font-family:Roboto,sans-serif;font-size:24px;font-weight:700;margin:0;color:#242C33;">Dialog title</h2>
-    <p style="font-family:Roboto,sans-serif;font-size:16px;margin:0;color:#242C33;line-height:1.5;">
-      This is the modal body content. The 24px padding is built into the modal container.
-    </p>
-  </div>
-`
-
-export const LightLarge: Story = {
-  name: 'Light — large (800px)',
-  args: { modelValue: true, size: 'lg', theme: 'light' },
-  render: (args) => ({
-    components: { BaseModal },
-    setup() { return { args } },
-    template: `
-      <div style="height:400px;position:relative;">
-        <BaseModal v-bind="args">
-          ${placeholderContent}
-        </BaseModal>
-      </div>
-    `,
-  }),
-}
-
-export const LightSmall: Story = {
-  name: 'Light — small (500px)',
-  args: { modelValue: true, size: 'sm', theme: 'light' },
-  render: (args) => ({
-    components: { BaseModal },
-    setup() { return { args } },
-    template: `
-      <div style="height:400px;position:relative;">
-        <BaseModal v-bind="args">
-          ${placeholderContent}
-        </BaseModal>
-      </div>
-    `,
-  }),
-}
-
-export const DarkLarge: Story = {
-  name: 'Dark — large (800px)',
-  args: { modelValue: true, size: 'lg', theme: 'dark' },
-  render: (args) => ({
-    components: { BaseModal },
-    setup() { return { args } },
-    template: `
-      <div style="height:400px;position:relative;">
-        <BaseModal v-bind="args">
-          <div style="display:flex;flex-direction:column;gap:16px;">
-            <h2 style="font-family:Roboto,sans-serif;font-size:24px;font-weight:700;margin:0;color:#fff;">Dialog title</h2>
-            <p style="font-family:Roboto,sans-serif;font-size:16px;margin:0;color:#E8E9EB;line-height:1.5;">
-              Dark theme modal body. Content text should use light colours against the navy background.
-            </p>
-          </div>
-        </BaseModal>
-      </div>
-    `,
-  }),
-}
-
-export const DarkSmall: Story = {
-  name: 'Dark — small (500px)',
-  args: { modelValue: true, size: 'sm', theme: 'dark' },
-  render: (args) => ({
-    components: { BaseModal },
-    setup() { return { args } },
-    template: `
-      <div style="height:400px;position:relative;">
-        <BaseModal v-bind="args">
-          <div style="display:flex;flex-direction:column;gap:16px;">
-            <h2 style="font-family:Roboto,sans-serif;font-size:24px;font-weight:700;margin:0;color:#fff;">Dialog title</h2>
-            <p style="font-family:Roboto,sans-serif;font-size:16px;margin:0;color:#E8E9EB;line-height:1.5;">
-              Dark small modal body content.
-            </p>
-          </div>
-        </BaseModal>
-      </div>
-    `,
-  }),
-}
-
 // ─── Interactive ──────────────────────────────────────────────────────────────
 
 export const Interactive: Story = {
-  name: 'Interactive — open / close',
-  args: { modelValue: false },
+  name: 'Interactive — light / open / close',
   parameters: {
     docs: {
       description: {
@@ -175,7 +89,6 @@ export const Interactive: Story = {
 
 export const InteractiveDark: Story = {
   name: 'Interactive — dark theme',
-  args: { modelValue: false },
   render: () => ({
     components: { BaseModal },
     setup() {
