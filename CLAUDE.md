@@ -241,6 +241,16 @@ EPDS/
 - **Visual**: white bg, 1px `--color-neutral-90` border, `border-radius: --border-radius-md` (8px), `overflow: hidden`
 - **Content padding**: `--spacing-xxs` (24px) built in on all sides
 
+### `BaseAlert` — `src/components/BaseAlert/`
+- **Figma**: "Components/Alert" — inline feedback banner
+- **Props**: `variant?: 'error' | 'warning' | 'success' | 'info' | 'notification'` (default `'info'`), `title?: string`
+- **Slots**: default — body text content
+- **Layout**: 24px icon + 8px gap (`--spacing-nano`) + content column; 16px padding (`--spacing-xxxs`); `--border-radius-lg` (16px)
+- **Variants**: error (Warning90 bg / Warning40 border+icon), warning (Alert90 / Alert70), success (Primary90 / Primary50), info (Neutral95 / Neutral90, Neutral40 text+icon), notification (Accent90 / Accent40)
+- **Icon pattern**: `?raw` + `v-html` + `:deep(path) { fill: var(--alert-icon-color) }` — CSS custom property per variant
+- **Accessibility**: `role="alert"` (assertive) for error/warning; `role="status"` (polite) for success/info/notification
+- **Info variant**: not in original Figma component — added per design intent; uses muted Neutral40 for both icon and text
+
 ### `BaseToggle` — `src/components/BaseToggle/`
 - **Figma**: "Inputs/Toggle" — 48×28px pill switch; immediate-effect setting control
 - **Props**: `modelValue?: boolean`, `disabled?: boolean`, `label?: string`, `name?: string`
