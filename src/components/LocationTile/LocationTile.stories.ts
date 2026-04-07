@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { ref } from 'vue'
 import LocationTile from './LocationTile.vue'
 
 const STORE_PHOTO = 'https://www.echopark.com/-/media/project/sonic/echopark/all-store-images/grand-prarie/grandprarie_listimage-dt_v2.jpg?h=512&w=482&hash=970167BCF95985F958787C798F429EB5'
@@ -11,11 +12,14 @@ const meta = {
     docs: {
       description: {
         component:
-          'Store location card for location-selection flows. Two sizes: `desktop` (544px, horizontal) and `mobile` (241px, vertical).\n\n' +
-          '**Selected state:** green (`--color-base-primary-60`) 2px inset border.\n\n' +
-          '**Links:** pass `directionsHref` and `shopHref` to make the action areas navigate.\n\n' +
+          'Selectable store location card. Use like a radio group — multiple tiles share the same `name` and bind to the same `v-model`.\n\n' +
+          '**Sizes:** `desktop` (544px horizontal) · `mobile` (241px vertical)\n\n' +
+          '**Selected state:** 2px green (`--color-base-primary-60`) outline, no layout shift.\n\n' +
           '```html\n' +
           '<LocationTile\n' +
+          '  v-model="selectedStore"\n' +
+          '  value="grand-prairie"\n' +
+          '  name="store-select"\n' +
           '  storeName="Dallas (Grand Prairie)"\n' +
           '  address="2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052"\n' +
           '  distance="12 Miles"\n' +
@@ -31,17 +35,18 @@ const meta = {
     },
   },
   argTypes: {
-    size:     { control: 'radio',    options: ['desktop', 'mobile'] },
-    selected: { control: 'boolean' },
+    size: { control: 'radio', options: ['desktop', 'mobile'] },
   },
   args: {
+    value:       'grand-prairie',
+    name:        'store-select',
     storeName:   'Dallas (Grand Prairie)',
     address:     '2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052',
     distance:    '12 Miles',
     phoneNumber: '(866) 533-5175',
     imageUrl:    STORE_PHOTO,
     size:        'desktop',
-    selected:    false,
+    modelValue:  '',
     directionsHref:   'https://maps.google.com/',
     directionsTarget: '_blank',
     shopHref:    '/stores/dallas-grand-prairie',
@@ -56,7 +61,7 @@ type Story = StoryObj<typeof meta>
 
 export const DesktopDefault: Story = {
   name: 'Desktop — Default',
-  args: { size: 'desktop', selected: false },
+  args: { size: 'desktop', modelValue: '' },
   render: (args) => ({
     components: { LocationTile },
     setup() { return { args } },
@@ -66,7 +71,7 @@ export const DesktopDefault: Story = {
 
 export const DesktopSelected: Story = {
   name: 'Desktop — Selected',
-  args: { size: 'desktop', selected: true },
+  args: { size: 'desktop', modelValue: 'grand-prairie' },
   render: (args) => ({
     components: { LocationTile },
     setup() { return { args } },
@@ -78,7 +83,7 @@ export const DesktopSelected: Story = {
 
 export const MobileDefault: Story = {
   name: 'Mobile — Default',
-  args: { size: 'mobile', selected: false },
+  args: { size: 'mobile', modelValue: '' },
   render: (args) => ({
     components: { LocationTile },
     setup() { return { args } },
@@ -88,11 +93,49 @@ export const MobileDefault: Story = {
 
 export const MobileSelected: Story = {
   name: 'Mobile — Selected',
-  args: { size: 'mobile', selected: true },
+  args: { size: 'mobile', modelValue: 'grand-prairie' },
   render: (args) => ({
     components: { LocationTile },
     setup() { return { args } },
     template: `<div style="padding:24px;"><LocationTile v-bind="args" /></div>`,
+  }),
+}
+
+// ─── Interactive group ────────────────────────────────────────────────────────
+
+export const InteractiveGroup: Story = {
+  name: 'Interactive group',
+  parameters: {
+    docs: {
+      description: { story: 'Click a tile to select it. Demonstrates v-model across a list.' },
+    },
+  },
+  render: () => ({
+    components: { LocationTile },
+    setup() {
+      const selected = ref('')
+      return { selected, photo: STORE_PHOTO }
+    },
+    template: `
+      <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
+        <LocationTile
+          v-model="selected" name="store-select"
+          value="grand-prairie" storeName="Dallas (Grand Prairie)"
+          address="2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052"
+          distance="12 Miles" phoneNumber="(866) 533-5175" :imageUrl="photo"
+          directionsHref="https://maps.google.com/" directionsTarget="_blank"
+          shopHref="/stores/dallas-grand-prairie"
+        />
+        <LocationTile
+          v-model="selected" name="store-select"
+          value="houston" storeName="Houston (Katy)"
+          address="20711 Katy Freeway, Katy, TX 77450"
+          distance="28 Miles" phoneNumber="(866) 533-5175" :imageUrl="photo"
+          directionsHref="https://maps.google.com/" directionsTarget="_blank"
+          shopHref="/stores/houston-katy"
+        />
+      </div>
+    `,
   }),
 }
 
@@ -111,31 +154,35 @@ export const AllStates: Story = {
     template: `
       <div style="padding:24px;display:flex;flex-direction:column;gap:24px;">
         <LocationTile
+          name="s1" value="a" modelValue=""
           storeName="Dallas (Grand Prairie)" address="2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052"
           distance="12 Miles" phoneNumber="(866) 533-5175" :imageUrl="photo"
-          size="desktop" :selected="false"
+          size="desktop"
           directionsHref="https://maps.google.com/" directionsTarget="_blank"
           shopHref="/stores/dallas-grand-prairie"
         />
         <LocationTile
+          name="s2" value="a" modelValue="a"
           storeName="Dallas (Grand Prairie)" address="2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052"
           distance="12 Miles" phoneNumber="(866) 533-5175" :imageUrl="photo"
-          size="desktop" :selected="true"
+          size="desktop"
           directionsHref="https://maps.google.com/" directionsTarget="_blank"
           shopHref="/stores/dallas-grand-prairie"
         />
         <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
           <LocationTile
+            name="s3" value="a" modelValue=""
             storeName="Dallas (Grand Prairie)" address="2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052"
             distance="12 Miles" phoneNumber="(866) 533-5175" :imageUrl="photo"
-            size="mobile" :selected="false"
+            size="mobile"
             directionsHref="https://maps.google.com/" directionsTarget="_blank"
             shopHref="/stores/dallas-grand-prairie"
           />
           <LocationTile
+            name="s4" value="a" modelValue="a"
             storeName="Dallas (Grand Prairie)" address="2615 W Interstate 20 Frontage Rd Grand Prairie, TX 75052"
             distance="12 Miles" phoneNumber="(866) 533-5175" :imageUrl="photo"
-            size="mobile" :selected="true"
+            size="mobile"
             directionsHref="https://maps.google.com/" directionsTarget="_blank"
             shopHref="/stores/dallas-grand-prairie"
           />
@@ -145,7 +192,7 @@ export const AllStates: Story = {
   }),
 }
 
-// ─── No image (placeholder) ───────────────────────────────────────────────────
+// ─── No image ─────────────────────────────────────────────────────────────────
 
 export const NoImage: Story = {
   name: 'No image (placeholder)',

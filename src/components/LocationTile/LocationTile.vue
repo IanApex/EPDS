@@ -5,10 +5,16 @@ import storeSvg       from '../../../icon/Style=Location, Detail=Store, Icon=NA.
 import arrowRightSvg  from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Right.svg?raw'
 
 const props = withDefaults(defineProps<{
+  /** This tile's value — emitted when selected (v-model). */
+  value: string
+  /** Radio group name — all tiles in the same group share this. */
+  name: string
   /** Store display name */
   storeName: string
   /** Full street address */
   address: string
+  /** Currently selected value in the group (bind with v-model). */
+  modelValue?: string
   /** Distance from user, e.g. "12 Miles" */
   distance?: string
   /** Phone number string */
@@ -17,8 +23,6 @@ const props = withDefaults(defineProps<{
   imageUrl?: string
   /** Layout variant */
   size?: 'desktop' | 'mobile'
-  /** Highlighted / chosen state */
-  selected?: boolean
   /** href for "Get directions" — renders as <a> when provided */
   directionsHref?: string
   directionsTarget?: string
@@ -27,22 +31,37 @@ const props = withDefaults(defineProps<{
   shopTarget?: string
 }>(), {
   size: 'desktop',
-  selected: false,
 })
+
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+}>()
+
+const isSelected = computed(() => props.modelValue === props.value)
 
 const directionsTag = computed(() => props.directionsHref ? 'a' : 'div')
 const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 </script>
 
 <template>
-  <div
+  <label
     class="lt"
     :class="{
       'lt--desktop':  size === 'desktop',
       'lt--mobile':   size === 'mobile',
-      'lt--selected': selected,
+      'lt--selected': isSelected,
     }"
   >
+    <!-- Visually hidden radio — provides selection semantics + keyboard nav -->
+    <input
+      type="radio"
+      class="lt__radio"
+      :name="name"
+      :value="value"
+      :checked="isSelected"
+      @change="emit('update:modelValue', value)"
+    />
+
     <!-- ── Image ───────────────────────────────────────────── -->
     <div class="lt__image">
       <img
@@ -109,18 +128,35 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
       </component>
 
     </div>
-  </div>
+  </label>
 </template>
 
 <style scoped>
 /* ─── Card shell ───────────────────────────────────────────── */
 .lt {
   display: flex;
+  position: relative;
   background: var(--color-neutral-100);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   box-sizing: border-box;
-  border: var(--border-width-hairline) solid var(--color-neutral-85);
+  cursor: pointer;
+}
+
+/*
+ * ::after overlay renders the border on top of ALL children (including the
+ * image). box-shadow inset means no layout shift when thickness changes.
+ * pointer-events:none keeps clicks/hover working on the card content.
+ * z-index:1 ensures it sits above positioned children (e.g. the photo).
+ */
+.lt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--border-radius-lg);
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 0 0 1px var(--color-neutral-85);
 }
 
 .lt--desktop {
@@ -135,13 +171,35 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
   width: 241px;
 }
 
-.lt--selected {
-  border: var(--border-width-thin) solid var(--color-base-primary-60);
+.lt--selected::after {
+  box-shadow: inset 0 0 0 2px var(--color-base-primary-60);
+}
+
+/* ─── Hidden radio ─────────────────────────────────────────── */
+.lt__radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ─── Image panel ──────────────────────────────────────────── */
+/*
+ * The img is position:absolute so it never contributes to the panel's
+ * natural height. On desktop the panel height is set entirely by
+ * align-self:stretch (= right content height), eliminating the extra
+ * whitespace that appeared when the photo's natural dimensions were taller
+ * than the text content.
+ */
 .lt__image {
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
   background: var(--color-neutral-90);
 }
 
@@ -151,12 +209,13 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 }
 
 .lt--mobile .lt__image {
-  width: 241px;
+  width: 100%;
   height: 200px;
 }
 
 .lt__photo {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -202,8 +261,8 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
   flex: 1;
   min-width: 0;
   font-family: var(--font-family-base);
-  font-size: var(--text-body-lg-size);       /* 16px */
-  font-weight: var(--font-weight-bold);      /* 700 */
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--font-weight-bold);
   line-height: var(--text-body-lg-line-height);
   color: var(--color-accent-40);
 }
@@ -211,7 +270,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 .lt__distance {
   flex-shrink: 0;
   font-family: var(--font-family-base);
-  font-size: var(--text-body-sm-size);       /* 14px */
+  font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--text-body-sm-line-height);
   color: var(--color-neutral-0);
@@ -226,13 +285,13 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 }
 
 .lt--desktop .lt__address {
-  font-size: var(--text-body-lg-size);       /* 16px */
+  font-size: var(--text-body-lg-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--text-body-lg-line-height);
 }
 
 .lt--mobile .lt__address {
-  font-size: var(--text-body-sm-size);       /* 14px */
+  font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--text-body-sm-line-height);
 }
@@ -254,7 +313,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 /* Phone */
 .lt__phone {
   font-family: var(--font-family-base);
-  font-size: var(--text-body-sm-size);       /* 14px */
+  font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--text-body-sm-line-height);
   color: var(--color-accent-40);
@@ -264,7 +323,6 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 .lt__directions {
   display: flex;
   align-items: center;
-  gap: 0;
   text-decoration: none;
   color: inherit;
 }
@@ -303,14 +361,14 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 .lt__dir-label {
   font-family: var(--font-family-base);
   font-size: var(--text-label-size);         /* 12px */
-  font-weight: var(--font-weight-medium);    /* 500 */
+  font-weight: var(--font-weight-medium);
   line-height: var(--text-label-line-height);
   color: var(--color-accent-40);
   white-space: nowrap;
 }
 
 .lt__dir-label--mobile {
-  font-size: var(--text-body-sm-size);       /* 14px */
+  font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-bold);
   line-height: var(--text-body-sm-line-height);
 }
@@ -348,8 +406,8 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 
 .lt__shop-label {
   font-family: var(--font-family-base);
-  font-size: var(--text-body-sm-size);       /* 14px */
-  font-weight: var(--font-weight-bold);      /* 700 */
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-bold);
   line-height: var(--text-body-sm-line-height);
   color: var(--color-accent-40);
   white-space: nowrap;
