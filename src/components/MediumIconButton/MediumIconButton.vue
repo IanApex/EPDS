@@ -59,8 +59,7 @@ defineEmits<{
   width: 40px;
   height: 40px;
 
-  /* 3px transparent border reserves space to prevent layout shift on hover */
-  border: 3px solid transparent;
+  border: none;
   border-radius: var(--border-radius-pill);
   background: none;
   cursor: pointer;
