@@ -1,25 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import errorSvg       from '../../../icon/Style=Alerts, Detail=Warning, Icon=NA.svg?raw'
-import warningSvg     from '../../../icon/Style=Alerts, Detail=Help, Icon=NA.svg?raw'
+import warningSvg     from '../../../icon/Style=Alerts, Detail=Info, Icon=NA.svg?raw'
 import successSvg     from '../../../icon/Style=Display, Detail=Default, Icon=Check-Circle.svg?raw'
-import infoSvg        from '../../../icon/Style=Alerts, Detail=Info, Icon=NA.svg?raw'
 import notificationSvg from '../../../icon/Style=Alerts, Detail=Bell, Icon=NA.svg?raw'
 
 const props = withDefaults(defineProps<{
   /** Visual variant */
-  variant?: 'error' | 'warning' | 'success' | 'info' | 'notification'
+  variant?: 'error' | 'warning' | 'success' | 'notification'
   /** Optional title text above the body */
   title?: string
 }>(), {
-  variant: 'info',
+  variant: 'warning',
 })
 
 const iconMap: Record<string, string> = {
   error:        errorSvg,
   warning:      warningSvg,
   success:      successSvg,
-  info:         infoSvg,
   notification: notificationSvg,
 }
 
@@ -120,13 +118,6 @@ const role = computed(() =>
   border-color: var(--color-base-primary-50);
   --alert-icon-color: var(--color-base-primary-50);
   --alert-text-color: var(--color-neutral-0);
-}
-
-.alert--info {
-  background: var(--color-neutral-95);
-  border-color: var(--color-neutral-90);
-  --alert-icon-color: var(--color-neutral-40);
-  --alert-text-color: var(--color-neutral-40);
 }
 
 .alert--notification {
