@@ -1,0 +1,298 @@
+<script setup lang="ts">
+import checkSvg       from '../../../icon/Style=Display, Detail=Default, Icon=Check-Small.svg?raw'
+import rightSmallSvg  from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Right-Small.svg?raw'
+
+withDefaults(defineProps<{
+  /** Visible option label, e.g. "4WD" */
+  label: string
+  /** Inventory count, e.g. 82 — shown as "(82)" in Neutral40 */
+  count?: number
+  /** Whether this option is checked (bind with v-model) */
+  selected?: boolean
+  /**
+   * "Returning to selected" state — option was previously applied.
+   * Renders light-green background on the filter (left) half.
+   */
+  returning?: boolean
+  /** Label for the secondary navigation link, e.g. "Trim" */
+  linkLabel: string
+  /** href for the secondary link — renders as <a> when provided */
+  linkHref?: string
+  /** target for the secondary link */
+  linkTarget?: string
+}>(), {
+  selected:  false,
+  returning: false,
+})
+
+const emit = defineEmits<{
+  'update:selected': [value: boolean]
+  /** Emitted when the secondary text link is clicked */
+  'link-click':      [event: MouseEvent]
+}>()
+
+function handleLinkClick(e: MouseEvent) {
+  e.stopPropagation()      // don't toggle the checkbox
+  emit('link-click', e)
+}
+</script>
+
+<template>
+  <div
+    class="srp-ftl"
+    :class="{
+      'srp-ftl--selected':  selected,
+      'srp-ftl--returning': returning,
+    }"
+  >
+    <!-- ── Left: filter toggle ─────────────────────────── -->
+    <label class="srp-ftl__left">
+      <input
+        type="checkbox"
+        class="srp-ftl__input"
+        :checked="selected"
+        @change="emit('update:selected', ($event.target as HTMLInputElement).checked)"
+      />
+
+      <!-- Checkmark badge -->
+      <span
+        v-if="selected || returning"
+        class="srp-ftl__check"
+        aria-hidden="true"
+        v-html="checkSvg"
+      />
+
+      <!-- Label + count -->
+      <span class="srp-ftl__content">
+        <span class="srp-ftl__label">{{ label }}</span>
+        <span v-if="count !== undefined" class="srp-ftl__count">({{ count }})</span>
+      </span>
+    </label>
+
+    <!-- ── Right: secondary text link ────────────────── -->
+    <component
+      :is="linkHref ? 'a' : 'button'"
+      class="srp-ftl__link"
+      :href="linkHref"
+      :target="linkHref ? linkTarget : undefined"
+      :rel="linkTarget === '_blank' ? 'noopener noreferrer' : undefined"
+      :type="linkHref ? undefined : 'button'"
+      @click="handleLinkClick"
+    >
+      <span class="srp-ftl__link-text">{{ linkLabel }}</span>
+      <span class="srp-ftl__link-chevron" aria-hidden="true" v-html="rightSmallSvg" />
+    </component>
+  </div>
+</template>
+
+<style scoped>
+/* ─── Outer row ────────────────────────────────────────── */
+.srp-ftl {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 56px;
+  box-sizing: border-box;
+  border-top: var(--border-width-hairline) solid var(--color-neutral-90);
+  border-bottom: var(--border-width-hairline) solid var(--color-neutral-90);
+}
+
+/* Focus ring on the outer row when either half is focused */
+.srp-ftl:focus-within {
+  /* individual halves handle their own outlines */
+}
+
+/* ─── Left: filter half ────────────────────────────────── */
+.srp-ftl__left {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-nano);               /* 8px */
+  flex: 1 1 0;
+  min-width: 0;
+  padding: var(--spacing-xxxs) var(--spacing-xxs);  /* 16px 24px */
+  box-sizing: border-box;
+  background: var(--color-neutral-100);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.srp-ftl__left:hover {
+  background: var(--color-neutral-95);
+}
+
+.srp-ftl__left:active {
+  background: var(--color-neutral-90);
+}
+
+.srp-ftl__left:has(.srp-ftl__input:focus-visible) {
+  outline: 3px solid var(--color-accessibility-80);
+  outline-offset: -3px;
+}
+
+@media (hover: none) {
+  .srp-ftl__left:active {
+    background: rgba(0, 111, 166, 0.15);
+    outline: 1px solid var(--color-accent-40);
+    outline-offset: -1px;
+  }
+}
+
+/* ─── Returning to selected — left half green bg ───────── */
+.srp-ftl--returning .srp-ftl__left {
+  background: var(--color-base-primary-90);
+}
+
+.srp-ftl--returning .srp-ftl__left:hover {
+  background: var(--color-base-primary-90);
+}
+
+.srp-ftl--returning .srp-ftl__left::after {
+  content: none;
+}
+
+.srp-ftl--returning .srp-ftl__left:active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+}
+
+/* ─── Hidden checkbox ──────────────────────────────────── */
+.srp-ftl__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ─── Checkmark badge ──────────────────────────────────── */
+.srp-ftl__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  background: var(--color-base-primary-50);
+  border-radius: var(--border-radius-sm);
+}
+
+.srp-ftl__check :deep(svg) {
+  width: 24px;
+  height: 24px;
+}
+
+.srp-ftl__check :deep(path) {
+  fill: var(--color-neutral-100);
+}
+
+/* ─── Label + count ────────────────────────────────────── */
+.srp-ftl__content {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.srp-ftl__label {
+  font-family: var(--font-family-base);
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--text-body-lg-line-height);
+  color: var(--color-neutral-0);
+  white-space: nowrap;
+}
+
+.srp-ftl__count {
+  font-family: var(--font-family-base);
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--font-weight-light);
+  line-height: var(--text-body-lg-line-height);
+  color: var(--color-neutral-40);
+  white-space: nowrap;
+}
+
+/* Underline when selected + hover */
+.srp-ftl--selected .srp-ftl__left:hover .srp-ftl__content,
+.srp-ftl--returning .srp-ftl__left:hover .srp-ftl__content {
+  text-decoration: underline;
+  text-decoration-color: var(--color-neutral-20);
+  text-underline-offset: 2px;
+}
+
+/* ─── Right: text link half ────────────────────────────── */
+.srp-ftl__link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: var(--spacing-xxxs) var(--spacing-xxs);  /* 16px 24px */
+  box-sizing: border-box;
+
+  background: var(--color-neutral-100);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: background-color 0.15s ease;
+}
+
+.srp-ftl__link:hover {
+  background: var(--color-neutral-95);
+}
+
+.srp-ftl__link:active {
+  background: var(--color-neutral-90);
+}
+
+.srp-ftl__link:focus-visible {
+  outline: 3px solid var(--color-accessibility-80);
+  outline-offset: -3px;
+}
+
+@media (hover: none) {
+  .srp-ftl__link:active {
+    background: rgba(0, 111, 166, 0.15);
+    outline: 1px solid var(--color-accent-40);
+    outline-offset: -1px;
+  }
+}
+
+/* ─── Link label ───────────────────────────────────────── */
+.srp-ftl__link-text {
+  font-family: var(--font-family-base);
+  font-size: var(--text-label-size);         /* 12px */
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-body-lg-line-height);
+  color: var(--color-accent-40);
+  white-space: nowrap;
+}
+
+.srp-ftl__link:hover .srp-ftl__link-text {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-40);
+  text-underline-offset: 2px;
+}
+
+/* ─── Link chevron (right-small arrow) ─────────────────── */
+.srp-ftl__link-chevron {
+  display: inline-flex;
+  align-items: center;
+  width: 8px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.srp-ftl__link-chevron :deep(svg) {
+  width: 8px;
+  height: 13px;
+}
+
+.srp-ftl__link-chevron :deep(path) {
+  fill: var(--color-accent-40);
+}
+</style>
