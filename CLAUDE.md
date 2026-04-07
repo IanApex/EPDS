@@ -349,6 +349,8 @@ Breakpoints (JS only — `breakpoints.ts`): sm=0 md=600 lg=1024 xlg=1440 max=192
 - Use `<script setup lang="ts">`, `defineProps<{}>()`, `defineEmits<{}>()` — no Options API
 - `<style scoped>` only — no global selectors in component files
 - No inline styles unless dynamically computed
+- **Always reuse existing EPDS components before writing new markup.** Before implementing any UI pattern, check whether an existing component (`BaseButton`, `LinkCta`, `BaseAlert`, etc.) already covers it. Only build net-new sub-components when no existing component fits AND you have explicit sign-off — do not silently create new primitives inside a larger component.
+- **Do not create new sub-components without checking with the user first.** If a larger component could benefit from a new primitive, propose it before building it.
 
 ## Storybook Rules
 - Stories co-located in component folder, CSF3 format (`satisfies Meta<typeof Component>`)
