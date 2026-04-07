@@ -9,7 +9,7 @@ import CarouselDots      from '../CarouselDots/CarouselDots.vue'
 import heartFilledSvg  from '../../../icon/Style=Account, Detail=Heart-Filled, Icon=NA.svg?raw'
 import calculatorSvg   from '../../../icon/Style=Finance, Detail=Payment, Icon=Calculator.svg?raw'
 import infoSvg         from '../../../icon/Style=Alerts, Detail=Info, Icon=NA.svg?raw'
-import testDriveSrc    from '../../../icon/Icon Type=Vehicle Descriptors, Size=Small, Theme=Test Drive.svg?url'
+import testDriveSvg    from '../../../icon/Icon Type=Vehicle Descriptors, Size=Small, Theme=Test Drive.svg?raw'
 
 const props = withDefaults(defineProps<{
   /** Model year, e.g. "2020" */
@@ -158,16 +158,16 @@ function openTestDrive(e: MouseEvent) {
         />
       </div>
 
-      <!-- Carousel dots (always visible when multiple images) -->
-      <div v-if="imageCount > 1" class="srpt__dots">
-        <CarouselDots
-          :count="imageCount"
-          :modelValue="imageIndex"
-          @update:modelValue="emit('update:imageIndex', $event)"
-        />
-      </div>
-
     </div><!-- /.srpt__image-area -->
+
+    <!-- Carousel dots — straddling image/content boundary -->
+    <div v-if="imageCount > 1" class="srpt__dots">
+      <CarouselDots
+        :count="imageCount"
+        :modelValue="imageIndex"
+        @update:modelValue="emit('update:imageIndex', $event)"
+      />
+    </div>
 
 
     <!-- ═══════════════════════════════════════════════════ -->
@@ -266,13 +266,13 @@ function openTestDrive(e: MouseEvent) {
         >
           <span v-if="deliveryLabel" class="srpt__delivery-label">{{ deliveryLabel }}</span>
           <span v-if="deliveryStore" class="srpt__delivery-store">
-            {{ deliveryStore }}<span v-if="deliveryDistance" class="srpt__delivery-dist"> {{ deliveryDistance }}</span>
+            {{ deliveryStore }}<span v-if="deliveryDistance" class="srpt__delivery-dist">{{ deliveryDistance }}</span>
           </span>
         </a>
         <div v-else-if="deliveryLabel || deliveryStore" class="srpt__delivery">
           <span v-if="deliveryLabel" class="srpt__delivery-label">{{ deliveryLabel }}</span>
           <span v-if="deliveryStore" class="srpt__delivery-store">
-            {{ deliveryStore }}<span v-if="deliveryDistance" class="srpt__delivery-dist"> {{ deliveryDistance }}</span>
+            {{ deliveryStore }}<span v-if="deliveryDistance" class="srpt__delivery-dist">{{ deliveryDistance }}</span>
           </span>
         </div>
 
@@ -297,7 +297,7 @@ function openTestDrive(e: MouseEvent) {
           @click="openTestDrive"
         >
           <template #icon>
-            <img :src="testDriveSrc" alt="" class="srpt__cta-icon" />
+            <span v-html="testDriveSvg" class="srpt__cta-icon" aria-hidden="true" />
           </template>
         </TileCta>
 
@@ -427,13 +427,13 @@ function openTestDrive(e: MouseEvent) {
   pointer-events: all;
 }
 
-/* ─── Carousel dots ────────────────────────────────────────── */
+/* ─── Carousel dots — straddle image/content boundary ─────── */
 .srpt__dots {
   position: absolute;
-  bottom: 8px;
+  top: 294px;             /* = image area height */
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
+  transform: translate(-50%, -50%);
+  z-index: 5;
 }
 
 /* ─── Content section ──────────────────────────────────────── */
@@ -664,6 +664,7 @@ function openTestDrive(e: MouseEvent) {
 }
 
 .srpt__delivery-dist {
+  margin-left: 4px;
   font-size: var(--text-label-size);
   letter-spacing: var(--text-label-letter-spacing);
 }
@@ -675,12 +676,22 @@ function openTestDrive(e: MouseEvent) {
   justify-content: space-between;
 }
 
-/* Test drive icon inside TileCta slot */
+/* Test drive icon inside TileCta slot — blue to match accent CTA style */
 .srpt__cta-icon {
-  display: block;
+  display: inline-flex;
   width: 24px;
   height: 24px;
-  object-fit: contain;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.srpt__cta-icon :deep(svg) {
+  width: 24px;
+  height: 24px;
+}
+
+.srpt__cta-icon :deep(path) {
+  fill: var(--color-accent-40);
 }
 
 /* ─── VDP link focus styles ────────────────────────────────── */
