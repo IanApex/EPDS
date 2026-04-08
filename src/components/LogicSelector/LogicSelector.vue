@@ -196,6 +196,6 @@ function select(value: string) {
   font-weight: var(--font-weight-regular);
   line-height: 16px;
   letter-spacing: 0.2px;
-  color: var(--color-warning-40); /* #B30715 */
+  color: var(--color-feedback-error-text); /* #B30715 */
 }
 </style>

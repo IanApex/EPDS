@@ -95,7 +95,7 @@ function handleChange() {
 
 /* ─── Focus (keyboard navigation — any state) ───────────── */
 .fbt:has(.fbt__radio:focus-visible) {
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ─── Disabled ──────────────────────────────────────────── */

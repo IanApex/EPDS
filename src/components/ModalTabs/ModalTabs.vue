@@ -196,7 +196,7 @@ function activateNext(currentId: string) {
   font-size: 16px;
   font-weight: var(--font-weight-medium); /* 500 */
   line-height: 16px;
-  color: var(--color-accent-40);          /* #006FA6 */
+  color: var(--color-action-accent);          /* #006FA6 */
   white-space: nowrap;
 }
 
@@ -212,7 +212,7 @@ function activateNext(currentId: string) {
   left: 0;
   right: 24px;
   height: 0;
-  background: var(--color-accent-40);
+  background: var(--color-action-accent);
   transition: height 0.12s ease;
 }
 
@@ -233,7 +233,7 @@ function activateNext(currentId: string) {
 
 /* ─── Focus ring ────────────────────────────────────────── */
 .modal-tabs__tab:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
   border-radius: 2px;
 }

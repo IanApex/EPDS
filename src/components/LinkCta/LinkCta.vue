@@ -80,13 +80,13 @@ defineEmits<{
 }
 
 .link-cta:focus-visible {
-  outline: 3px solid var(--color-accessibility-80);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 /* ─── Light theme ──────────────────────────────────────── */
 .link-cta--light {
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
 }
 
 .link-cta--light:hover:not(:disabled):not([aria-disabled='true']) {
@@ -95,7 +95,7 @@ defineEmits<{
 }
 
 .link-cta--light:active:not(:disabled):not([aria-disabled='true']) {
-  color: var(--color-accent-30);
+  color: var(--color-action-accent-hover);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -111,7 +111,7 @@ defineEmits<{
 }
 
 .link-cta--dark:active:not(:disabled):not([aria-disabled='true']) {
-  color: var(--color-accent-90);
+  color: var(--color-action-accent-subtle);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

@@ -335,16 +335,16 @@ function onMaxInput(e: Event) {
 }
 
 .base-slider__input:hover:not(:disabled)::-webkit-slider-thumb {
-  background: var(--color-base-primary-40);
+  background: var(--color-action-primary-hover);
 }
 
 .base-slider__input:active::-webkit-slider-thumb {
-  background: var(--color-base-primary-60);
+  background: var(--color-action-primary-press);
   cursor: grabbing;
 }
 
 .base-slider__input:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 2px var(--color-accessibility-80);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 /* ── Firefox: thumb ─────────────────────────────────────────── */
@@ -360,16 +360,16 @@ function onMaxInput(e: Event) {
 }
 
 .base-slider__input:hover:not(:disabled)::-moz-range-thumb {
-  background: var(--color-base-primary-40);
+  background: var(--color-action-primary-hover);
 }
 
 .base-slider__input:active::-moz-range-thumb {
-  background: var(--color-base-primary-60);
+  background: var(--color-action-primary-press);
   cursor: grabbing;
 }
 
 .base-slider__input:focus-visible::-moz-range-thumb {
-  box-shadow: 0 0 0 2px var(--color-accessibility-80);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 /* ─── Labels ────────────────────────────────────────────────── */

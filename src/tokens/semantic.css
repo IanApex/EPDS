@@ -1,0 +1,75 @@
+/*
+ * Semantic design tokens
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Maps intent-based names to brand primitives defined in primitives/*.css.
+ * Components reference THESE tokens — never the primitives directly.
+ *
+ * This file must be loaded AFTER a primitives file and BEFORE tokens.css.
+ * Load order: primitives/[brand].css → semantic.css → tokens.css
+ *
+ * To override for a different brand: redefine the primitives — the semantic
+ * layer cascades automatically. Only override semantic tokens here if a brand
+ * requires a structurally different intent mapping.
+ */
+
+:root {
+  /* ─── Action: Primary ─────────────────────────────────────────
+   * Brand's primary interactive color.
+   * Used by: buttons, checkboxes, radio buttons, toggle on-state,
+   *          selected chips, progress indicators, success feedback.
+   * ----------------------------------------------------------- */
+  --color-action-primary:        var(--color-base-primary-50);
+  --color-action-primary-hover:  var(--color-base-primary-40);
+  --color-action-primary-press:  var(--color-base-primary-55);
+  --color-action-primary-subtle: var(--color-base-primary-90);
+
+  /* ─── Action: Accent ──────────────────────────────────────────
+   * Brand's secondary/accent color.
+   * Used by: links, icon buttons (MediumIconButton, TileCta),
+   *          info/notification feedback, active tab indicators.
+   * ----------------------------------------------------------- */
+  --color-action-accent:        var(--color-accent-40);
+  --color-action-accent-hover:  var(--color-accent-30);
+  --color-action-accent-press:  var(--color-accent-60);
+  --color-action-accent-subtle: var(--color-accent-90);
+
+  /* ─── Focus Ring ──────────────────────────────────────────────
+   * Universal focus indicator — applied to all interactive elements.
+   * Must meet WCAG 3:1 contrast against any surface this sits on.
+   * ----------------------------------------------------------- */
+  --color-focus-ring: var(--color-accessibility-80);
+
+  /* ─── Disabled States ─────────────────────────────────────────
+   * Surface and text colors for inactive/disabled elements.
+   * ----------------------------------------------------------- */
+  --color-surface-disabled: var(--color-neutral-secondary-90);
+  --color-text-disabled:    var(--color-neutral-70);
+
+  /* ─── Feedback: Error ─────────────────────────────────────────
+   * Error and destructive action states.
+   * ----------------------------------------------------------- */
+  --color-feedback-error:         var(--color-warning-50);
+  --color-feedback-error-text:    var(--color-warning-40);
+  --color-feedback-error-surface: var(--color-warning-90);
+
+  /* ─── Feedback: Warning ───────────────────────────────────────
+   * Caution and in-progress states.
+   * ----------------------------------------------------------- */
+  --color-feedback-warning:         var(--color-alert-70);
+  --color-feedback-warning-surface: var(--color-alert-90);
+
+  /* ─── Feedback: Success ───────────────────────────────────────
+   * Confirmation and completed states.
+   * Intentionally mapped to --color-action-primary so success
+   * always matches the brand's primary color.
+   * ----------------------------------------------------------- */
+  --color-feedback-success:         var(--color-action-primary);
+  --color-feedback-success-surface: var(--color-action-primary-subtle);
+
+  /* ─── Feedback: Info / Notification ──────────────────────────
+   * Informational and notification states.
+   * Intentionally mapped to --color-action-accent.
+   * ----------------------------------------------------------- */
+  --color-feedback-info:         var(--color-action-accent);
+  --color-feedback-info-surface: var(--color-action-accent-subtle);
+}

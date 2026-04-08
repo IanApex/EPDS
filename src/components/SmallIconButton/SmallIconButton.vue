@@ -79,19 +79,19 @@ defineEmits<{
 
 /* ─── Selected state ───────────────────────────────────── */
 .small-icon-btn--selected {
-  color: var(--color-base-primary-50);
+  color: var(--color-action-primary);
 }
 
 /* ─── Hover (selected) ─────────────────────────────────── */
 .small-icon-btn--selected:hover:not(:disabled) {
-  color: var(--color-base-primary-55);
+  color: var(--color-action-primary-press);
   border-width: 2px;
 }
 
 /* ─── Focus ────────────────────────────────────────────── */
 .small-icon-btn:focus-visible {
   outline: none;
-  border: 3px solid var(--color-accessibility-80);
+  border: 3px solid var(--color-focus-ring);
 }
 
 /* ─── Disabled ─────────────────────────────────────────── */

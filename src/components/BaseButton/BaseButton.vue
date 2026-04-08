@@ -88,23 +88,23 @@ defineEmits<{
 /* ─── Primary variant ──────────────────────────────────── */
 .base-button--primary {
   border: var(--border-width-thick) solid transparent;
-  background-color: var(--color-base-primary-50);
+  background-color: var(--color-action-primary);
   color: var(--color-neutral-100);
 }
 
 .base-button--primary:hover:not(:disabled) {
-  background-color: var(--color-base-primary-40);
+  background-color: var(--color-action-primary-hover);
   text-decoration: underline;
 }
 
 .base-button--primary:active:not(:disabled) {
-  background-color: var(--color-base-primary-60);
+  background-color: var(--color-action-primary-press);
   text-decoration: none;
 }
 
 .base-button--primary:focus-visible {
   outline: none;
-  border-color: var(--color-accessibility-80);
+  border-color: var(--color-focus-ring);
   overflow: clip;
 }
 
@@ -134,7 +134,7 @@ defineEmits<{
 /* Focus-visible overrides the theme colour with accessibility blue */
 .base-button--secondary:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ─── Secondary — light theme (dark border on light bg) ─ */

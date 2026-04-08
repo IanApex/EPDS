@@ -198,7 +198,7 @@ withDefaults(defineProps<{
 }
 
 .gf__logo-link:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 4px;
   border-radius: var(--border-radius-sm);
 }
@@ -270,7 +270,7 @@ withDefaults(defineProps<{
 }
 
 .gf__social-link:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
 }
 
@@ -331,7 +331,7 @@ withDefaults(defineProps<{
 
 .gf__link:hover { text-decoration: underline; text-underline-offset: 2px; }
 .gf__link:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -376,7 +376,7 @@ withDefaults(defineProps<{
 
 .gf__legal-link:hover { text-decoration: underline; text-underline-offset: 2px; }
 .gf__legal-link:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
   border-radius: 2px;
 }

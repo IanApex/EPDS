@@ -102,7 +102,7 @@ const emit = defineEmits<{
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  background: var(--color-base-primary-50);
+  background: var(--color-action-primary);
   border-radius: var(--border-radius-sm);  /* 4px */
 }
 
@@ -181,7 +181,7 @@ const emit = defineEmits<{
 
 /* ─── Focus ────────────────────────────────────────────── */
 .srp-fc:has(.srp-fc__input:focus-visible) {
-  outline: 3px solid var(--color-accessibility-80);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: -3px;
 }
 
@@ -189,23 +189,23 @@ const emit = defineEmits<{
 @media (hover: none) {
   .srp-fc:active {
     background: rgba(0, 111, 166, 0.15);
-    border-top-color: var(--color-accent-40);
-    border-bottom-color: var(--color-accent-40);
+    border-top-color: var(--color-action-accent);
+    border-bottom-color: var(--color-action-accent);
   }
 }
 
 /* ─── Returning to selected ────────────────────────────── */
 .srp-fc--returning {
-  background: var(--color-base-primary-90);
+  background: var(--color-action-primary-subtle);
 }
 
 .srp-fc--returning:hover {
-  background: var(--color-base-primary-90);
+  background: var(--color-action-primary-subtle);
 }
 
 /* Slightly darker pressed state over the green bg */
 .srp-fc--returning:active {
-  background: var(--color-base-primary-90);
+  background: var(--color-action-primary-subtle);
 }
 
 .srp-fc--returning:active::after {

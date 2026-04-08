@@ -113,8 +113,8 @@ function handleLinkClick(e: MouseEvent) {
 @media (hover: none) {
   .srp-ftl:has(*:active) {
     background: rgba(0, 111, 166, 0.15);
-    border-top-color: var(--color-accent-40);
-    border-bottom-color: var(--color-accent-40);
+    border-top-color: var(--color-action-accent);
+    border-bottom-color: var(--color-action-accent);
   }
 }
 
@@ -134,18 +134,18 @@ function handleLinkClick(e: MouseEvent) {
 }
 
 .srp-ftl__left:has(.srp-ftl__input:focus-visible) {
-  outline: 3px solid var(--color-accessibility-80);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: -3px;
 }
 
 /* ─── Returning to selected — left half green bg ───────── */
 .srp-ftl--returning .srp-ftl__left {
-  background: var(--color-base-primary-90);
+  background: var(--color-action-primary-subtle);
 }
 
 /* On hover the container goes neutral-95 but left stays green */
 .srp-ftl--returning:hover .srp-ftl__left {
-  background: var(--color-base-primary-90);
+  background: var(--color-action-primary-subtle);
 }
 
 /* Pressed over returning row: subtle darken via overlay */
@@ -174,7 +174,7 @@ function handleLinkClick(e: MouseEvent) {
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  background: var(--color-base-primary-50);
+  background: var(--color-action-primary);
   border-radius: var(--border-radius-sm);
 }
 
@@ -237,7 +237,7 @@ function handleLinkClick(e: MouseEvent) {
 }
 
 .srp-ftl__link:focus-visible {
-  outline: 3px solid var(--color-accessibility-80);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: -3px;
 }
 
@@ -247,13 +247,13 @@ function handleLinkClick(e: MouseEvent) {
   font-size: var(--text-label-size);         /* 12px */
   font-weight: var(--font-weight-medium);
   line-height: var(--text-body-lg-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   white-space: nowrap;
 }
 
 .srp-ftl__link:hover .srp-ftl__link-text {
   text-decoration: underline;
-  text-decoration-color: var(--color-accent-40);
+  text-decoration-color: var(--color-action-accent);
   text-underline-offset: 2px;
 }
 
@@ -272,6 +272,6 @@ function handleLinkClick(e: MouseEvent) {
 }
 
 .srp-ftl__link-chevron :deep(path) {
-  fill: var(--color-accent-40);
+  fill: var(--color-action-accent);
 }
 </style>

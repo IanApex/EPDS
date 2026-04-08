@@ -524,7 +524,7 @@ function openTestDrive(e: MouseEvent) {
   display: inline-flex;
   align-items: flex-end;
   padding-left: 9px;
-  color: var(--color-base-primary-50);
+  color: var(--color-action-primary);
   font-family: var(--font-family-base);
   font-weight: var(--font-weight-bold);
   text-decoration: none;
@@ -598,7 +598,7 @@ function openTestDrive(e: MouseEvent) {
 }
 
 .srpt__info-btn:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   border-radius: var(--border-radius-circular);
 }
 
@@ -691,12 +691,12 @@ function openTestDrive(e: MouseEvent) {
 }
 
 .srpt__cta-icon :deep(path) {
-  fill: var(--color-accent-40);
+  fill: var(--color-action-accent);
 }
 
 /* ─── VDP link focus styles ────────────────────────────────── */
 .srpt__vdp-link:focus-visible {
-  outline: 2px solid var(--color-accessibility-80);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
   border-radius: 2px;
 }

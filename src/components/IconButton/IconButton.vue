@@ -47,7 +47,7 @@ defineEmits<{
   border: 3px solid transparent;
   border-radius: var(--border-radius-pill);
   cursor: pointer;
-  background-color: var(--color-base-primary-50);
+  background-color: var(--color-action-primary);
   color: var(--color-neutral-100);
   font-family: var(--font-family-btn);
   font-size: var(--font-size-btn);
@@ -61,19 +61,19 @@ defineEmits<{
 }
 
 .icon-button:hover:not(:disabled) {
-  background-color: var(--color-base-primary-40);
+  background-color: var(--color-action-primary-hover);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .icon-button:active:not(:disabled) {
-  background-color: var(--color-base-primary-55);
+  background-color: var(--color-action-primary-press);
   text-decoration: none;
 }
 
 .icon-button:focus-visible {
   outline: none;
-  border-color: var(--color-accessibility-80);
+  border-color: var(--color-focus-ring);
   overflow: clip;
 }
 

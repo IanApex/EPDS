@@ -79,7 +79,7 @@ defineEmits<{
 /* ─── Focus (shared) ───────────────────────────────────── */
 .video-ctrl-btn:focus-visible {
   outline: none;
-  border-color: var(--color-accessibility-80);
+  border-color: var(--color-focus-ring);
 }
 
 /* ─── Disabled (shared) ────────────────────────────────── */

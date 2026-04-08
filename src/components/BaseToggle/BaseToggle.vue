@@ -108,7 +108,7 @@ const checked = computed({
   width: 16px;
   height: 16px;
   opacity: 0;
-  color: var(--color-base-primary-55);
+  color: var(--color-action-primary-press);
   line-height: 0;
   transition: opacity 0.15s ease;
 }
@@ -124,7 +124,7 @@ const checked = computed({
 
 /* ─── On (checked) ────────────────────────────────────────── */
 .toggle__input:checked ~ .toggle__track {
-  background: var(--color-base-primary-55);
+  background: var(--color-action-primary-press);
 }
 
 .toggle__input:checked ~ .toggle__track .toggle__thumb {
@@ -137,7 +137,7 @@ const checked = computed({
 
 /* ─── Focus ring ──────────────────────────────────────────── */
 .toggle__input:focus-visible ~ .toggle__track {
-  box-shadow: 0 0 0 2px var(--color-accessibility-80);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 /* ─── Disabled ────────────────────────────────────────────── */

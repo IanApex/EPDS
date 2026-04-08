@@ -140,7 +140,7 @@ const emit = defineEmits<{
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--color-base-primary-50);
+  background: var(--color-action-primary);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0);
@@ -177,7 +177,7 @@ const emit = defineEmits<{
 
 /* ─── Checked ───────────────────────────────────────────────── */
 .base-radio__input:checked ~ .base-radio__circle {
-  border-color: var(--color-base-primary-50);
+  border-color: var(--color-action-primary);
 }
 .base-radio__input:checked ~ .base-radio__circle::before {
   opacity: 1;
@@ -186,7 +186,7 @@ const emit = defineEmits<{
 
 /* ─── Hover + Checked ───────────────────────────────────────── */
 .base-radio:hover:not(.base-radio--disabled) .base-radio__input:checked ~ .base-radio__circle {
-  border-color: var(--color-base-primary-40);
+  border-color: var(--color-action-primary-hover);
 }
 .base-radio:hover:not(.base-radio--disabled) .base-radio__input:checked ~ .base-radio__label {
   text-decoration: underline;
@@ -199,7 +199,7 @@ const emit = defineEmits<{
 */
 .base-radio__input:focus-visible ~ .base-radio__circle {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-accessibility-80);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 /* ─── Disabled (selected) — grey dot ───────────────────────── */

@@ -104,7 +104,7 @@ const iconSvg = computed(() => {
 /* ─── Focus (shared) ───────────────────────────────────── */
 .arrow-circle-btn:focus-visible {
   outline: none;
-  border-color: var(--color-accessibility-80);
+  border-color: var(--color-focus-ring);
 }
 
 /* ─── Disabled (shared) ────────────────────────────────── */
@@ -131,14 +131,14 @@ const iconSvg = computed(() => {
 /* ─── Theme: green ─────────────────────────────────────── */
 /* Small expand button — solid Primary green, white icon */
 .arrow-circle-btn--green {
-  background: var(--color-base-primary-50);
+  background: var(--color-action-primary);
   color: var(--color-neutral-100);
 }
 .arrow-circle-btn--green:hover:not(:disabled):not([aria-disabled='true']) {
-  background: var(--color-base-primary-40);
+  background: var(--color-action-primary-hover);
 }
 .arrow-circle-btn--green:active:not(:disabled):not([aria-disabled='true']) {
-  background: var(--color-base-primary-60);
+  background: var(--color-action-primary-press);
 }
 
 /* ─── Theme: white ─────────────────────────────────────── */

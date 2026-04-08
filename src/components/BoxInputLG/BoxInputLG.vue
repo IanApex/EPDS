@@ -107,12 +107,12 @@ function handleChange() {
 /* ─── Selected ─────────────────────────────────────────── */
 .box-input-lg--selected {
   background: var(--color-neutral-100);
-  box-shadow: inset 0 0 0 2px var(--color-base-primary-50);
+  box-shadow: inset 0 0 0 2px var(--color-action-primary);
 }
 
 /* ─── Focus ────────────────────────────────────────────── */
 .box-input-lg:has(.box-input-lg__radio:focus-visible) {
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ─── Disabled ─────────────────────────────────────────── */
@@ -156,12 +156,12 @@ function handleChange() {
 
 /* Divider matches outer border on selected */
 .box-input-lg--selected .box-input-lg__header {
-  box-shadow: 0 2px 0 0 var(--color-base-primary-50);
+  box-shadow: 0 2px 0 0 var(--color-action-primary);
 }
 
 /* Divider matches outer border on focus */
 .box-input-lg:has(.box-input-lg__radio:focus-visible) .box-input-lg__header {
-  box-shadow: 0 3px 0 0 var(--color-accessibility-80);
+  box-shadow: 0 3px 0 0 var(--color-focus-ring);
 }
 
 /* ─── Body (description text) ──────────────────────────── */

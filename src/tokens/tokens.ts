@@ -1,5 +1,5 @@
 /**
- * TypeScript token map — mirrors tokens.css.
+ * TypeScript token map — mirrors tokens.css + semantic.css.
  * References CSS variable names so that CSS handles theming and TS provides
  * autocomplete + type safety when tokens are used in dynamic style bindings.
  *
@@ -7,6 +7,10 @@
  *   import { tokens } from '@/tokens/tokens'
  *   // Use in :style bindings or pass as prop values.
  *   // In static <style scoped> blocks, reference the CSS var directly.
+ *
+ * Token layers:
+ *   tokens.semantic  — intent-based aliases (use these in new components)
+ *   tokens.color     — raw brand primitives (avoid in new code; kept for compat)
  */
 
 type CSSVar = `var(--${string})`;
@@ -16,6 +20,41 @@ function v(name: string): CSSVar {
 }
 
 export const tokens = {
+  /**
+   * Semantic color tokens — map design intent to brand primitives.
+   * Prefer these over raw `color.*` tokens in dynamic style bindings.
+   */
+  semantic: {
+    action: {
+      primary:        v('color-action-primary'),
+      primaryHover:   v('color-action-primary-hover'),
+      primaryPress:   v('color-action-primary-press'),
+      primarySubtle:  v('color-action-primary-subtle'),
+      accent:         v('color-action-accent'),
+      accentHover:    v('color-action-accent-hover'),
+      accentPress:    v('color-action-accent-press'),
+      accentSubtle:   v('color-action-accent-subtle'),
+    },
+    focus: {
+      ring: v('color-focus-ring'),
+    },
+    disabled: {
+      surface: v('color-surface-disabled'),
+      text:    v('color-text-disabled'),
+    },
+    feedback: {
+      error:          v('color-feedback-error'),
+      errorText:      v('color-feedback-error-text'),
+      errorSurface:   v('color-feedback-error-surface'),
+      warning:        v('color-feedback-warning'),
+      warningSurface: v('color-feedback-warning-surface'),
+      success:        v('color-feedback-success'),
+      successSurface: v('color-feedback-success-surface'),
+      info:           v('color-feedback-info'),
+      infoSurface:    v('color-feedback-info-surface'),
+    },
+  },
+
   color: {
     base: {
       primary40: v('color-base-primary-40'),

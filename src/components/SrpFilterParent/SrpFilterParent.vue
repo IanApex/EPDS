@@ -117,7 +117,7 @@ const emit = defineEmits<{
 
 /* ─── Focus ────────────────────────────────────────────── */
 .srp-fp:focus-visible {
-  outline: 3px solid var(--color-accessibility-80);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: -3px;
 }
 
@@ -125,8 +125,8 @@ const emit = defineEmits<{
 @media (hover: none) {
   .srp-fp:active:not(:disabled) {
     background: rgba(0, 111, 166, 0.15);
-    border-top-color: var(--color-accent-40);
-    border-bottom-color: var(--color-accent-40);
+    border-top-color: var(--color-action-accent);
+    border-bottom-color: var(--color-action-accent);
   }
 }
 </style>

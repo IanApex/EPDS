@@ -137,12 +137,12 @@ function handleChange() {
 /* ─── Selected ─────────────────────────────────────────── */
 .box-input-md--selected {
   background: var(--color-neutral-100);
-  box-shadow: inset 0 0 0 2px var(--color-base-primary-50);
+  box-shadow: inset 0 0 0 2px var(--color-action-primary);
 }
 
 /* ─── Focus ────────────────────────────────────────────── */
 .box-input-md:has(.box-input-md__radio:focus-visible) {
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ─── Disabled ─────────────────────────────────────────── */

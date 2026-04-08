@@ -172,7 +172,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
 }
 
 .lt--selected::after {
-  box-shadow: inset 0 0 0 2px var(--color-base-primary-60);
+  box-shadow: inset 0 0 0 2px var(--color-action-primary-press);
 }
 
 /* ─── Hidden radio ─────────────────────────────────────────── */
@@ -264,7 +264,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
   font-size: var(--text-body-lg-size);
   font-weight: var(--font-weight-bold);
   line-height: var(--text-body-lg-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
 }
 
 .lt__distance {
@@ -316,7 +316,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
   font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--text-body-sm-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
 }
 
 /* Directions CTA */
@@ -363,7 +363,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
   font-size: var(--text-label-size);         /* 12px */
   font-weight: var(--font-weight-medium);
   line-height: var(--text-label-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   white-space: nowrap;
 }
 
@@ -409,7 +409,7 @@ const shopTag       = computed(() => props.shopHref ? 'a' : 'div')
   font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-bold);
   line-height: var(--text-body-sm-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   white-space: nowrap;
 }
 

@@ -150,7 +150,7 @@ function select(value: string) {
 /* ─── Focus Selected (keyboard nav) ───────────────────── */
 /* 3px inset Accessibility80 border — inset stays inside chip bounds */
 .box-selector__chip:has(.box-selector__radio:focus-visible) {
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
   outline: none;
 }
 

@@ -125,11 +125,11 @@ function focusInput() {
 }
 
 .text-box-sm--focused .text-box-sm__control {
-  border-color: var(--color-accent-30);
+  border-color: var(--color-action-accent-hover);
 }
 
 .text-box-sm--error .text-box-sm__control {
-  border-color: var(--color-warning-50);
+  border-color: var(--color-feedback-error);
 }
 
 .text-box-sm--disabled .text-box-sm__control {
@@ -188,7 +188,7 @@ function focusInput() {
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-  color: var(--color-warning-50);
+  color: var(--color-feedback-error);
   margin: 0;
   white-space: nowrap;
 }

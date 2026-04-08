@@ -100,30 +100,30 @@ const role = computed(() =>
 
 /* ─── Variants ────────────────────────────────────────────── */
 .alert--error {
-  background: var(--color-warning-90);
-  border-color: var(--color-warning-40);
-  --alert-icon-color: var(--color-warning-40);
+  background: var(--color-feedback-error-surface);
+  border-color: var(--color-feedback-error-text);
+  --alert-icon-color: var(--color-feedback-error-text);
   --alert-text-color: var(--color-neutral-0);
 }
 
 .alert--warning {
-  background: var(--color-alert-90);
-  border-color: var(--color-alert-70);
-  --alert-icon-color: var(--color-alert-70);
+  background: var(--color-feedback-warning-surface);
+  border-color: var(--color-feedback-warning);
+  --alert-icon-color: var(--color-feedback-warning);
   --alert-text-color: var(--color-neutral-0);
 }
 
 .alert--success {
-  background: var(--color-base-primary-90);
-  border-color: var(--color-base-primary-50);
-  --alert-icon-color: var(--color-base-primary-50);
+  background: var(--color-action-primary-subtle);
+  border-color: var(--color-action-primary);
+  --alert-icon-color: var(--color-action-primary);
   --alert-text-color: var(--color-neutral-0);
 }
 
 .alert--notification {
-  background: var(--color-accent-90);
-  border-color: var(--color-accent-40);
-  --alert-icon-color: var(--color-accent-40);
+  background: var(--color-action-accent-subtle);
+  border-color: var(--color-action-accent);
+  --alert-icon-color: var(--color-action-accent);
   --alert-text-color: var(--color-neutral-0);
 }
 </style>

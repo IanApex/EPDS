@@ -119,7 +119,7 @@ function focusInput() {
 }
 
 .text-field--light.text-field--focused .text-field__label {
-  color: var(--color-accent-30);
+  color: var(--color-action-accent-hover);
 }
 
 /* Label colors — dark */
@@ -128,7 +128,7 @@ function focusInput() {
 }
 
 .text-field--dark.text-field--focused .text-field__label {
-  color: var(--color-accessibility-80);
+  color: var(--color-focus-ring);
 }
 
 /* ── Control area ──────────────────────────────────────────────────── */
@@ -206,7 +206,7 @@ function focusInput() {
 }
 
 .text-field--light.text-field--focused .text-field__line {
-  background-color: var(--color-accent-30);
+  background-color: var(--color-action-accent-hover);
 }
 
 /* Line colors — dark */
@@ -215,12 +215,12 @@ function focusInput() {
 }
 
 .text-field--dark.text-field--focused .text-field__line {
-  background-color: var(--color-accessibility-80);
+  background-color: var(--color-focus-ring);
 }
 
 /* Error line override */
 .text-field--error .text-field__line {
-  background-color: var(--color-warning-50);
+  background-color: var(--color-feedback-error);
 }
 
 /* ── Error message ─────────────────────────────────────────────────── */
@@ -237,7 +237,7 @@ function focusInput() {
 }
 
 .text-field--light .text-field__error {
-  color: var(--color-warning-40);
+  color: var(--color-feedback-error-text);
 }
 
 .text-field--dark .text-field__error {

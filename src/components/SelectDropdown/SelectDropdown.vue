@@ -288,11 +288,11 @@ function onChange(e: Event) {
   background: var(--color-neutral-80); /* #BCBFC2 */
 }
 .select-dropdown--light.select-dropdown--focused .select-dropdown__line {
-  background: var(--color-accessibility-80);
+  background: var(--color-focus-ring);
 }
 
 .select-dropdown--light .select-dropdown__error {
-  color: var(--color-warning-40); /* #B30715 dark red */
+  color: var(--color-feedback-error-text); /* #B30715 dark red */
 }
 
 /* Light disabled */
@@ -330,7 +330,7 @@ function onChange(e: Event) {
   background: var(--color-neutral-85);
 }
 .select-dropdown--dark.select-dropdown--focused .select-dropdown__line {
-  background: var(--color-accessibility-80);
+  background: var(--color-focus-ring);
 }
 
 .select-dropdown--dark .select-dropdown__error {

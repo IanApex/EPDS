@@ -123,11 +123,11 @@ function focusTextarea() {
 }
 
 .text-box-lg--focused .text-box-lg__control {
-  border-color: var(--color-accent-30);
+  border-color: var(--color-action-accent-hover);
 }
 
 .text-box-lg--error .text-box-lg__control {
-  border-color: var(--color-warning-50);
+  border-color: var(--color-feedback-error);
 }
 
 .text-box-lg--disabled .text-box-lg__control {
@@ -175,7 +175,7 @@ function focusTextarea() {
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-  color: var(--color-warning-50);
+  color: var(--color-feedback-error);
   margin: 0;
 }
 
@@ -191,6 +191,6 @@ function focusTextarea() {
 }
 
 .text-box-lg__counter--at-limit {
-  color: var(--color-warning-50);
+  color: var(--color-feedback-error);
 }
 </style>

@@ -4,7 +4,7 @@
 - **Framework**: Vue 3 with `<script setup>` + TypeScript (Composition API only — no Options API)
 - **Build**: Vite 8, `@vitejs/plugin-vue`, `vite-svg-loader`
 - **Docs/Testing**: Storybook 10 (`@storybook/vue3-vite`) — addons: docs, a11y (errors on violation), vitest, pseudo-states, Chromatic
-- **Styling**: CSS custom properties in `src/tokens/tokens.css`, scoped `<style>` blocks in SFCs
+- **Styling**: Three-layer CSS custom property system (primitives → semantic → scales); scoped `<style>` blocks in SFCs
 - **Token TS wrapper**: `src/tokens/tokens.ts`
 - **Breakpoints**: `src/tokens/breakpoints.ts` (JS constants — CSS vars can't be used in `@media`)
 - **Font**: Roboto via Google Fonts (weights 300/400/500/700) — loaded in `index.html` and `.storybook/preview-head.html`
@@ -26,8 +26,11 @@ EPDS/
 │   └── 3rd Party/                   ← Partner/trust logos
 ├── src/
 │   ├── tokens/
-│   │   ├── tokens.css                ← ALL design tokens (source of truth)
-│   │   ├── tokens.ts                 ← TypeScript token map (CSS var references)
+│   │   ├── primitives/
+│   │   │   └── echopark.css          ← Brand color palette + --font-family-brand (swap to white-label)
+│   │   ├── semantic.css              ← Intent aliases: --color-action-*, --color-focus-ring, --color-feedback-*
+│   │   ├── tokens.css                ← Brand-agnostic scales: spacing, border, shadow, opacity, typography
+│   │   ├── tokens.ts                 ← TypeScript token map (tokens.semantic.* + tokens.color.*)
 │   │   └── breakpoints.ts            ← Breakpoint constants for JS/media queries
 │   ├── components/
 │   │   └── ComponentName/
@@ -39,11 +42,11 @@ EPDS/
 │   │   └── Logos.stories.ts
 │   ├── vite-env.d.ts                 ← SVG import type declarations
 │   ├── App.vue
-│   ├── main.ts                       ← imports tokens.css + style.css
+│   ├── main.ts                       ← imports primitives → semantic → tokens → style (in order)
 │   └── style.css                     ← global resets only
 ├── .storybook/
 │   ├── main.ts
-│   ├── preview.ts                    ← imports tokens.css + style.css
+│   ├── preview.ts                    ← same import order as main.ts
 │   └── preview-head.html             ← Google Fonts link for Storybook iframe
 └── .cursor/rules/design-system.mdc  ← Cursor rules mirror of this file
 ```
@@ -339,10 +342,36 @@ Button text: `--font-family-btn --font-size-btn --font-weight-btn --line-height-
 `--grid-padding-sm(24)/md(24)/lg(32)/xlg(32)/max(32)`
 Breakpoints (JS only — `breakpoints.ts`): sm=0 md=600 lg=1024 xlg=1440 max=1920
 
+## Token Architecture (White-Label)
+
+The token system has three layers loaded in order:
+
+| Layer | File | Purpose |
+|---|---|---|
+| **Primitives** | `src/tokens/primitives/echopark.css` | Concrete brand values: color palette + `--font-family-brand` |
+| **Semantic** | `src/tokens/semantic.css` | Intent aliases mapping purpose → primitive |
+| **Scales** | `src/tokens/tokens.css` | Brand-agnostic: spacing, border, shadow, opacity, typography |
+
+**To white-label for a new brand:** create `primitives/brand-b.css`, redefine the color vars and `--font-family-brand`, then swap the one import line in `main.ts` and `preview.ts`. No component changes needed.
+
+### Semantic token groups
+- `--color-action-primary[-hover|-press|-subtle]` — primary brand CTA color
+- `--color-action-accent[-hover|-press|-subtle]` — secondary/link color
+- `--color-focus-ring` — universal focus indicator
+- `--color-surface-disabled`, `--color-text-disabled` — disabled state
+- `--color-feedback-error[-text|-surface]` — error/destructive states
+- `--color-feedback-warning[-surface]` — caution states
+- `--color-feedback-success[-surface]` — success/confirmation states
+- `--color-feedback-info[-surface]` — informational/notification states
+
+### Font family chain
+`--font-family-brand` (primitives) → `--font-family-base` (tokens.css) → `--font-family-btn` (tokens.css)
+
 ## Design Token Rules
 - **Always** use CSS custom properties — never hardcode raw color/spacing/radius/typography values
-- When adding a new token, add to both `tokens.css` AND `tokens.ts` simultaneously
-- Old/legacy aliases (`warmgray-*`, `parkgray-70`, `green-50`) are NOT to be used
+- **In component `<style scoped>` blocks**, use semantic tokens (`--color-action-primary`, `--color-focus-ring`, etc.) for any brand-variable color. Use primitive tokens (`--color-neutral-*`, `--color-neutral-secondary-*`) only for structural neutrals that are unlikely to differ by brand.
+- When adding a new token, add to both the appropriate CSS file AND `tokens.ts` simultaneously
+- Old/legacy aliases (`warmgray-*`, `parkgray-70`, `green-50`, `--color-parkgray-0`, `--color-white`) are NOT to be used in components
 
 ## Component Rules
 - Every component in its own folder: `src/components/ComponentName/`

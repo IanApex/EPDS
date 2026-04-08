@@ -147,7 +147,7 @@ function select(value: string) {
 
 /* ─── Selected ──────────────────────────────────────────────── */
 .segmented-control__chip--selected {
-  background: var(--color-base-primary-50);
+  background: var(--color-action-primary);
 }
 
 /* ─── Focus ring (via :has) ─────────────────────────────────── */
@@ -158,7 +158,7 @@ function select(value: string) {
 */
 .segmented-control__chip:has(.segmented-control__radio:focus-visible) {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-accessibility-80);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 /* ─── Hidden radio ──────────────────────────────────────────── */

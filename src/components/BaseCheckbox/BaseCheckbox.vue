@@ -127,7 +127,7 @@ const checked = computed({
   top: 50%;
   transform: translate(-50%, -50%);
   border-radius: 1px;
-  background: var(--color-base-primary-50);
+  background: var(--color-action-primary);
 }
 .checkbox:active:not(.checkbox--disabled) .checkbox__input:not(:checked) ~ .checkbox__label {
   text-decoration: underline;
@@ -136,13 +136,13 @@ const checked = computed({
 /* ─── Focus (unchecked) ─────────────────────────────────── */
 .checkbox__input:focus-visible ~ .checkbox__box {
   outline: none;
-  border-color: var(--color-accessibility-80);
+  border-color: var(--color-focus-ring);
 }
 
 /* ─── Checked ───────────────────────────────────────────── */
 .checkbox__input:checked ~ .checkbox__box {
-  background: var(--color-base-primary-50);
-  border-color: var(--color-base-primary-50);
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
 }
 .checkbox__input:checked ~ .checkbox__box .checkbox__check {
   opacity: 1;
@@ -150,15 +150,15 @@ const checked = computed({
 
 /* ─── Hover checked ─────────────────────────────────────── */
 .checkbox:hover:not(.checkbox--disabled) .checkbox__input:checked ~ .checkbox__box {
-  background: var(--color-base-primary-40);
-  border-color: var(--color-base-primary-40);
+  background: var(--color-action-primary-hover);
+  border-color: var(--color-action-primary-hover);
 }
 
 /* ─── Focus checked ─────────────────────────────────────── */
 .checkbox__input:checked:focus-visible ~ .checkbox__box {
-  background: var(--color-base-primary-50);
-  border-color: var(--color-base-primary-50);
-  box-shadow: inset 0 0 0 2px var(--color-accessibility-80);
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  box-shadow: inset 0 0 0 2px var(--color-focus-ring);
 }
 
 /* ─── Disabled ──────────────────────────────────────────── */

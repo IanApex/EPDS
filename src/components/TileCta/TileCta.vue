@@ -64,7 +64,7 @@ defineEmits<{
   text-decoration: none;
   white-space: nowrap;
 
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   font-family: var(--font-family-btn);
   font-size: var(--font-size-btn-sm);
   font-weight: var(--font-weight-btn-sm);
@@ -72,7 +72,7 @@ defineEmits<{
   letter-spacing: var(--letter-spacing-btn-sm);
 
   /* Default 2px Accent40 border rendered inside — no layout impact */
-  box-shadow: inset 0 0 0 2px var(--color-accent-40);
+  box-shadow: inset 0 0 0 2px var(--color-action-accent);
 
   transition:
     color 0.15s ease,
@@ -82,21 +82,21 @@ defineEmits<{
 
 /* ─── Hover ────────────────────────────────────────────── */
 .tile-cta:hover:not(:disabled):not([aria-disabled='true']) {
-  color: var(--color-accent-30);
-  box-shadow: inset 0 0 0 3px var(--color-accent-30);
+  color: var(--color-action-accent-hover);
+  box-shadow: inset 0 0 0 3px var(--color-action-accent-hover);
 }
 
 /* ─── Active / Pressed ─────────────────────────────────── */
 .tile-cta:active:not(:disabled):not([aria-disabled='true']) {
-  color: var(--color-accent-40);
-  box-shadow: inset 0 0 0 3px var(--color-accent-40);
-  background-color: var(--color-accent-90);
+  color: var(--color-action-accent);
+  box-shadow: inset 0 0 0 3px var(--color-action-accent);
+  background-color: var(--color-action-accent-subtle);
 }
 
 /* ─── Focus ────────────────────────────────────────────── */
 .tile-cta:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ─── Disabled ─────────────────────────────────────────── */

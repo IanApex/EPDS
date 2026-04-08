@@ -89,13 +89,13 @@ const emit = defineEmits<{
 
   border: none; /* reset <button> default */
   border-radius: 8px;
-  background: var(--color-accent-90); /* #E6F1F5 — always */
-  color: var(--color-accent-40);       /* #006FA6 Blue60 */
+  background: var(--color-action-accent-subtle); /* #E6F1F5 — always */
+  color: var(--color-action-accent);       /* #006FA6 Blue60 */
   cursor: pointer;
   text-decoration: none;
 
   /* 1px border via inset shadow — never shifts layout as weight changes */
-  box-shadow: inset 0 0 0 1px var(--color-accent-40);
+  box-shadow: inset 0 0 0 1px var(--color-action-accent);
 
   transition:
     background-color 0.15s ease,
@@ -106,8 +106,8 @@ const emit = defineEmits<{
 /* ─── Hover ────────────────────────────────────────────── */
 .journey-selector:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--color-accent-85); /* #C8E0E9 */
-  box-shadow: inset 0 0 0 2px var(--color-accent-40);
-  color: var(--color-accent-30);      /* #004D80 */
+  box-shadow: inset 0 0 0 2px var(--color-action-accent);
+  color: var(--color-action-accent-hover);      /* #004D80 */
 }
 .journey-selector:hover:not(:disabled):not([aria-disabled='true']) .journey-selector__label {
   text-decoration: underline;
@@ -115,20 +115,20 @@ const emit = defineEmits<{
 
 /* ─── Selected ─────────────────────────────────────────── */
 .journey-selector--selected {
-  box-shadow: inset 0 0 0 2px var(--color-accent-30); /* #004D80 */
-  color: var(--color-accent-30);
+  box-shadow: inset 0 0 0 2px var(--color-action-accent-hover); /* #004D80 */
+  color: var(--color-action-accent-hover);
 }
 
 /* Selected + hover: keep selected border, change bg */
 .journey-selector--selected:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--color-accent-85);
-  box-shadow: inset 0 0 0 2px var(--color-accent-30);
+  box-shadow: inset 0 0 0 2px var(--color-action-accent-hover);
 }
 
 /* ─── Focus ────────────────────────────────────────────── */
 .journey-selector:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 3px var(--color-accessibility-80);
+  box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ─── Disabled ─────────────────────────────────────────── */
