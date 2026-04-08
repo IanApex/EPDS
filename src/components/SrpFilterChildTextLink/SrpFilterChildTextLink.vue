@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import checkSvg       from '../../../icon/Style=Display, Detail=Default, Icon=Check-Small.svg?raw'
-import rightSmallSvg  from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Right-Small.svg?raw'
+import rightSvg  from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Right.svg?raw'
 
 withDefaults(defineProps<{
   /** Visible option label, e.g. "4WD" */
@@ -80,7 +80,7 @@ function handleLinkClick(e: MouseEvent) {
       @click="handleLinkClick"
     >
       <span class="srp-ftl__link-text">{{ linkLabel }}</span>
-      <span class="srp-ftl__link-chevron" aria-hidden="true" v-html="rightSmallSvg" />
+      <span class="srp-ftl__link-chevron" aria-hidden="true" v-html="rightSvg" />
     </component>
   </div>
 </template>
@@ -93,13 +93,29 @@ function handleLinkClick(e: MouseEvent) {
   width: 100%;
   height: 56px;
   box-sizing: border-box;
+  background: var(--color-neutral-100);
   border-top: var(--border-width-hairline) solid var(--color-neutral-90);
   border-bottom: var(--border-width-hairline) solid var(--color-neutral-90);
+  transition: background-color 0.15s ease;
 }
 
-/* Focus ring on the outer row when either half is focused */
-.srp-ftl:focus-within {
-  /* individual halves handle their own outlines */
+/* Entire row highlights when EITHER half is hovered */
+.srp-ftl:hover {
+  background: var(--color-neutral-95);
+}
+
+.srp-ftl:has(*:active) {
+  background: var(--color-neutral-90);
+  border-top-color: var(--color-neutral-90);
+  border-bottom-color: var(--color-neutral-90);
+}
+
+@media (hover: none) {
+  .srp-ftl:has(*:active) {
+    background: rgba(0, 111, 166, 0.15);
+    border-top-color: var(--color-accent-40);
+    border-bottom-color: var(--color-accent-40);
+  }
 }
 
 /* ─── Left: filter half ────────────────────────────────── */
@@ -112,18 +128,9 @@ function handleLinkClick(e: MouseEvent) {
   min-width: 0;
   padding: var(--spacing-xxxs) var(--spacing-xxs);  /* 16px 24px */
   box-sizing: border-box;
-  background: var(--color-neutral-100);
+  background: transparent;               /* inherits container bg */
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s ease;
-}
-
-.srp-ftl__left:hover {
-  background: var(--color-neutral-95);
-}
-
-.srp-ftl__left:active {
-  background: var(--color-neutral-90);
 }
 
 .srp-ftl__left:has(.srp-ftl__input:focus-visible) {
@@ -131,28 +138,18 @@ function handleLinkClick(e: MouseEvent) {
   outline-offset: -3px;
 }
 
-@media (hover: none) {
-  .srp-ftl__left:active {
-    background: rgba(0, 111, 166, 0.15);
-    outline: 1px solid var(--color-accent-40);
-    outline-offset: -1px;
-  }
-}
-
 /* ─── Returning to selected — left half green bg ───────── */
 .srp-ftl--returning .srp-ftl__left {
   background: var(--color-base-primary-90);
 }
 
-.srp-ftl--returning .srp-ftl__left:hover {
+/* On hover the container goes neutral-95 but left stays green */
+.srp-ftl--returning:hover .srp-ftl__left {
   background: var(--color-base-primary-90);
 }
 
-.srp-ftl--returning .srp-ftl__left::after {
-  content: none;
-}
-
-.srp-ftl--returning .srp-ftl__left:active::after {
+/* Pressed over returning row: subtle darken via overlay */
+.srp-ftl--returning:has(*:active) .srp-ftl__left::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -233,33 +230,15 @@ function handleLinkClick(e: MouseEvent) {
   padding: var(--spacing-xxxs) var(--spacing-xxs);  /* 16px 24px */
   box-sizing: border-box;
 
-  background: var(--color-neutral-100);
+  background: transparent;               /* inherits container bg */
   border: none;
   cursor: pointer;
   text-decoration: none;
-
-  transition: background-color 0.15s ease;
-}
-
-.srp-ftl__link:hover {
-  background: var(--color-neutral-95);
-}
-
-.srp-ftl__link:active {
-  background: var(--color-neutral-90);
 }
 
 .srp-ftl__link:focus-visible {
   outline: 3px solid var(--color-accessibility-80);
   outline-offset: -3px;
-}
-
-@media (hover: none) {
-  .srp-ftl__link:active {
-    background: rgba(0, 111, 166, 0.15);
-    outline: 1px solid var(--color-accent-40);
-    outline-offset: -1px;
-  }
 }
 
 /* ─── Link label ───────────────────────────────────────── */
@@ -278,18 +257,18 @@ function handleLinkClick(e: MouseEvent) {
   text-underline-offset: 2px;
 }
 
-/* ─── Link chevron (right-small arrow) ─────────────────── */
+/* ─── Link chevron ─────────────────────────────────────── */
 .srp-ftl__link-chevron {
   display: inline-flex;
   align-items: center;
-  width: 8px;
-  height: 13px;
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .srp-ftl__link-chevron :deep(svg) {
-  width: 8px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
 }
 
 .srp-ftl__link-chevron :deep(path) {

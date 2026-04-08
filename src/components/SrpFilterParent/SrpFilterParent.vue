@@ -4,24 +4,21 @@ import rightArrowSvg from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Righ
 withDefaults(defineProps<{
   /** Filter category label, e.g. "Body style" */
   label: string
-  /** Whether the accordion is expanded (v-model) */
-  open?: boolean
   /** True when one or more children are selected — renders label in bold */
   hasSelection?: boolean
   /**
    * Disabled / "Common Inputs" state — mutes the label to Neutral40
-   * and hides the expand chevron. Used when this row is part of a
-   * common-input form rather than an interactive filter.
+   * and hides the chevron. Used when this row is part of a common-input
+   * form rather than an interactive filter.
    */
   disabled?: boolean
 }>(), {
-  open:         false,
   hasSelection: false,
   disabled:     false,
 })
 
 const emit = defineEmits<{
-  'update:open': [value: boolean]
+  click: [event: MouseEvent]
 }>()
 </script>
 
@@ -29,13 +26,11 @@ const emit = defineEmits<{
   <button
     class="srp-fp"
     :class="{
-      'srp-fp--open':          open,
       'srp-fp--has-selection': hasSelection,
       'srp-fp--disabled':      disabled,
     }"
     :disabled="disabled"
-    :aria-expanded="disabled ? undefined : open"
-    @click="emit('update:open', !open)"
+    @click="emit('click', $event)"
   >
     <span class="srp-fp__label">{{ label }}</span>
     <span
@@ -108,10 +103,6 @@ const emit = defineEmits<{
 }
 
 /* Rotate 90° clockwise when open (points downward) */
-.srp-fp--open .srp-fp__chevron {
-  transform: rotate(90deg);
-}
-
 /* ─── Hover ────────────────────────────────────────────── */
 .srp-fp:hover:not(:disabled) {
   background: var(--color-neutral-95);

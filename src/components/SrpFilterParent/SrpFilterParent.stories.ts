@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
 import SrpFilterParent from './SrpFilterParent.vue'
 
 const meta = {
@@ -20,13 +19,11 @@ const meta = {
   },
   argTypes: {
     label:        { control: 'text' },
-    open:         { control: 'boolean' },
     hasSelection: { control: 'boolean' },
     disabled:     { control: 'boolean' },
   },
   args: {
     label:        'Body style',
-    open:         false,
     hasSelection: false,
     disabled:     false,
   },
@@ -40,17 +37,7 @@ const w = 'width:306px;'
 // ─── Static states ────────────────────────────────────────────────────────────
 
 export const Default: Story = {
-  name: 'Default (collapsed)',
-  render: (args) => ({
-    components: { SrpFilterParent },
-    setup() { return { args } },
-    template: `<div style="${w}"><SrpFilterParent v-bind="args" /></div>`,
-  }),
-}
-
-export const Open: Story = {
-  name: 'Open (expanded)',
-  args: { open: true },
+  name: 'Default',
   render: (args) => ({
     components: { SrpFilterParent },
     setup() { return { args } },
@@ -61,16 +48,11 @@ export const Open: Story = {
 export const WithSelection: Story = {
   name: 'Has selection (bold)',
   args: { hasSelection: true },
-  render: (args) => ({
-    components: { SrpFilterParent },
-    setup() { return { args } },
-    template: `<div style="${w}"><SrpFilterParent v-bind="args" /></div>`,
-  }),
-}
-
-export const WithSelectionOpen: Story = {
-  name: 'Has selection + open',
-  args: { hasSelection: true, open: true },
+  parameters: {
+    docs: {
+      description: { story: 'Label renders bold when one or more child filters are active.' },
+    },
+  },
   render: (args) => ({
     components: { SrpFilterParent },
     setup() { return { args } },
@@ -93,25 +75,15 @@ export const Disabled: Story = {
   }),
 }
 
-// ─── Interactive ──────────────────────────────────────────────────────────────
-
-export const Interactive: Story = {
-  name: 'Interactive (toggle)',
-  parameters: {
-    docs: {
-      description: { story: 'Click to open/close. Chevron rotates 90°.' },
-    },
-  },
+export const AllVariants: Story = {
+  name: 'All variants',
   render: () => ({
     components: { SrpFilterParent },
-    setup() {
-      const open = ref(false)
-      return { open }
-    },
     template: `
-      <div style="${w}">
-        <SrpFilterParent label="Body style" :open="open" @update:open="open = $event" />
-        <p style="margin-top:8px;font-size:12px;color:#666;">open: {{ open }}</p>
+      <div style="${w}display:flex;flex-direction:column;">
+        <SrpFilterParent label="Body style" />
+        <SrpFilterParent label="Body style" :hasSelection="true" />
+        <SrpFilterParent label="Body style" :disabled="true" />
       </div>
     `,
   }),
