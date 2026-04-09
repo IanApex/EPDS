@@ -12,6 +12,8 @@ const meta = {
         component:
           'Trade-in / offer entry card from Figma **Car offer input card**. Composes `SegmentedControl`, ' +
           '`TextField`, `SelectDropdown`, `BaseButton`, and `LinkCta`.\n\n' +
+          'Vertical rhythm matches TextField usage: **48px** (`--spacing-md`) between the segmented control, ' +
+          'the form block, the primary field and whatever sits below it (dropdown, link row, or text), and the CTA.\n\n' +
           '**v-model:** `offerType` (`vin` | `license`), `vin`, `licensePlate`, `state`. ' +
           '**Events:** `submit`, `vin-help`.',
       },

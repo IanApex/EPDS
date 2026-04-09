@@ -4,6 +4,8 @@
  *
  * Layout (Figma usage): when placing multiple text fields in a grid or flex wrap, use
  * 48px vertical and 16px horizontal gap between fields — e.g. `gap: var(--spacing-md) var(--spacing-xxxs)`.
+ * Use the same 48px vertical gap between a text field and **any** following sibling in a column
+ * (another control, body copy, links, etc.).
  */
 import { computed, ref } from 'vue'
 

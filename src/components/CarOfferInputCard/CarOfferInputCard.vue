@@ -115,7 +115,7 @@ function onVinHelp(e: MouseEvent) {
     </template>
 
     <template v-else>
-      <div class="car-offer-input-card__block car-offer-input-card__block--plate">
+      <div class="car-offer-input-card__block">
         <TextField
           class="car-offer-input-card__field"
           label="Enter license plate"
@@ -155,7 +155,8 @@ function onVinHelp(e: MouseEvent) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xxs);
+  /* Match TextField usage: 48px between segmented control, form block, and CTA. */
+  gap: var(--spacing-md);
   width: 100%;
   max-width: 328px;
   padding: var(--spacing-xxs);
@@ -175,13 +176,9 @@ function onVinHelp(e: MouseEvent) {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--spacing-nano);
-  width: 100%;
-}
-
-/* Same vertical rhythm as TextField usage (48px between stacked fields / controls). */
-.car-offer-input-card__block--plate {
+  /* 48px after the primary TextField to the next row (dropdown, links, helper text, etc.). */
   gap: var(--spacing-md);
+  width: 100%;
 }
 
 .car-offer-input-card__field {
