@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import SegmentedControl from '../SegmentedControl/SegmentedControl.vue'
 import TextField from '../TextField/TextField.vue'
 import SelectDropdown from '../SelectDropdown/SelectDropdown.vue'
 import BaseButton from '../BaseButton/BaseButton.vue'
-import LinkCta from '../LinkCta/LinkCta.vue'
 import type { SelectOption } from '../SelectDropdown/SelectDropdown.vue'
 
 import infoSvg from '../../../icon/Style=Alerts, Detail=Info, Icon=NA.svg?raw'
@@ -15,6 +15,10 @@ const OFFER_TYPE = {
 } as const
 
 export type CarOfferType = (typeof OFFER_TYPE)[keyof typeof OFFER_TYPE]
+
+const ERR_VIN = 'Enter a valid 17-character VIN.'
+const ERR_PLATE = 'Enter a valid license plate.'
+const ERR_STATE_REQUIRED = 'This field is required.'
 
 const props = withDefaults(
   defineProps<{
@@ -54,13 +58,91 @@ const segmentedOptions = [
   { value: OFFER_TYPE.license, label: 'License plate' },
 ]
 
+const showVinError = ref(false)
+const showPlateError = ref(false)
+const showStateError = ref(false)
+
+function isValidVin(v: string) {
+  return v.trim().length === 17
+}
+
+function isValidPlate(v: string) {
+  return v.trim().length > 0
+}
+
+function isValidState(v: string) {
+  return v.trim().length > 0
+}
+
+function clearErrors() {
+  showVinError.value = false
+  showPlateError.value = false
+  showStateError.value = false
+}
+
 function setOfferType(v: string) {
   if (v === OFFER_TYPE.vin || v === OFFER_TYPE.license) {
+    clearErrors()
     emit('update:offerType', v)
   }
 }
 
+function onVinUpdate(value: string) {
+  emit('update:vin', value)
+  if (isValidVin(value)) showVinError.value = false
+}
+
+function onVinBlur() {
+  if (props.disabled) return
+  showVinError.value = !isValidVin(props.vin)
+}
+
+function onPlateUpdate(value: string) {
+  emit('update:licensePlate', value)
+  if (isValidPlate(value)) showPlateError.value = false
+}
+
+function onPlateBlur() {
+  if (props.disabled) return
+  showPlateError.value = !isValidPlate(props.licensePlate)
+}
+
+function onStateUpdate(value: string) {
+  emit('update:state', value)
+  if (isValidState(value)) showStateError.value = false
+}
+
+function onStateBlur() {
+  if (props.disabled) return
+  showStateError.value = !isValidState(props.state)
+}
+
 function onSubmit() {
+  if (props.disabled) return
+  if (props.offerType === OFFER_TYPE.vin) {
+    if (!isValidVin(props.vin)) {
+      showVinError.value = true
+      return
+    }
+    showVinError.value = false
+    emit('submit')
+    return
+  }
+
+  let ok = true
+  if (!isValidPlate(props.licensePlate)) {
+    showPlateError.value = true
+    ok = false
+  } else {
+    showPlateError.value = false
+  }
+  if (!isValidState(props.state)) {
+    showStateError.value = true
+    ok = false
+  } else {
+    showStateError.value = false
+  }
+  if (!ok) return
   emit('submit')
 }
 
@@ -90,17 +172,14 @@ function onVinHelp(e: MouseEvent) {
           name="car-offer-vin"
           :model-value="vin"
           :disabled="disabled"
+          :error="showVinError ? ERR_VIN : undefined"
+          maxlength="17"
           autocomplete="off"
-          @update:model-value="emit('update:vin', $event)"
+          @update:model-value="onVinUpdate"
+          @blur="onVinBlur"
         />
         <div class="car-offer-input-card__vin-help">
-          <LinkCta
-            label="Where is my VIN?"
-            :arrow="false"
-            theme="light"
-            :disabled="disabled"
-            @click="onVinHelp"
-          />
+          <p class="car-offer-input-card__vin-hint">Where is my VIN?</p>
           <button
             type="button"
             class="car-offer-input-card__info"
@@ -122,8 +201,10 @@ function onVinHelp(e: MouseEvent) {
           name="car-offer-plate"
           :model-value="licensePlate"
           :disabled="disabled"
+          :error="showPlateError ? ERR_PLATE : undefined"
           autocomplete="off"
-          @update:model-value="emit('update:licensePlate', $event)"
+          @update:model-value="onPlateUpdate"
+          @blur="onPlateBlur"
         />
         <div class="car-offer-input-card__state">
           <SelectDropdown
@@ -132,7 +213,9 @@ function onVinHelp(e: MouseEvent) {
             :options="stateOptions"
             :model-value="state"
             :disabled="disabled"
-            @update:model-value="emit('update:state', $event)"
+            :error="showStateError ? ERR_STATE_REQUIRED : undefined"
+            @update:model-value="onStateUpdate"
+            @blur="onStateBlur"
           />
         </div>
       </div>
@@ -194,6 +277,16 @@ function onVinHelp(e: MouseEvent) {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-nano);
+}
+
+.car-offer-input-card__vin-hint {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--text-body-sm-weight);
+  line-height: var(--text-body-sm-line-height);
+  letter-spacing: var(--text-body-sm-letter-spacing);
+  color: var(--color-neutral-40);
 }
 
 .car-offer-input-card__info {

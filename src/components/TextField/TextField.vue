@@ -33,6 +33,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  blur: []
 }>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
@@ -49,6 +50,11 @@ function onInput(e: Event) {
 
 function focusInput() {
   inputEl.value?.focus()
+}
+
+function onBlur() {
+  isFocused.value = false
+  emit('blur')
 }
 </script>
 
@@ -83,7 +89,7 @@ function focusInput() {
         :placeholder="label"
         @input="onInput"
         @focus="isFocused = true"
-        @blur="isFocused = false"
+        @blur="onBlur"
       />
     </div>
 

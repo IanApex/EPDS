@@ -49,6 +49,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  blur: []
 }>()
 
 const isFocused = ref(false)
@@ -56,6 +57,11 @@ const hasValue  = computed(() => !!props.modelValue)
 
 function onChange(e: Event) {
   emit('update:modelValue', (e.target as HTMLSelectElement).value)
+}
+
+function onBlur() {
+  isFocused.value = false
+  emit('blur')
 }
 </script>
 
@@ -87,7 +93,7 @@ function onChange(e: Event) {
         :disabled="disabled"
         @change="onChange"
         @focus="isFocused = true"
-        @blur="isFocused = false"
+        @blur="onBlur"
       >
         <!-- Empty placeholder option (hidden once a value is selected) -->
         <option value="" disabled :selected="!hasValue" />
@@ -109,7 +115,7 @@ function onChange(e: Event) {
     </div>
 
     <!-- Error message — absolutely positioned so it never shifts layout height -->
-    <p v-if="error" class="select-dropdown__error">{{ error }}</p>
+    <p v-if="error" class="select-dropdown__error" role="alert">{{ error }}</p>
   </div>
 </template>
 

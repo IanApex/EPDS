@@ -11,11 +11,13 @@ const meta = {
       description: {
         component:
           'Trade-in / offer entry card from Figma **Car offer input card**. Composes `SegmentedControl`, ' +
-          '`TextField`, `SelectDropdown`, `BaseButton`, and `LinkCta`.\n\n' +
+          '`TextField`, `SelectDropdown`, and `BaseButton`.\n\n' +
           'Vertical rhythm matches TextField usage: **48px** (`--spacing-md`) between the segmented control, ' +
-          'the form block, the primary field and whatever sits below it (dropdown, link row, or text), and the CTA.\n\n' +
+          'the form block, the primary field and whatever sits below it (dropdown, hint text, etc.), and the CTA.\n\n' +
+          '**Validation:** VIN must be **17** characters (blur or CTA). License plate must be non-empty; state is required. ' +
+          'The info control still emits **`vin-help`**.\n\n' +
           '**v-model:** `offerType` (`vin` | `license`), `vin`, `licensePlate`, `state`. ' +
-          '**Events:** `submit`, `vin-help`.',
+          '**Events:** `submit` (only when valid), `vin-help`.',
       },
     },
     backgrounds: { default: 'neutral-95' },
