@@ -132,7 +132,7 @@ function openTestDrive(e: MouseEvent) {
       <!-- Favorite button — ADA tab stop 2 -->
       <div class="srpt__favorite">
         <SmallIconButton
-          :aria-label="favorited ? 'Remove from favorites' : 'Save to favorites'"
+          :ariaLabel="favorited ? 'Remove from favorites' : 'Save to favorites'"
           :selected="favorited"
           @click="toggleFavorite"
         >
@@ -145,13 +145,13 @@ function openTestDrive(e: MouseEvent) {
       <!-- Carousel arrows (visible on image-area hover) -->
       <div v-if="imageCount > 1" class="srpt__arrows">
         <ArrowCircleButton
-          aria-label="Previous photo"
+          ariaLabel="Previous photo"
           direction="left"
           size="sm"
           @click="prevImage"
         />
         <ArrowCircleButton
-          aria-label="Next photo"
+          ariaLabel="Next photo"
           direction="right"
           size="sm"
           @click="nextImage"
@@ -283,7 +283,7 @@ function openTestDrive(e: MouseEvent) {
 
         <!-- Calculator — ADA tab stop 8 -->
         <MediumIconButton
-          aria-label="Open payment calculator"
+          ariaLabel="Open payment calculator"
           @click="openCalculator"
         >
           <template #icon>
@@ -491,7 +491,7 @@ function openTestDrive(e: MouseEvent) {
 .srpt__title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   margin: 0;
   font-family: var(--font-family-base);
