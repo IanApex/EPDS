@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import TextBoxSM from './TextBoxSM.vue'
 
 const meta: Meta<typeof TextBoxSM> = {
-  title: 'Components/Inputs/TextBoxSM',
+  title: 'Atoms/Inputs/TextBoxSM',
   component: TextBoxSM,
   tags: ['autodocs'],
   argTypes: {

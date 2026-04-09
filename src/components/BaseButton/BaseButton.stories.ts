@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import BaseButton from './BaseButton.vue'
 
 const meta = {
-  title: 'Components/Buttons/BaseButton',
+  title: 'Atoms/Buttons/BaseButton',
   component: BaseButton,
   tags: ['autodocs'],
   parameters: {

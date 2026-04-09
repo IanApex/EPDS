@@ -9,7 +9,7 @@ const ProfileCircleIcon = defineComponent({
 })
 
 const meta = {
-  title: 'Components/Buttons/IconButton',
+  title: 'Atoms/Buttons/IconButton',
   component: IconButton,
   tags: ['autodocs'],
   parameters: {

@@ -7,7 +7,7 @@ import mapLocationSvg from '../../../icon/Style=Location, Detail=Map-Location, I
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/Inputs/Box Input/MD',
+  title: 'Atoms/Inputs/Box Input/MD',
   component: BoxInputMD,
   tags: ['autodocs'],
   parameters: {

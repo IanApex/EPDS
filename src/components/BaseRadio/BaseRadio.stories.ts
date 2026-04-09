@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import BaseRadio from './BaseRadio.vue'
 
 const meta: Meta<typeof BaseRadio> = {
-  title: 'Components/Inputs/BaseRadio',
+  title: 'Atoms/Inputs/BaseRadio',
   component: BaseRadio,
   tags: ['autodocs'],
   argTypes: {

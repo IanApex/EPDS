@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import BaseSlider from './BaseSlider.vue'
 
 const meta: Meta<typeof BaseSlider> = {
-  title: 'Components/Inputs/BaseSlider',
+  title: 'Atoms/Inputs/BaseSlider',
   component: BaseSlider,
   tags: ['autodocs'],
   argTypes: {

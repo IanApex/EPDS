@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import BaseAccordion from './BaseAccordion.vue'
+import Accordion from './Accordion.vue'
 
 const meta = {
-  title: 'Components/BaseAccordion',
-  component: BaseAccordion,
+  title: 'Molecules/Accordion',
+  component: Accordion,
   tags: ['autodocs'],
   parameters: {
     docs: {
@@ -19,9 +19,9 @@ const meta = {
           '- Do not nest accordions inside accordions\n' +
           '- On mobile, anchor the user to the top of the newly opened item\n\n' +
           '```html\n' +
-          '<BaseAccordion label="How does the trade-in process work?">\n' +
+          '<Accordion label="How does the trade-in process work?">\n' +
           '  We make it easy — bring your car in and we handle the rest.\n' +
-          '</BaseAccordion>\n' +
+          '</Accordion>\n' +
           '```\n\n' +
           'Figma: "Components/Accordion".',
       },
@@ -37,7 +37,7 @@ const meta = {
     size: 'sm',
     modelValue: false,
   },
-} satisfies Meta<typeof BaseAccordion>
+} satisfies Meta<typeof Accordion>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -50,9 +50,9 @@ export const ClosedSm: Story = {
   name: 'Small — closed',
   args: { size: 'sm', modelValue: false },
   render: (args) => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() { return { args, bodyText } },
-    template: `<div style="padding:24px;max-width:500px;"><BaseAccordion v-bind="args">{{ bodyText }}</BaseAccordion></div>`,
+    template: `<div style="padding:24px;max-width:500px;"><Accordion v-bind="args">{{ bodyText }}</Accordion></div>`,
   }),
 }
 
@@ -60,9 +60,9 @@ export const OpenSm: Story = {
   name: 'Small — open',
   args: { size: 'sm', modelValue: true },
   render: (args) => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() { return { args, bodyText } },
-    template: `<div style="padding:24px;max-width:500px;"><BaseAccordion v-bind="args">{{ bodyText }}</BaseAccordion></div>`,
+    template: `<div style="padding:24px;max-width:500px;"><Accordion v-bind="args">{{ bodyText }}</Accordion></div>`,
   }),
 }
 
@@ -70,9 +70,9 @@ export const ClosedLg: Story = {
   name: 'Large — closed',
   args: { size: 'lg', modelValue: false, label: 'How does your trade-in process work?' },
   render: (args) => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() { return { args, bodyText } },
-    template: `<div style="padding:24px;max-width:840px;"><BaseAccordion v-bind="args">{{ bodyText }}</BaseAccordion></div>`,
+    template: `<div style="padding:24px;max-width:840px;"><Accordion v-bind="args">{{ bodyText }}</Accordion></div>`,
   }),
 }
 
@@ -80,9 +80,9 @@ export const OpenLg: Story = {
   name: 'Large — open',
   args: { size: 'lg', modelValue: true, label: 'How does your trade-in process work?' },
   render: (args) => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() { return { args, bodyText } },
-    template: `<div style="padding:24px;max-width:840px;"><BaseAccordion v-bind="args">{{ bodyText }}</BaseAccordion></div>`,
+    template: `<div style="padding:24px;max-width:840px;"><Accordion v-bind="args">{{ bodyText }}</Accordion></div>`,
   }),
 }
 
@@ -91,9 +91,9 @@ export const FocusSm: Story = {
   args: { size: 'sm', modelValue: false },
   parameters: { pseudo: { focusVisible: true } },
   render: (args) => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() { return { args, bodyText } },
-    template: `<div style="padding:24px;max-width:500px;"><BaseAccordion v-bind="args">{{ bodyText }}</BaseAccordion></div>`,
+    template: `<div style="padding:24px;max-width:500px;"><Accordion v-bind="args">{{ bodyText }}</Accordion></div>`,
   }),
 }
 
@@ -102,17 +102,17 @@ export const FocusSm: Story = {
 export const Interactive: Story = {
   name: 'Interactive — single item',
   render: () => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() {
       const open = ref(false)
       return { open, bodyText }
     },
     template: `
       <div style="padding:24px;max-width:500px;">
-        <BaseAccordion
+        <Accordion
           v-model="open"
           label="How does your trade-in process work?"
-        >{{ bodyText }}</BaseAccordion>
+        >{{ bodyText }}</Accordion>
       </div>
     `,
   }),
@@ -130,7 +130,7 @@ export const FaqList: Story = {
     },
   },
   render: () => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() {
       const items = ref([
         {
@@ -158,13 +158,13 @@ export const FaqList: Story = {
     },
     template: `
       <div style="padding:24px;max-width:500px;display:flex;flex-direction:column;gap:24px;">
-        <BaseAccordion
+        <Accordion
           v-for="(item, i) in items"
           :key="i"
           v-model="item.open"
           :label="item.label"
           size="sm"
-        >{{ item.body }}</BaseAccordion>
+        >{{ item.body }}</Accordion>
       </div>
     `,
   }),
@@ -173,7 +173,7 @@ export const FaqList: Story = {
 export const FaqListLg: Story = {
   name: 'Interactive — FAQ list (lg)',
   render: () => ({
-    components: { BaseAccordion },
+    components: { Accordion },
     setup() {
       const items = ref([
         {
@@ -196,13 +196,13 @@ export const FaqListLg: Story = {
     },
     template: `
       <div style="padding:24px;max-width:840px;display:flex;flex-direction:column;gap:24px;">
-        <BaseAccordion
+        <Accordion
           v-for="(item, i) in items"
           :key="i"
           v-model="item.open"
           :label="item.label"
           size="lg"
-        >{{ item.body }}</BaseAccordion>
+        >{{ item.body }}</Accordion>
       </div>
     `,
   }),

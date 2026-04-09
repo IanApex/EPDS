@@ -6,7 +6,7 @@ import SrpFilterChild from './SrpFilterChild.vue'
 import hatchbackSrc from '../../../icon/Icon Type=Vehicle Descriptors, Size=Large, Theme=Hatchback.svg?url'
 
 const meta = {
-  title: 'Components/SRP Filters/FilterChild',
+  title: 'Molecules/SRP Filters/FilterChild',
   component: SrpFilterChild,
   tags: ['autodocs'],
   parameters: {

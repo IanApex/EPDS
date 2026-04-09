@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import TextBoxLG from './TextBoxLG.vue'
 
 const meta: Meta<typeof TextBoxLG> = {
-  title: 'Components/Inputs/TextBoxLG',
+  title: 'Atoms/Inputs/TextBoxLG',
   component: TextBoxLG,
   tags: ['autodocs'],
   argTypes: {

@@ -21,6 +21,8 @@
  *   - Chip: 30px height, 16px left/right padding, 8px top/bottom padding, 69px border-radius
  *   - Chip text: 14px/14px Roboto Medium (500), Neutral0 (default/hover), white (selected)
  *   - Gap between chips: 1px
+ *   - Chips share the track width equally (each column matches the widest label’s needs when the
+ *     parent constrains width — e.g. VIN + License plate in a fixed-width row)
  *   - Default fill: none; Hover fill: Neutral90; Selected fill: Primary50
  *   - Focus ring: 2px Accessibility80 outside the selected chip
  *   - First chip is always auto-selected on page arrival
@@ -98,8 +100,9 @@ function select(value: string) {
   1px gap between chips matches Figma's gap-[1px].
 */
 .segmented-control {
-  display: inline-flex;
-  width: fit-content;
+  display: flex;
+  width: 100%;
+  min-width: 0;
   align-items: center;
   gap: 1px;
   padding: 4px;
@@ -124,7 +127,9 @@ function select(value: string) {
 */
 .segmented-control__chip {
   position: relative;
-  display: inline-flex;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
   align-items: center;
   justify-content: center;
   height: 30px;

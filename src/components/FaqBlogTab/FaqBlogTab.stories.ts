@@ -8,7 +8,7 @@ import popularIcon         from '../../../icon/Icon=Illustrative, Name=Popular.s
 import carInfoIcon         from '../../../icon/Icon=Illustrative, Name=Car-Info.svg?url'
 
 const meta = {
-  title: 'Components/Navigation/FaqBlogTab',
+  title: 'Molecules/FaqBlogTab',
   component: FaqBlogTab,
   tags: ['autodocs'],
   parameters: {

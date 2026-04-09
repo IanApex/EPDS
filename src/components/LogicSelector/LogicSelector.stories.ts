@@ -22,7 +22,7 @@ const paymentOptions = [
 ]
 
 const meta: Meta<typeof LogicSelector> = {
-  title: 'Components/Inputs/LogicSelector',
+  title: 'Atoms/Inputs/LogicSelector',
   component: LogicSelector,
   parameters: {
     backgrounds: { default: 'light' },

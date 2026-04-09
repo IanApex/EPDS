@@ -167,7 +167,7 @@ const IconGrid = defineComponent({
 // ─── Storybook meta ───────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Foundations/Icons',
+  title: 'Atoms/Icons',
   tags: ['autodocs'],
   parameters: {
     docs: {

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import CarouselDots from './CarouselDots.vue'
 
 const meta = {
-  title: 'Components/Navigation/CarouselDots',
+  title: 'Molecules/CarouselDots',
   component: CarouselDots,
   tags: ['autodocs'],
   parameters: {

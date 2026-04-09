@@ -6,7 +6,7 @@ import BoxInputXS from '../BoxInputXS/BoxInputXS.vue'
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/Inputs/Box Input/SM',
+  title: 'Atoms/Inputs/Box Input/SM',
   component: BoxInputSM,
   tags: ['autodocs'],
   parameters: {

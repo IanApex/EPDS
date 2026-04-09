@@ -6,7 +6,7 @@ const CAR_IMAGE = 'https://content.homenetiol.com/scaler/400/400/eb9a7bffdd55493
 const VDP_HREF  = '#'
 
 const meta = {
-  title: 'Components/Cards/SrpTile',
+  title: 'Molecules/SRPTile',
   component: SrpTile,
   tags: ['autodocs'],
   parameters: {

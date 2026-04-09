@@ -5,7 +5,7 @@ import LocationTile from './LocationTile.vue'
 const STORE_PHOTO = 'https://www.echopark.com/-/media/project/sonic/echopark/all-store-images/grand-prarie/grandprarie_listimage-dt_v2.jpg?h=512&w=482&hash=970167BCF95985F958787C798F429EB5'
 
 const meta = {
-  title: 'Components/LocationTile',
+  title: 'Molecules/LocationTile',
   component: LocationTile,
   tags: ['autodocs'],
   parameters: {

@@ -7,7 +7,7 @@ import { ref } from 'vue'
 import ModalTabs from './ModalTabs.vue'
 
 const meta: Meta<typeof ModalTabs> = {
-  title: 'Components/Navigation/ModalTabs',
+  title: 'Molecules/ModalTabs',
   component: ModalTabs,
   parameters: {
     backgrounds: { default: 'light' },

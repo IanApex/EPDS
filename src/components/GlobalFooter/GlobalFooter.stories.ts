@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import GlobalFooter from './GlobalFooter.vue'
 
 const meta = {
-  title: 'Components/Navigation/GlobalFooter',
+  title: 'Organisms/GlobalFooter',
   component: GlobalFooter,
   tags: ['autodocs'],
   parameters: {

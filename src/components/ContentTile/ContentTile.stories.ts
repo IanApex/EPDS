@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import ContentTile from './ContentTile.vue'
 
 const meta = {
-  title: 'Components/ContentTile',
+  title: 'Molecules/ContentTile',
   component: ContentTile,
   tags: ['autodocs'],
   parameters: {

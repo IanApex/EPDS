@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import BaseModal from './BaseModal.vue'
 
 const meta = {
-  title: 'Components/BaseModal',
+  title: 'Molecules/BaseModal',
   component: BaseModal,
   tags: ['autodocs'],
   parameters: {

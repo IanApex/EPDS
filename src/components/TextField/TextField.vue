@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * Underline text field (light/dark, default + feedback variant).
+ *
+ * Layout (Figma usage): when placing multiple text fields in a grid or flex wrap, use
+ * 48px vertical and 16px horizontal gap between fields — e.g. `gap: var(--spacing-md) var(--spacing-xxxs)`.
+ */
 import { computed, ref } from 'vue'
 
 const props = withDefaults(
@@ -93,6 +99,10 @@ function focusInput() {
 }
 
 /* ── Floating label ────────────────────────────────────────────────── */
+/*
+  Figma Text field (light): empty state keeps label slot at -16px (opacity 0);
+  filled / focus float the caption to -12px (Paragraph/Label over the value).
+*/
 .text-field__label {
   position: absolute;
   left: 0;
@@ -105,11 +115,15 @@ function focusInput() {
   pointer-events: none;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease,
+    top 0.15s ease;
 }
 
 .text-field--focused .text-field__label,
 .text-field--has-value .text-field__label {
+  top: -12px;
   opacity: 1;
 }
 

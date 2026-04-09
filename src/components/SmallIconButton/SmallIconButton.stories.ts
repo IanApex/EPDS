@@ -19,7 +19,7 @@ const BookmarkFilledIcon = makeIconSlot(bookmarkFilledSvg)
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/Buttons/SmallIconButton',
+  title: 'Atoms/Buttons/SmallIconButton',
   component: SmallIconButton,
   tags: ['autodocs'],
   parameters: {

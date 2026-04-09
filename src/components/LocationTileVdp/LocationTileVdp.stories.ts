@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import LocationTileVdp from './LocationTileVdp.vue'
 
 const meta = {
-  title: 'Components/LocationTileVdp',
+  title: 'Molecules/LocationTileVdp',
   component: LocationTileVdp,
   tags: ['autodocs'],
   parameters: {

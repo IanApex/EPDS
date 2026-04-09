@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import SrpFilterParent from './SrpFilterParent.vue'
 
 const meta = {
-  title: 'Components/SRP Filters/FilterParent',
+  title: 'Molecules/SRP Filters/FilterParent',
   component: SrpFilterParent,
   tags: ['autodocs'],
   parameters: {

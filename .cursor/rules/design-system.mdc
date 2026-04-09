@@ -6,6 +6,10 @@ alwaysApply: true
 
 # EchoPark Design System (EPDS) — Project Knowledge
 
+## Documentation sources (read and follow)
+- **This file** (`.cursor/rules/design-system.mdc`) is `alwaysApply: true` for the globs below — treat it as the **primary** EPDS reference in Cursor: tokens, components, Storybook, icons, accessibility, and Figma workflow.
+- **`CLAUDE.md`** at the repo root mirrors the same knowledge for humans and other tools — when components, paths, or conventions change, **keep this file and `CLAUDE.md` aligned** (duplicate the important bits in both).
+
 ## Stack
 - **Framework**: Vue 3 with `<script setup>` + TypeScript (Composition API only — no Options API)
 - **Build**: Vite 8, `@vitejs/plugin-vue`, `vite-svg-loader`
@@ -141,6 +145,7 @@ EPDS/
 - **Overflow**: horizontal scroll on `.modal-tabs__bar`; right-edge white gradient fade via `.modal-tabs__fade` overlay
 - **Usage rules** (Figma): max one tab active; first tab auto-selected; tabs only change content below (header stays static); tabs must be parallel in nature (use different pattern for dissimilar navigation)
 - **Stories**: FeaturesAndSpecs, FirstTabAutoSelected, ManyTabsScrollable, TabBarOnly, NoSeparator, AllStates
+- **Storybook `title`**: `Molecules/ModalTabs`
 
 ### `LogicSelector` — `src/components/LogicSelector/`
 - **Figma**: "Inputs/LogicSelectors" — compact inline single-choice picker that drives form logic (shows/hides fields)
@@ -384,6 +389,73 @@ EPDS/
 - **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
 - **Key tokens used**: `--color-base-primary-*`, `--color-neutral-0/95/100`, `--color-accessibility-80`, `--border-radius-pill`, `--border-width-thin/thick`, `--font-*-btn*`
 
+### `Accordion` — `src/components/Accordion/`
+- **Figma**: "Components/Accordion" — expandable disclosure with animated expand/collapse (renamed from `BaseAccordion`)
+- **Props**: `label: string` (**required**), `size?: 'sm' | 'lg'` (default `'sm'`), `modelValue?: boolean`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Rules**: multiple items may be open; do not nest; full header row is clickable; works uncontrolled or with `v-model`
+- **Root CSS**: BEM `accordion` / `accordion__*` (not tied to old component filename)
+- **Stories**: `Molecules/Accordion`
+
+### `Alert` — `src/components/Alert/`
+- **Figma**: "Components/Alert" — inline feedback banner (renamed from `BaseAlert`)
+- **Props**: `variant?: 'error' | 'warning' | 'success' | 'notification'` (default `'warning'`), `title?: string`
+- **Slots**: default — body
+- **Accessibility**: `role="alert"` for `error`/`warning`; `role="status"` for `success`/`notification`
+- **Root CSS**: `alert` / `alert--*`
+- **Stories**: `Molecules/Alert`
+- **Note**: There is **no** `BaseCard` / card primitive in the library anymore — it was removed; use composition or future layout components as needed.
+
+### `BaseModal` — `src/components/BaseModal/`
+- **Figma**: "UI Components/Modal base" — overlay dialog
+- **Props**: `modelValue: boolean` (**required**, v-model), `size?: 'sm' | 'lg'` (default `'lg'`), `theme?: 'light' | 'dark'` (default `'light'`), `ariaLabel?: string`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Behaviour**: backdrop click, ESC, body scroll lock, `Teleport` to `body`
+- **Stories**: `Molecules/BaseModal`
+
+### `BaseToggle` — `src/components/BaseToggle/`
+- **Figma**: "Inputs/Toggle" — 48×28 pill switch
+- **Props**: `modelValue?: boolean`, `disabled?: boolean`, `label?: string`, `name?: string`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Stories**: `Atoms/Inputs/BaseToggle`
+
+### `TextField` — `src/components/TextField/`
+- Underline-style single-line input with floating label; **light/dark** themes and **`default` | `feedback`** variants
+- **Props**: `label: string` (**required**), `modelValue?: string`, `name?: string`, `type?: string`, `inputmode?` (typed union — avoid plain `string` for `vue-tsc`), `maxlength?`, `disabled?`, `error?`, `autocomplete?`, `theme?`, `variant?`
+- **Emits**: `update:modelValue: [value: string]`
+- **Stories**: `Atoms/Inputs/TextField`
+
+### `ContentTile` — `src/components/ContentTile/`
+- **Figma**: "Content Tiles" — marketing tile/banner with decorative circular image
+- **Props**: `heading: string` (**required**), `body?`, `type?: 'tile' | 'banner'`, `size?: 'sm'|'md'|'lg'|'xl'`, `imageLocation?`, `imageUrl?`, `linkLabel?`, `linkHref?`, `linkTarget?`
+- **Reuses**: `LinkCta` (`arrow: true`, `theme: 'light'`)
+- **Stories**: `Molecules/ContentTile`
+
+### `CarOfferInputCard` — `src/components/CarOfferInputCard/`
+- **Figma**: Car offer input card — VIN vs license plate segmented control, underline fields, primary CTA
+- **Props**: `offerType?` (`'vin'|'license'`, **v-model**), `vin?`, `licensePlate?`, `state?` (**v-models**), `stateOptions?` (for `SelectDropdown`), `disabled?`
+- **Emits**: `submit`, `vin-help` (VIN helper link + info icon)
+- **Composes**: `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` + info SVG (`?raw`)
+- **Stories**: `Molecules/CarOfferInputCard`
+
+### Composite & layout components (compose primitives above)
+Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full props and states.
+
+| Component | Story title prefix | Role |
+|-----------|-------------------|------|
+| `CarouselDots` | `Molecules/CarouselDots` | Photo carousel indicators; `count`, `v-model` index |
+| `ModalTabs` | `Molecules/ModalTabs` | Modal / panel tabs |
+| `FaqBlogTab` | `Molecules/FaqBlogTab` | FAQ / blog tab switcher |
+| `LocationTile` | `Molecules/LocationTile` | Store picker tile (radio group) |
+| `LocationTileVdp` | `Molecules/LocationTileVdp` | VDP-oriented location tile |
+| `SrpTile` | `Molecules/SRPTile` | SRP vehicle card; composes `SmallIconButton`, `ArrowCircleButton`, `MediumIconButton`, `TileCta`, `CarouselDots` |
+| `CarOfferInputCard` | `Molecules/CarOfferInputCard` | Car offer entry (Figma); composes `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` |
+| `GlobalHeader` | `Organisms/GlobalHeader` | Site header |
+| `GlobalFooter` | `Organisms/GlobalFooter` | Site footer |
+| `SrpFilterParent` | `Molecules/SRP Filters/FilterParent` | SRP filter shell |
+| `SrpFilterChild` | `Molecules/SRP Filters/FilterChild` | SRP filter row |
+| `SrpFilterChildTextLink` | `Molecules/SRP Filters/FilterChildTextLink` | Text-link variant for filters |
+
 ## Token Reference
 
 ### Figma variable name → CSS custom property convention
@@ -496,15 +568,22 @@ The token system has three layers loaded in order:
 - Use `<script setup lang="ts">`, `defineProps<{}>()`, `defineEmits<{}>()` — no Options API
 - `<style scoped>` only — no global selectors in component files
 - No inline styles unless dynamically computed
+- **Reuse first**: before new markup, check whether an existing component (`BaseButton`, `LinkCta`, `Alert`, `Accordion`, etc.) already fits. Do not add hidden one-off primitives inside larger components without explicit sign-off.
+- **No new sub-components without checking the user** — if a composite needs a new primitive, propose it first.
+- **Vue + TypeScript templates**: on **child SFCs**, bind props using the **camelCase name from `defineProps`** (e.g. `ariaLabel`, not `aria-label`). `vue-tsc` treats DOM-style `aria-label` as a separate attribute and will report required props missing.
 
 ## Storybook Rules
 - Stories co-located in component folder, CSF3 format (`satisfies Meta<typeof Component>`)
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
-- Story titles mirror Figma hierarchy and use Storybook folder grouping:
-  - **CTAs** (buttons): `'Components/CTAs/ComponentName'` — BaseButton, LinkCta, IconButton, TileCta, MediumIconButton, SmallIconButton, ArrowCircleButton, VideoControlButton
-  - **BoxInput** (selection boxes): `'Components/BoxInput/SizeName'` — e.g. `'Components/BoxInput/XS'`, `'Components/BoxInput/SM'`
-  - Other components: `'Components/ComponentName'`
+- **Top-level sidebar groups**: **`Atoms`**, **`Molecules`**, **`Organisms`**, **`Components`**. Set each story’s `title` on `Meta`; order is controlled in **`.storybook/preview.ts`** via the inline `storySort` comparator (`order` array — **must stay inline** for Storybook 10 static analysis; **no TypeScript types inside that function**).
+  - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
+  - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
+  - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
+  - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Logos'` — **no** `Foundations/` parent
+  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/FilterParent'`**, **`FilterChild`**, **`FilterChildTextLink`**
+  - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`
+  - **Components**: reserved for future page-level / app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
 
 ## Figma MCP Workflow
 1. **Select node in Figma** (Figma must be open and the desktop app focused)
@@ -524,14 +603,14 @@ The token system has three layers loaded in order:
 - Components: PascalCase (`BaseButton`, `FormInput`, `NavigationBar`)
 - Props: camelCase; emits: camelCase (`"update:modelValue"`, `"click"`, `"dismiss"`)
 - CSS custom properties: kebab-case matching Figma variable name pattern (see mapping above)
-- Story titles: `'Components/GroupName/ComponentName'`
+- Story titles: `'Atoms/…'`, `'Molecules/…'`, `'Organisms/…'`, `'Components/…'` — see Storybook Rules and `.storybook/preview.ts` sort order
 
 ## Icon & Logo System
 
 ### SVG loader setup
 - **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — imported in `vite.config.ts`
 - **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`
-- **Types**: `src/vite-env.d.ts` declares `*.svg?component` (Vue component) and `*.svg?url` (string URL)
+- **Types**: `src/vite-env.d.ts` declares `*.svg?component` (Vue component), `*.svg?url` (string URL), and `*.svg?raw` (inline SVG string for `v-html` / icons inside styled wrappers)
 
 ### System icons (`icon/Style=*.svg`)
 - 24×24, single-colour `fill="#242C33"`, always imported with `?component` query
@@ -540,7 +619,7 @@ The token system has three layers loaded in order:
   ```css
   .my-wrapper :deep(path) { fill: currentColor; }
   ```
-- **Gallery story**: `src/stories/Icons.stories.ts` (`Foundations/Icons`)
+- **Gallery story**: `src/stories/Icons.stories.ts` (`Atoms/Icons`)
 
 ### Illustrative icons (`icon/Icon=Illustrative, Name=*.svg`)
 - Multi-colour, used at larger display sizes — do NOT attempt to override colours
@@ -551,7 +630,7 @@ The token system has three layers loaded in order:
 ### Logos (`Logos/`)
 - Always import with `?url` to preserve multi-colour fills: `import epLogo from '@logos/Color=Default.svg?url'`
 - Use in `<img src="epLogo" alt="EchoPark" />` — NEVER as inline Vue component
-- **Gallery story**: `src/stories/Logos.stories.ts` (`Foundations/Logos`)
+- **Gallery story**: `src/stories/Logos.stories.ts` (`Atoms/Logos`)
 - Subdirectory `Logos/3rd Party/` contains partner/trust badge logos (same `?url` approach)
 
 ## Accessibility

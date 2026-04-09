@@ -5,7 +5,7 @@ import BoxSelector from './BoxSelector.vue'
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Components/Inputs/BoxSelector',
+  title: 'Atoms/Inputs/BoxSelector',
   component: BoxSelector,
   tags: ['autodocs'],
   parameters: {

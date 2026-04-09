@@ -134,7 +134,7 @@ const SectionHeading = defineComponent({
 // ─── Storybook meta ───────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Foundations/Logos',
+  title: 'Atoms/Logos',
   tags: ['autodocs'],
   parameters: {
     docs: {

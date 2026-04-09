@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import SegmentedControl from './SegmentedControl.vue'
 
 const meta: Meta<typeof SegmentedControl> = {
-  title: 'Components/Inputs/SegmentedControl',
+  title: 'Atoms/Inputs/SegmentedControl',
   component: SegmentedControl,
   tags: ['autodocs'],
   argTypes: {
@@ -226,16 +226,18 @@ export const SRPSortFilter: Story = {
         <p style="font-size:12px; color:var(--color-neutral-40); margin:0;">
           Sorting by: <strong>{{ sort }}</strong>
         </p>
-        <div style="display:flex; align-items:center; gap:16px;">
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; max-width:360px;">
           <span style="font-size:14px; color:var(--color-neutral-0);">Sort by</span>
-          <SegmentedControl
-            v-model="sort"
-            name="srp-sort"
-            :options="[
-              {value:'price',   label:'Price'  },
-              {value:'mileage', label:'Mileage'},
-            ]"
-          />
+          <div style="flex:1 1 200px; min-width:0;">
+            <SegmentedControl
+              v-model="sort"
+              name="srp-sort"
+              :options="[
+                {value:'price',   label:'Price'  },
+                {value:'mileage', label:'Mileage'},
+              ]"
+            />
+          </div>
         </div>
       </div>
     `,

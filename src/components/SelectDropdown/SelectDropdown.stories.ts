@@ -39,7 +39,7 @@ const employment: Array<{ value: string; label: string }> = [
 ]
 
 const meta: Meta<typeof SelectDropdown> = {
-  title: 'Components/Inputs/SelectDropdown',
+  title: 'Atoms/Inputs/SelectDropdown',
   component: SelectDropdown,
   parameters: {
     backgrounds: {

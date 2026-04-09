@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import SrpFilterChildTextLink from './SrpFilterChildTextLink.vue'
 
 const meta = {
-  title: 'Components/SRP Filters/FilterChildTextLink',
+  title: 'Molecules/SRP Filters/FilterChildTextLink',
   component: SrpFilterChildTextLink,
   tags: ['autodocs'],
   parameters: {

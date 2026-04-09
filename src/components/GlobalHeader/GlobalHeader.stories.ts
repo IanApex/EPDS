@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import GlobalHeader from './GlobalHeader.vue'
 
 const meta = {
-  title: 'Components/Navigation/GlobalHeader',
+  title: 'Organisms/GlobalHeader',
   component: GlobalHeader,
   tags: ['autodocs'],
   parameters: {

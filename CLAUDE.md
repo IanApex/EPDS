@@ -48,8 +48,11 @@ EPDS/
 │   ├── main.ts
 │   ├── preview.ts                    ← same import order as main.ts
 │   └── preview-head.html             ← Google Fonts link for Storybook iframe
-└── .cursor/rules/design-system.mdc  ← Cursor rules mirror of this file
+└── .cursor/rules/design-system.mdc  ← Cursor `alwaysApply` rule; keep in sync with this file
 ```
+
+## Documentation sources
+- **`CLAUDE.md`** (this file) and **`.cursor/rules/design-system.mdc`** carry the same EPDS knowledge. The **Cursor rule file** is what the agent applies every session (`alwaysApply: true`); update **both** when the component list, Storybook titles, or conventions change.
 
 ## Components Built
 
@@ -214,7 +217,7 @@ EPDS/
 - **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text
 - **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
 
-### `BaseAccordion` — `src/components/BaseAccordion/`
+### `Accordion` — `src/components/Accordion/`
 - **Figma**: "Components/Accordion" — expandable disclosure with animated expand/collapse
 - **Props**: `label: string` (**required**), `size?: 'sm' | 'lg'` (default `'sm'`), `modelValue?: boolean`
 - **Emits**: `update:modelValue: [value: boolean]`
@@ -237,22 +240,14 @@ EPDS/
 - **Behaviour**: ESC closes, body scroll locked while open, Teleport to `<body>`
 - **Content padding**: `--spacing-xxs` (24px) built in; `border-radius: --border-radius-lg` (16px)
 
-### `BaseCard` — `src/components/BaseCard/`
-- **Figma**: "UI Components/Card base" — structured content container
-- **Props**: `size?: 'min' | 'max'` (default `'min'`)
-- **Sizes**: `min` = 280px wide, `max` = 420px wide; height always content-driven
-- **Visual**: white bg, 1px `--color-neutral-90` border, `border-radius: --border-radius-md` (8px), `overflow: hidden`
-- **Content padding**: `--spacing-xxs` (24px) built in on all sides
-
-### `BaseAlert` — `src/components/BaseAlert/`
+### `Alert` — `src/components/Alert/`
 - **Figma**: "Components/Alert" — inline feedback banner
-- **Props**: `variant?: 'error' | 'warning' | 'success' | 'info' | 'notification'` (default `'info'`), `title?: string`
+- **Props**: `variant?: 'error' | 'warning' | 'success' | 'notification'` (default `'warning'`), `title?: string`
 - **Slots**: default — body text content
 - **Layout**: 24px icon + 8px gap (`--spacing-nano`) + content column; 16px padding (`--spacing-xxxs`); `--border-radius-lg` (16px)
-- **Variants**: error (Warning90 bg / Warning40 border+icon), warning (Alert90 / Alert70), success (Primary90 / Primary50), info (Neutral95 / Neutral90, Neutral40 text+icon), notification (Accent90 / Accent40)
+- **Variants**: error, warning, success, notification (semantic feedback tokens per variant)
 - **Icon pattern**: `?raw` + `v-html` + `:deep(path) { fill: var(--alert-icon-color) }` — CSS custom property per variant
-- **Accessibility**: `role="alert"` (assertive) for error/warning; `role="status"` (polite) for success/info/notification
-- **Info variant**: not in original Figma component — added per design intent; uses muted Neutral40 for both icon and text
+- **Accessibility**: `role="alert"` (assertive) for error/warning; `role="status"` (polite) for success/notification
 
 ### `BaseToggle` — `src/components/BaseToggle/`
 - **Figma**: "Inputs/Toggle" — 48×28px pill switch; immediate-effect setting control
@@ -378,19 +373,22 @@ The token system has three layers loaded in order:
 - Use `<script setup lang="ts">`, `defineProps<{}>()`, `defineEmits<{}>()` — no Options API
 - `<style scoped>` only — no global selectors in component files
 - No inline styles unless dynamically computed
-- **Always reuse existing EPDS components before writing new markup.** Before implementing any UI pattern, check whether an existing component (`BaseButton`, `LinkCta`, `BaseAlert`, etc.) already covers it. Only build net-new sub-components when no existing component fits AND you have explicit sign-off — do not silently create new primitives inside a larger component.
+- **Always reuse existing EPDS components before writing new markup.** Before implementing any UI pattern, check whether an existing component (`BaseButton`, `LinkCta`, `Alert`, etc.) already covers it. Only build net-new sub-components when no existing component fits AND you have explicit sign-off — do not silently create new primitives inside a larger component.
 - **Do not create new sub-components without checking with the user first.** If a larger component could benefit from a new primitive, propose it before building it.
 
 ## Storybook Rules
 - Stories co-located in component folder, CSF3 format (`satisfies Meta<typeof Component>`)
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
-- Story title grouping:
-  - **Buttons**: `'Components/Buttons/ComponentName'` — all button/CTA/link components + JourneySelector
-  - **Inputs**: `'Components/Inputs/ComponentName'` — all form controls (checkbox, toggle, radio, slider, selectors, text inputs, dropdowns)
-  - **Box Inputs** (sub-group): `'Components/Inputs/Box Input/SizeName'` (e.g. `'Components/Inputs/Box Input/XS'`)
-  - **Navigation**: `'Components/Navigation/ComponentName'` — ModalTabs and future nav components
-  - **Foundations**: `'Foundations/ComponentName'` — Icons, Logos
+- **Sidebar**: top-level **`Atoms`**, **`Molecules`**, **`Organisms`**, **`Components`**. **Sort order** is set in **`.storybook/preview.ts`** (`parameters.options.storySort` — inline function only; edit the `order` array inside it).
+- **Title prefixes** (match existing stories):
+  - **Atoms — Buttons**: `'Atoms/Buttons/ComponentName'` — BaseButton, LinkCta, IconButton, TileCta, Medium/Small icon buttons, ArrowCircleButton, VideoControlButton, JourneySelector
+  - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — text fields, slider, radio, checkbox, toggle, segmented control, dropdown, logic selector, box selector
+  - **Atoms — Box Input**: `'Atoms/Inputs/Box Input/XS|SM|MD|LG'`
+  - **Atoms — galleries**: `'Atoms/Icons'`, `'Atoms/Logos'` (`src/stories/`) — no `Foundations/` group
+  - **Molecules** (flat or `Molecules/SRP Filters/…`): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, `'Molecules/SRP Filters/FilterParent|FilterChild|FilterChildTextLink'`
+  - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`
+  - **Components**: none yet — use for future app/page stories; `preview.ts` still lists `Components` in sort order for when you add them
 
 ## Icon & Logo System
 
