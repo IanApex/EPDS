@@ -6,6 +6,7 @@ import SelectDropdown from '../SelectDropdown/SelectDropdown.vue'
 import BaseButton from '../BaseButton/BaseButton.vue'
 import type { SelectOption } from '../SelectDropdown/SelectDropdown.vue'
 
+import TooltipComp from '../Tooltip/Tooltip.vue'
 import infoSvg from '../../../icon/Style=Alerts, Detail=Info, Icon=NA.svg?raw'
 import { CAR_OFFER_DEFAULT_STATE_OPTIONS } from './carOfferDefaultStates'
 
@@ -50,7 +51,6 @@ const emit = defineEmits<{
   'update:licensePlate': [value: string]
   'update:state': [value: string]
   submit: []
-  'vin-help': []
 }>()
 
 const segmentedOptions = [
@@ -146,10 +146,6 @@ function onSubmit() {
   emit('submit')
 }
 
-function onVinHelp(e: MouseEvent) {
-  e.preventDefault()
-  emit('vin-help')
-}
 </script>
 
 <template>
@@ -180,15 +176,17 @@ function onVinHelp(e: MouseEvent) {
         />
         <div class="car-offer-input-card__vin-help">
           <p class="car-offer-input-card__vin-hint">Where is my VIN?</p>
-          <button
-            type="button"
-            class="car-offer-input-card__info"
-            aria-label="Where is my VIN?"
-            :disabled="disabled"
-            @click="onVinHelp"
+          <TooltipComp
+            text="A VIN is a 17 character long number that you can find inside your door or on the windshield of your car."
+            ariaLabel="Where is my VIN?"
+            caretAlign="left"
+            :closeOnClickOutside="true"
+            :closeOnEscape="true"
           >
-            <span class="car-offer-input-card__info-icon" aria-hidden="true" v-html="infoSvg" />
-          </button>
+            <template #icon>
+              <span v-html="infoSvg" style="display:contents" />
+            </template>
+          </TooltipComp>
         </div>
       </div>
     </template>
@@ -287,34 +285,6 @@ function onVinHelp(e: MouseEvent) {
   line-height: var(--text-body-sm-line-height);
   letter-spacing: var(--text-body-sm-letter-spacing);
   color: var(--color-neutral-40);
-}
-
-.car-offer-input-card__info {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: var(--color-neutral-0);
-  line-height: 0;
-}
-
-.car-offer-input-card__info:disabled {
-  cursor: not-allowed;
-  opacity: var(--opacity-level-medium);
-}
-
-.car-offer-input-card__info:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-  border-radius: var(--border-radius-sm);
-}
-
-.car-offer-input-card__info-icon :deep(path) {
-  fill: currentColor;
 }
 
 .car-offer-input-card__state {

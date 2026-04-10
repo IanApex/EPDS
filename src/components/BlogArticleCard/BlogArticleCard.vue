@@ -1,36 +1,27 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed } from 'vue'
 
-import epLogoGreenWhite from '@logos/Property 1=EP-GreenWhite.svg?url'
+import epLogoRaw from '@logos/Property 1=EP-GreenWhite.svg?raw'
 
 const props = withDefaults(
   defineProps<{
-    /**
-     * `threeUp` — photo + top gradient (marketing 3-column layout).
-     * `fourUp` — tighter crop / alternate hero treatment (4-column layout).
-     * `branded` — solid primary panel + EchoPark logo (no photo).
-     */
-    variant?: 'threeUp' | 'fourUp' | 'branded'
-    /** Single line, e.g. `August 10, 2021 • Buying tips` */
+    /** `photo` — hero image card; `branded` — green panel + EchoPark logo */
+    variant?: 'photo' | 'branded'
+    /** Date + category line, e.g. "August 10, 2021 • Buying tips" */
     meta: string
     /** Article headline */
     title: string
-    /** Hero image URL (`threeUp` / `fourUp`). Ignored for `branded`. */
+    /** Hero image URL (photo variant only; ignored for branded) */
     imageUrl?: string
-    /** Optional card link (entire block is the hit target). */
+    /** Makes the entire card a link */
     href?: string
     target?: string
   }>(),
   {
-    variant: 'threeUp',
+    variant: 'photo',
     imageUrl: '',
   },
 )
-
-const titleId = useId()
-
-const isBranded = computed(() => props.variant === 'branded')
-const isFourUp = computed(() => props.variant === 'fourUp')
 
 const rootTag = computed(() => (props.href ? 'a' : 'article'))
 
@@ -42,173 +33,146 @@ const linkRel = computed(() =>
 <template>
   <component
     :is="rootTag"
-    class="blog-acard"
-    :class="{
-      'blog-acard--link': !!href,
-      [`blog-acard--${variant}`]: true,
-    }"
+    class="blog-card"
+    :class="{ 'blog-card--link': !!href }"
     :href="href || undefined"
     :target="href ? target : undefined"
     :rel="linkRel"
   >
-    <div
-      class="blog-acard__media"
-      :class="{
-        'blog-acard__media--branded': isBranded,
-        'blog-acard__media--photo': !isBranded,
-      }"
-    >
-      <template v-if="isBranded">
-        <img
-          :src="epLogoGreenWhite"
-          alt="EchoPark Automotive"
-          class="blog-acard__logo"
-          width="160"
-          height="54"
-        />
-      </template>
-      <template v-else>
-        <div class="blog-acard__img-shell">
-          <img
-            v-if="imageUrl"
-            :src="imageUrl"
-            alt=""
-            class="blog-acard__img"
-            :class="{ 'blog-acard__img--four-up': isFourUp }"
-          />
-          <div v-else class="blog-acard__placeholder" aria-hidden="true" />
-          <div class="blog-acard__gradient" aria-hidden="true" />
-        </div>
-      </template>
+    <!-- Photo variant -->
+    <div v-if="variant === 'photo'" class="blog-card__media">
+      <img
+        v-if="imageUrl"
+        :src="imageUrl"
+        alt=""
+        class="blog-card__img"
+      />
+      <div v-else class="blog-card__placeholder" aria-hidden="true" />
+      <div class="blog-card__gradient" aria-hidden="true" />
     </div>
 
-    <div class="blog-acard__text">
-      <p class="blog-acard__meta">{{ meta }}</p>
-      <h3 :id="titleId" class="blog-acard__title">{{ title }}</h3>
+    <!-- Branded variant -->
+    <div v-else class="blog-card__media blog-card__media--branded">
+      <span
+        class="blog-card__logo"
+        role="img"
+        aria-label="EchoPark Automotive"
+        v-html="epLogoRaw"
+      />
+    </div>
+
+    <div class="blog-card__text">
+      <p class="blog-card__meta">{{ meta }}</p>
+      <h3 class="blog-card__title">{{ title }}</h3>
     </div>
   </component>
 </template>
 
 <style scoped>
-/* ─── Card shell ──────────────────────────────────────────── */
-.blog-acard {
+.blog-card {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: var(--spacing-xxxs); /* 16px image → text */
-  width: 100%;
-  max-width: 384px;
-  box-sizing: border-box;
+  gap: var(--spacing-xxxs);
+  width: 384px;
+  max-width: 100%;
   color: var(--color-neutral-0);
 }
 
-.blog-acard--link {
+.blog-card--link {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
 
-.blog-acard--link:hover .blog-acard__title {
+.blog-card--link:hover .blog-card__title {
   text-decoration: underline;
 }
 
-.blog-acard--link:focus-visible {
+.blog-card--link:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
   border-radius: var(--border-radius-sm);
 }
 
-/* ─── Media (240px tall, 16px radius) ───────────────────────── */
-.blog-acard__media {
-  flex-shrink: 0;
+/* ─── Media panel (240 px, 16 px radius) ─────────────────── */
+.blog-card__media {
+  position: relative;
   width: 100%;
   height: 240px;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
-  position: relative;
-  box-sizing: border-box;
+  flex-shrink: 0;
+  background: var(--color-neutral-95);
 }
 
-.blog-acard__media--branded {
+.blog-card__media--branded {
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--color-action-primary);
 }
 
-.blog-acard__logo {
-  display: block;
-  max-width: 62%;
-  height: auto;
-  max-height: 54px;
-  width: auto;
-  object-fit: contain;
-}
-
-.blog-acard__img-shell {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: var(--color-neutral-95);
-}
-
-.blog-acard__img {
+.blog-card__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   display: block;
 }
 
-.blog-acard__img--four-up {
-  transform: scale(1.08);
-  transform-origin: center center;
-}
-
-.blog-acard__placeholder {
+.blog-card__placeholder {
   width: 100%;
   height: 100%;
   background: var(--color-neutral-90);
 }
 
-/* Top fade — matches Figma 3-up / 4-up treatment */
-.blog-acard__gradient {
+.blog-card__gradient {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--color-neutral-0) 80%, transparent) 0%,
-    color-mix(in srgb, var(--color-neutral-0) 35%, transparent) 28%,
-    transparent 62%
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0) 39%
   );
 }
 
-/* ─── Typography ──────────────────────────────────────────── */
-.blog-acard__text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-nano); /* 8px */
-  width: 100%;
+.blog-card__logo {
+  display: block;
+  width: 160px;
+  color: var(--color-neutral-100);
 }
 
-.blog-acard__meta {
+.blog-card__logo :deep(svg) {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.blog-card__logo :deep(path) {
+  fill: currentColor;
+}
+
+/* ─── Text block ─────────────────────────────────────────── */
+.blog-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-nano);
+}
+
+.blog-card__meta {
   margin: 0;
   font-family: var(--font-family-base);
   font-size: var(--text-label-size);
-  font-weight: var(--text-label-weight);
-  line-height: var(--line-height-lg);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--text-label-line-height);
   letter-spacing: var(--text-label-letter-spacing);
-  color: var(--color-neutral-40);
 }
 
-.blog-acard__title {
+.blog-card__title {
   margin: 0;
   font-family: var(--font-family-base);
-  font-size: var(--text-h5-size);
+  font-size: 22px;
   font-weight: var(--font-weight-bold);
-  line-height: 1.18; /* ~26px on 22px */
-  letter-spacing: var(--text-h5-letter-spacing);
-  color: var(--color-neutral-0);
+  line-height: 26px;
 }
 </style>

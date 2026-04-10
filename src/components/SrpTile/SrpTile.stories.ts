@@ -41,6 +41,7 @@ const meta = {
     imageIndex:      { control: { type: 'number', min: 0 } },
     favorited:       { control: 'boolean' },
     href:            { control: 'text' },
+    badgeLabel:      { control: 'text' },
   },
   args: {
     year:             '2020',
@@ -174,6 +175,28 @@ export const StaticCard: Story = {
       description: { story: 'When no `href` is provided the card renders without any VDP anchor links.' },
     },
   },
+  render: (args) => ({
+    components: { SrpTile },
+    setup() { return { args } },
+    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+  }),
+}
+
+// ─── Price-drop badge ────────────────────────────────────────────────────────
+
+export const WithBadge: Story = {
+  name: 'With price-drop badge',
+  args: { badgeLabel: 'New price drop' },
+  render: (args) => ({
+    components: { SrpTile },
+    setup() { return { args } },
+    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+  }),
+}
+
+export const WithBadgeAmount: Story = {
+  name: 'With price-drop amount',
+  args: { badgeLabel: 'Just dropped $2,000' },
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },

@@ -28,6 +28,7 @@ const config: StorybookConfig = {
           '@': path.resolve(dirname, '../src'),
           '@icons': path.resolve(dirname, '../icon'),
           '@logos': path.resolve(dirname, '../Logos'),
+          '@illustrations': path.resolve(dirname, '../Illustrations'),
         },
       },
     });

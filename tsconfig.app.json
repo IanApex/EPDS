@@ -7,7 +7,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@icons/*": ["icon/*"],
-      "@logos/*": ["Logos/*"]
+      "@logos/*": ["Logos/*"],
+      "@illustrations/*": ["Illustrations/*"]
     },
 
     /* Linting */

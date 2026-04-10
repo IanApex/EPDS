@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Full-screen overlay dialog. Teleports to `<body>`, locks scroll, dismisses on ESC or backdrop click.\n\n' +
+          'Full-screen overlay dialog. Composes the `Overlay` atom for the scrim. Teleports to `<body>`, locks scroll, dismisses on ESC or backdrop click.\n\n' +
           '**Sizes:** `sm` = 500px, `lg` = 800px\n\n' +
           '**Themes:** `light` (white), `dark` (Neutral20 navy)\n\n' +
           '**Content padding:** 24px on all sides — built in.\n\n' +

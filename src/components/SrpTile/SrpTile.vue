@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import SmallIconButton   from '../SmallIconButton/SmallIconButton.vue'
 import ArrowCircleButton from '../ArrowCircleButton/ArrowCircleButton.vue'
 import MediumIconButton  from '../MediumIconButton/MediumIconButton.vue'
 import TileCta           from '../TileCta/TileCta.vue'
 import CarouselDots      from '../CarouselDots/CarouselDots.vue'
+
+import BadgePriceDrop  from '../BadgePriceDrop/BadgePriceDrop.vue'
+import TooltipComp     from '../Tooltip/Tooltip.vue'
 
 import heartFilledSvg  from '../../../icon/Style=Account, Detail=Heart-Filled, Icon=NA.svg?raw'
 import calculatorSvg   from '../../../icon/Style=Finance, Detail=Payment, Icon=Calculator.svg?raw'
@@ -42,6 +45,8 @@ const props = withDefaults(defineProps<{
   favorited?: boolean
   /** Link to the Vehicle Detail Page */
   href?: string
+  /** Price-drop badge text — when set, shows a BadgePriceDrop overlay on the image */
+  badgeLabel?: string
 }>(), {
   imageCount: 1,
   imageIndex: 0,
@@ -56,8 +61,6 @@ const emit = defineEmits<{
   /** "Schedule test drive" CTA clicked */
   'test-drive':         []
 }>()
-
-const showTooltip = ref(false)
 
 const isLastImage = computed(() =>
   props.imageCount > 1 && props.imageIndex === props.imageCount - 1
@@ -158,6 +161,11 @@ function openTestDrive(e: MouseEvent) {
         />
       </div>
 
+      <!-- Price-drop badge overlay -->
+      <div v-if="badgeLabel" class="srpt__badge">
+        <BadgePriceDrop :label="badgeLabel" variant="srp" />
+      </div>
+
     </div><!-- /.srpt__image-area -->
 
     <!-- Carousel dots — straddling image/content boundary -->
@@ -241,20 +249,16 @@ function openTestDrive(e: MouseEvent) {
               aria-label="Open payment calculator"
               @click="openCalculator"
             >{{ monthlyPayment }}</button>
-            <div class="srpt__tooltip-wrap">
-              <button
-                class="srpt__info-btn"
-                aria-label="Payment info"
-                :aria-expanded="showTooltip"
-                @click.stop="showTooltip = !showTooltip"
-              >
-                <span v-html="infoSvg" aria-hidden="true" />
-              </button>
-              <div v-if="showTooltip" class="srpt__tooltip" role="tooltip">
-                {{ tooltipText || 'Based on $1,000 down and 60 months at 4.79% APR' }}
-                <div class="srpt__tooltip-caret" aria-hidden="true" />
-              </div>
-            </div>
+            <TooltipComp
+              :text="tooltipText || 'Based on $1,000 down and 60 months at 4.79% APR'"
+              ariaLabel="Payment info"
+              :closeOnClickOutside="true"
+              :closeOnEscape="true"
+            >
+              <template #icon>
+                <span v-html="infoSvg" style="display:contents" />
+              </template>
+            </TooltipComp>
           </div>
         </div>
 
@@ -395,6 +399,14 @@ function openTestDrive(e: MouseEvent) {
   line-height: var(--text-body-sm-line-height);
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* ─── Price-drop badge ─────────────────────────────────────── */
+.srpt__badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
 }
 
 /* ─── Favorite button ──────────────────────────────────────── */
@@ -570,73 +582,6 @@ function openTestDrive(e: MouseEvent) {
 
 .srpt__payment-btn:hover {
   text-decoration-color: currentColor;
-}
-
-/* Info icon button */
-.srpt__info-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  line-height: 0;
-  color: var(--color-neutral-0);
-}
-
-.srpt__info-btn :deep(svg) {
-  width: 16px;
-  height: 16px;
-}
-
-.srpt__info-btn :deep(path) {
-  fill: currentColor;
-}
-
-.srpt__info-btn:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  border-radius: var(--border-radius-circular);
-}
-
-/* Tooltip */
-.srpt__tooltip-wrap {
-  position: relative;
-}
-
-.srpt__tooltip {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 155px;
-  background: var(--color-neutral-0);
-  color: var(--color-neutral-100);
-  font-family: var(--font-family-base);
-  font-size: var(--text-label-size);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--text-label-line-height);
-  letter-spacing: var(--text-label-letter-spacing);
-  text-align: center;
-  padding: var(--spacing-xxxs);
-  border-radius: 6px;
-  z-index: 20;
-  white-space: normal;
-}
-
-.srpt__tooltip-caret {
-  position: absolute;
-  bottom: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid var(--color-neutral-0);
 }
 
 /* Delivery info */

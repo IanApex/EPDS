@@ -17,7 +17,7 @@ alwaysApply: true
 - **Token TS wrapper**: `src/tokens/tokens.ts`
 - **Breakpoints**: `src/tokens/breakpoints.ts` (JS constants — CSS vars can't be used in `@media`)
 - **Font**: Roboto via Google Fonts (weights 300/400/500/700) — loaded in `index.html` and `.storybook/preview-head.html`
-- **Path aliases**: `@/` → `src/`, `@icons/` → `icon/`, `@logos/` → `Logos/`
+- **Path aliases**: `@/` → `src/`, `@icons/` → `icon/`, `@logos/` → `Logos/`, `@illustrations/` → `Illustrations/`
 
 ## Project Structure
 
@@ -29,6 +29,18 @@ EPDS/
 │   ├── Style=Arrows, Detail=No-Tail, Icon=Right.svg
 │   ├── Icon=Illustrative, Name=*.svg            ← multi-colour illustrative icons
 │   └── Icon Type=Vehicle Descriptors, *.svg     ← vehicle icons (Large/Medium/Small)
+├── Illustrations/                    ← Multi-colour SVG illustrations (1x + @2x retina)
+│   ├── Property 1=Car.svg
+│   ├── Property 1=PersonDriving.svg
+│   ├── Property 1=HoldingACar.svg
+│   └── Property 1=Variant4.svg      (+ @2x variants of each)
+├── Photos/                           ← Photography assets (PNG) by category
+│   ├── Car only/
+│   ├── EchoPark team/
+│   ├── Nascar promo/
+│   ├── People/
+│   ├── Service and protection/
+│   └── VDP cars/
 ├── Logos/                            ← Brand + 3rd-party logos (multi-colour SVGs)
 │   ├── Color=*.svg                   ← EchoPark brand logo variants
 │   ├── Property 1=*.svg
@@ -326,6 +338,19 @@ EPDS/
 - **Icons used**: `icon/Style=Arrows, Detail=Tail, Icon=Right.svg?raw`, `...Left.svg?raw`, `icon/Style=Media, Detail=Expand, Icon=NA.svg?raw`
 - **Stories**: SmallRight, SmallLeft, SmallExpand (+ hover/focus variants), LargeRight, LargeLeft, AllVariants
 
+### `BadgePriceDrop` — `src/components/BadgePriceDrop/`
+- **Figma**: "Badge/PriceDrop" — inline badge indicating a price reduction on a vehicle
+- **Props**: `label?: string` (default `"New price drop"`), `showIcon?: boolean` (default `true`), `variant?: 'srp' | 'vdp'` (default `'srp'`)
+- **Two variants**:
+  - **SRP**: Designed to overlay the top-left corner of an SRP tile image. `border-radius: 8px 0 0 0` top-left (matches card) + `0 0 2px 0` bottom-right. `padding: 6px 15px 6px 16px`.
+  - **VDP**: Standalone rounded pill. `height: 32px`, `border-radius: 4px`, `padding: 8px`, `overflow: hidden`.
+- **Anatomy**: `--color-base-primary-90` background · 24px circle (`--color-base-primary-40` bg) with `Style=Arrows, Detail=Tail, Icon=Down-Right.svg` arrow icon (white via `currentColor`) · Body SM Bold text in `--color-base-primary-40`
+- **Gap**: 8px between icon and label
+- **Usage rules** (Figma): Only one badge per car. The price-drop amount text ("Just dropped $2,000") can be toggled on/off globally — never a mix.
+- **SrpTile integration**: `SrpTile` exposes `badgeLabel?: string` prop — when set, a `BadgePriceDrop` renders at `position: absolute; top: 0; left: 0` inside the image area.
+- **Stories**: SrpDefault, SrpWithAmount, SrpNoIcon, VdpDefault, VdpNoIcon, AllVariants, Interactive, OnSrpTile, OnSrpTileWithAmount
+- **Storybook `title`**: `Atoms/BadgePriceDrop`
+
 ### `SmallIconButton` — `src/components/SmallIconButton/`
 - **Figma**: "IconButtons/Favorite" (32×32 toggle button)
 - **Props**: `ariaLabel: string` (**required**), `selected?: boolean` (default `false`), `disabled?: boolean`
@@ -424,9 +449,10 @@ EPDS/
 
 ### `BaseModal` — `src/components/BaseModal/`
 - **Figma**: "UI Components/Modal base" — overlay dialog
+- **Composes**: `Overlay` (scrim atom at `zIndex: 1000`) — all backdrop, scroll-lock, ESC, and click-to-dismiss behaviour is delegated to `Overlay`
 - **Props**: `modelValue: boolean` (**required**, v-model), `size?: 'sm' | 'lg'` (default `'lg'`), `theme?: 'light' | 'dark'` (default `'light'`), `ariaLabel?: string`
 - **Emits**: `update:modelValue: [value: boolean]`
-- **Behaviour**: backdrop click, ESC, body scroll lock, `Teleport` to `body`
+- **Behaviour**: backdrop click, ESC, body scroll lock — all via composed `Overlay`
 - **Stories**: `Molecules/BaseModal`
 
 ### `BaseToggle` — `src/components/BaseToggle/`
@@ -453,6 +479,99 @@ EPDS/
 - **Emits**: `submit`, `vin-help` (VIN helper link + info icon)
 - **Composes**: `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` + info SVG (`?raw`)
 - **Stories**: `Molecules/CarOfferInputCard`
+
+### `Divider` — `src/components/Divider/`
+- **Figma**: "Components/Divider" — 1px rule for separating content
+- **Props**: `color?: 'light' | 'dark'` (default `'light'`), `orientation?: 'horizontal' | 'vertical'` (default `'horizontal'`)
+- **Colours**: Light = `--color-neutral-90` (#E8E9EB); Dark = `--color-neutral-40` (#666B70)
+- **Dimensions**: Horizontal = `width: 100%; height: 1px`; Vertical = `width: 1px; height: 100%`
+- **Accessibility**: `role="separator"`, `aria-orientation`
+- **Usage rules** (Figma): Use to separate content and create visual hierarchy (sections, cards, form groups). Avoid overusing — only where necessary for meaningful separation. Never decorative.
+- **Stories**: HorizontalLight, HorizontalDark, VerticalLight, VerticalDark, AllVariants, CardContext, Interactive
+- **Storybook `title`**: `Atoms/Divider`
+
+### `Tooltip` — `src/components/Tooltip/`
+- **Figma**: "Components/Tooltip" — click-to-toggle context hint (dark bubble + caret, always above trigger)
+- **Props**: `text: string` (**required**), `ariaLabel: string` (**required**), `caretAlign?: 'center' | 'right' | 'left'` (default `'center'`), `closeOnClickOutside?: boolean`, `closeOnEscape?: boolean`
+- **Slots**: `#icon` — trigger icon (24×24 SVG, typically the info icon `Style=Alerts, Detail=Info, Icon=NA.svg`)
+- **Anatomy**: 24×24px trigger button + absolutely positioned dark panel above + caret triangle pointing down
+- **Panel**: `background: --color-neutral-0`; `color: --color-neutral-100`; `border-radius: 6px`; `padding: 16px` (`--spacing-xxxs`); `max-width: 175px`; `width: max-content`; `bottom: calc(100% + 12px)`
+- **Typography**: `--text-label-size` (12px), `--text-label-line-height`, `--text-label-letter-spacing` (0.2px), `--font-weight-regular`, `text-align: center`
+- **Caret**: 16×8px CSS triangle pointing down, same `--color-neutral-0` fill
+- **Caret alignment**: `center` (horizontally centered), `right` (near right edge), `left` (near left edge) — shifts both panel and caret positions
+- **Behaviour**: Click trigger toggles panel; optional `closeOnClickOutside` and `closeOnEscape`
+- **Accessibility**: `aria-expanded`, `aria-controls`, `role="tooltip"` on panel, `aria-label` on trigger; focus ring `2px solid --color-focus-ring`
+- **SrpTile integration**: SrpTile uses `Tooltip` for payment info
+- **CarOfferInputCard integration**: VIN helper uses `Tooltip` with `caretAlign="left"` and text "A VIN is a 17 character long number that you can find inside your door or on the windshield of your car."
+- **Stories**: CenterDefault, RightCaret, LeftCaret, LongText, AllOrientations, Interactive, SrpPaymentContext
+- **Storybook `title`**: `Atoms/Tooltip`
+
+### `Overlay` — `src/components/Overlay/`
+- **Figma**: "Overlay" — full-viewport semi-transparent scrim used behind modals, fly-out panels, and other focus-stealing UI
+- **Props**: `modelValue?: boolean` (v-model), `lockScroll?: boolean` (default `true`), `dismissOnClick?: boolean` (default `true`), `dismissOnEsc?: boolean` (default `true`), `zIndex?: number` (default `900`)
+- **Emits**: `update:modelValue: [value: boolean]`, `click: [event: MouseEvent]`
+- **Slots**: default — content rendered on top of the scrim (modals, fly-out panels, etc.)
+- **Behaviour**: Teleports to `<body>`; click on scrim emits close (opt-out via `dismissOnClick: false`); ESC key emits close (opt-out via `dismissOnEsc: false`); body scroll lock when visible (opt-out via `lockScroll: false`)
+- **Visual**: `position: fixed; inset: 0; background: rgba(36, 44, 51, 0.5)` — Neutral0 at 50% opacity; `z-index` via prop (default 900)
+- **Transition**: 200ms opacity fade in/out
+- **Usage**: **Default overlay for the entire design system.** Use whenever the user's action calls for a modal, fly-out, or important information to be in focus without losing context of the page. `BaseModal` composes this component internally.
+- **Stories**: Default (Interactive), ModalContext, FlyOutContext
+- **Storybook `title`**: `Atoms/Overlay`
+
+### `VscTable` — `src/components/VscTable/`
+- **Figma**: "Graphics/VSC" — Vehicle Service Contract comparison table showing repair costs with and without a plan
+- **Props**: `size?: 'sm' | 'lg'` (default `'lg'`), `rows?: VscTableRow[]` (default 5 standard repair types)
+- **Type export**: `VscTableRow` — `{ label: string, withoutPlan: string, withPlan: string }`
+- **Layout**: 3-column grid — "Repair type" (left-aligned labels), "without plan" (centered costs), "with plan" (centered, highlighted)
+- **Two sizes**:
+  - `lg` (desktop): header 71px (24px bold titles), data rows 67px (16px labels, 14px/16px values)
+  - `sm` (mobile): includes banner ("Save more with a **vehicle service contract**"), header 71px (16px bold titles), data rows 52px (14px text throughout)
+- **Alternating rows**: even rows `--color-neutral-95`, odd rows `--color-neutral-100` (white)
+- **Highlight column**: "with plan" column has `border-radius: 4px`, `box-shadow: 0 1px 20px 0 rgba(0,0,0,0.12)`, green accent text (`--color-base-primary-50`)
+- **Header typography**: titles use `--font-weight-bold` + `--color-neutral-20` (green for "with plan"); subtitles use `--font-weight-light` + `--color-neutral-0`
+- **Data typography**: labels use `--font-weight-medium`; without-plan costs `--font-weight-regular`; with-plan costs `--font-weight-bold` + `--color-base-primary-50`
+- **Default rows**: Brakes ($1,574 / $100), Electrical system ($808 / $100), Air conditioning ($1,402 / $100), Fuel system ($1,382 / $100), Engine ($5,329 / $100)
+- **Stories**: Large, Small, CustomRows, SideBySide, Interactive
+- **Storybook `title`**: `Molecules/VscTable`
+
+### `GapGraphic` — `src/components/GapGraphic/`
+- **Figma**: "Graphics/Gap" — GAP (Guaranteed Asset Protection) infographic showing a split car image with insurance payout vs. total loss protection coverage
+- **Props**: `size?: 'sm' | 'lg'` (default `'lg'`)
+- **Content**: Static — "E.g. $20,000 loan balance" title, "$15,000" insurance payout (market value), "$5,000" total loss protection coverage, bracket lines, and split car image
+- **Two sizes**:
+  - `lg` (desktop, max-width 671px): 40px italic light title, 28px medium amounts, 16px light labels, full-size car
+  - `sm` (mobile, max-width 336px): 16px italic title, 16px bold amounts, 8px labels, compact car
+- **Bracket lines**: Pure CSS — horizontal line with vertical tick marks at each end, connecting amounts to the car image
+- **Car image**: `Illustrations/GapCar.png` — half-grey (insurance payout) / half-green (GAP coverage) split car, imported via relative path
+- **Typography**: title `--font-weight-light` italic; amounts `--font-weight-medium` (lg) / `--font-weight-bold` (sm); labels `--font-weight-light`
+- **Stories**: Large, Small, SideBySide, Interactive
+- **Storybook `title`**: `Molecules/GapGraphic`
+
+### `ProtectionPlansGraphic` — `src/components/ProtectionPlansGraphic/`
+- **Figma**: "Graphics/ProtectionPlans" — static infographic showing a vehicle with 4 annotated protection coverage areas
+- **Props**: `size?: 'sm' | 'lg'` (default `'lg'`)
+- **Content**: Static — car image with 4 callout annotations connected by leader lines
+- **Callouts**: Windshield repairs & replacements, Ding & dent repairs, Interior/exterior appearance upkeep, Engine & core system maintenance
+- **Two sizes**:
+  - `lg` (desktop, 653×345 aspect): 52px blue check icons, 16px bold titles + 14px regular descriptions, full leader lines
+  - `sm` (mobile, 360×224 aspect): 38px check icons, 12px bold titles only (no descriptions), compact layout
+- **Car image**: `Illustrations/ProtectionPlansCar.png` — white sedan with transparent background
+- **Check icons**: Inline SVG (24→52/38px scaled), colored Blue60 (#006FA6) with subtle drop-shadow
+- **Leader lines**: SVG `<line>` elements overlay connecting callout icons to car body areas
+- **All positioning**: Percentage-based absolute, derived from Figma inset values
+- **Stories**: Large, Small, SideBySide, Interactive
+- **Storybook `title`**: `Molecules/ProtectionPlansGraphic`
+
+### `BlogArticleCard` — `src/components/BlogArticleCard/`
+- **Figma**: "Blog Articles" — teaser card with two states: "Article photo" and "Article Branded"
+- **Props**: `variant?: 'photo' | 'branded'` (default `'photo'`), `meta: string` (**required** — date + category), `title: string` (**required** — headline), `imageUrl?: string` (photo variant only), `href?: string`, `target?: string`
+- **Anatomy**: 384px wide card; 240px media panel (16px border-radius) + 16px gap + text block (meta 8px gap title)
+- **Photo variant**: Hero image (`object-fit: cover`) + top-down gradient overlay (`rgba(0,0,0,0.8)` → transparent at 39%)
+- **Branded variant**: `--color-action-primary` (green) background, centered white EchoPark logo (160px wide)
+- **Typography**: meta = Label style (12px / 16px / 0.2px spacing, regular); title = 22px bold / 26px line-height
+- **Link mode**: When `href` provided, renders as `<a>`, title underlines on hover, focus ring on card
+- **Stories**: Photo, PhotoNoImage, Branded, AsLink, ThreeUp, AllVariants
+- **Storybook `title`**: `Molecules/BlogArticleCard`
 
 ### Composite & layout components (compose primitives above)
 Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full props and states.
@@ -597,7 +716,7 @@ The token system has three layers loaded in order:
   - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
-  - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Logos'` — **no** `Foundations/` parent
+  - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
   - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/FilterParent'`**, **`FilterChild`**, **`FilterChildTextLink`**
   - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`
   - **Components**: reserved for future page-level / app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
@@ -626,7 +745,7 @@ The token system has three layers loaded in order:
 
 ### SVG loader setup
 - **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — used in `vite.config.ts` and `vite.lib.config.ts`
-- **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`
+- **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`, `@illustrations/` → `Illustrations/`
 - **Types**: `src/vite-env.d.ts` declares `*.svg?component` (Vue component), `*.svg?url` (string URL), and `*.svg?raw` (inline SVG string for `v-html` / icons inside styled wrappers)
 
 ### System icons (`icon/Style=*.svg`)
@@ -649,6 +768,25 @@ The token system has three layers loaded in order:
 - Use in `<img src="epLogo" alt="EchoPark" />` — NEVER as inline Vue component
 - **Gallery story**: `src/stories/Logos.stories.ts` (`Atoms/Logos`)
 - Subdirectory `Logos/3rd Party/` contains partner/trust badge logos (same `?url` approach)
+
+### Illustrations (`Illustrations/`)
+- Multi-colour SVG illustrations for marketing content, empty states, and hero sections
+- Naming: `Property 1=<Name>.svg` (1x) and `Property 1=<Name>@2x.svg` (retina)
+- **SVG illustrations**: **Car**, **PersonDriving**, **HoldingACar**, **Variant4** — each in 1x and @2x
+- **190-Point Inspection** (PNG): **Size=Badge**, **Size=Small**, **Size=Large** — raster badges at different display sizes
+- **Finance** (PNG): **Financial institutions** — partner/lender imagery
+- **GAP** (PNG): **GapCar** — split car image (half-grey insurance payout / half-green GAP coverage) used by `GapGraphic` component
+- **Protection Plans** (PNG): **ProtectionPlansCar** — white sedan with transparent background, used by `ProtectionPlansGraphic` component
+- Always import with `?url` to preserve fills: `import carIllustration from '@illustrations/Property 1=Car.svg?url'`
+- Use in `<img>` — NEVER as inline Vue component (same pattern as logos)
+- **Path alias**: `@illustrations/` → `Illustrations/`
+- **Gallery story**: `src/stories/Illustrations.stories.ts` (`Atoms/Illustrations`) — "All Illustrations" (SVGs) and "Raster Images" (PNGs grouped by category)
+
+### Photos (`Photos/`)
+- Photography assets (PNG) organized by category subfolders
+- **Categories**: `Car only/` (6), `EchoPark team/` (5), `Nascar promo/` (7), `People/` (14), `Service and protection/` (13), `VDP cars/` (4)
+- Import with `?url` for use in `<img>` tags: `import hero from '/Photos/People/Hero image.png?url'`
+- **Gallery story**: `src/stories/Photos.stories.ts` (`Atoms/Photos`) — one story per category + "All Photos" overview
 
 ## Accessibility
 - Semantic HTML first; ARIA only when native semantics are insufficient
