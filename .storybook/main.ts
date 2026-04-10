@@ -25,6 +25,7 @@ const config: StorybookConfig = {
       base: process.env.STORYBOOK_BASE || '/',
       resolve: {
         alias: {
+          '@': path.resolve(dirname, '../src'),
           '@icons': path.resolve(dirname, '../icon'),
           '@logos': path.resolve(dirname, '../Logos'),
         },

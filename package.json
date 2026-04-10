@@ -3,17 +3,35 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/epds.js",
+  "module": "./dist/epds.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/epds.js"
+    }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vue-tsc -p tsconfig.lib.json --noEmit && vite build --config vite.lib.config.ts",
+    "build:app": "vue-tsc -b && vite build",
+    "typecheck": "vue-tsc -b",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
-  "dependencies": {
-    "vue": "^3.5.30"
+  "peerDependencies": {
+    "vue": "^3.5.0"
   },
   "devDependencies": {
+    "vue": "^3.5.30",
     "@chromatic-com/storybook": "^5.0.2",
     "@storybook/addon-a11y": "^10.3.1",
     "@storybook/addon-docs": "^10.3.1",
@@ -26,6 +44,7 @@
     "storybook-addon-pseudo-states": "^10.3.1",
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
+    "vite-plugin-dts": "^4.5.4",
     "vite-svg-loader": "^5.1.1",
     "vue-tsc": "^3.2.5"
   }

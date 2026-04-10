@@ -22,24 +22,6 @@ type Story = StoryObj<typeof ModalTabs>
 // ─── Shared helpers ─────────────────────────────────────
 
 const panelStyle = 'padding: 20px 0; font: 400 14px/22px Roboto, sans-serif; color: #242C33;'
-const modalShell = (content: string) => `
-  <div style="
-    width: 640px;
-    border: 1px solid #BCBFC2;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-    font-family: Roboto, sans-serif;
-  ">
-    <!-- Modal header (stays constant while tabs change) -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;">
-      <h2 style="margin:0;font:700 22px/26px Roboto,sans-serif;color:#242C33;">All features &amp; specs</h2>
-      <button style="background:none;border:none;cursor:pointer;font-size:20px;color:#666;">✕</button>
-    </div>
-
-    <!-- Tab bar sits inside modal, below header -->
-    <div style="padding: 16px 24px 0;">${content}</div>
-  </div>`
 
 // ─── Core: 4 tabs (VDP features & specs) ───────────────
 

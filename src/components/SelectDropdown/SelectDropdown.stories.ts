@@ -29,15 +29,6 @@ const states: Array<{ value: string; label: string }> = [
   { value: 'TX', label: 'Texas' },
 ]
 
-const employment: Array<{ value: string; label: string }> = [
-  { value: 'full',    label: 'Fully employed' },
-  { value: 'part',    label: 'Part-time' },
-  { value: 'self',    label: 'Self-employed' },
-  { value: 'retired', label: 'Retired' },
-  { value: 'student', label: 'Student' },
-  { value: 'other',   label: 'Other' },
-]
-
 const meta: Meta<typeof SelectDropdown> = {
   title: 'Atoms/Inputs/SelectDropdown',
   component: SelectDropdown,

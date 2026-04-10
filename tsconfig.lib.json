@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src/index.ts", "src/**/*.ts", "src/**/*.vue"],
+  "exclude": ["src/**/*.stories.ts", "src/stories/**", "src/main.ts", "src/App.vue"]
+}

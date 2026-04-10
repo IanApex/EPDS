@@ -7,13 +7,12 @@ alwaysApply: true
 # EchoPark Design System (EPDS) — Project Knowledge
 
 ## Documentation sources (read and follow)
-- **This file** (`.cursor/rules/design-system.mdc`) is `alwaysApply: true` for the globs below — treat it as the **primary** EPDS reference in Cursor: tokens, components, Storybook, icons, accessibility, and Figma workflow.
-- **`CLAUDE.md`** at the repo root mirrors the same knowledge for humans and other tools — when components, paths, or conventions change, **keep this file and `CLAUDE.md` aligned** (duplicate the important bits in both).
+- **This file** (`.cursor/rules/design-system.mdc`) is `alwaysApply: true` for the globs below — it is the **single** EPDS reference: tokens, components, Storybook, library packaging, icons, accessibility, and Figma workflow. Update it when conventions change.
 
 ## Stack
 - **Framework**: Vue 3 with `<script setup>` + TypeScript (Composition API only — no Options API)
-- **Build**: Vite 8, `@vitejs/plugin-vue`, `vite-svg-loader`
-- **Docs/Testing**: Storybook 10 (`@storybook/vue3-vite`) — addons: docs, a11y (errors on violation), vitest, pseudo-states, Chromatic
+- **Build**: Vite 8, `@vitejs/plugin-vue`, `vite-svg-loader`; **library bundle** via `vite.lib.config.ts` + `vite-plugin-dts`
+- **Docs**: Storybook 10 (`@storybook/vue3-vite`) — addons: docs, a11y (errors on violation), pseudo-states, Chromatic
 - **Styling**: Three-layer CSS custom property system (primitives → semantic → scales); scoped `<style>` blocks in SFCs
 - **Token TS wrapper**: `src/tokens/tokens.ts`
 - **Breakpoints**: `src/tokens/breakpoints.ts` (JS constants — CSS vars can't be used in `@media`)
@@ -35,6 +34,8 @@ EPDS/
 │   ├── Property 1=*.svg
 │   └── 3rd Party/                   ← Partner/trust logos
 ├── src/
+│   ├── index.ts                      ← Library public API (re-exports components + tokens); side-effect import of epds.css
+│   ├── epds.css                      ← Token layers + global reset (same order as consumed by the library)
 │   ├── tokens/
 │   │   ├── primitives/
 │   │   │   └── echopark.css          ← Brand color palette + --font-family-brand (swap to white-label)
@@ -52,14 +53,29 @@ EPDS/
 │   │   └── Logos.stories.ts
 │   ├── vite-env.d.ts                 ← SVG import type declarations
 │   ├── App.vue
-│   ├── main.ts                       ← imports primitives → semantic → tokens → style (in order)
-│   └── style.css                     ← global resets only
+│   ├── main.ts                       ← imports `./epds.css` (local dev shell)
+│   └── style.css                     ← global resets only (pulled in via epds.css)
+├── vite.lib.config.ts                ← `npm run build` — ESM lib + `dist/epds.css` + `dist/index.d.ts`
+├── tsconfig.lib.json                 ← Typecheck scope for the library (excludes stories)
 ├── .storybook/
 │   ├── main.ts
-│   ├── preview.ts                    ← same import order as main.ts
+│   ├── preview.ts                    ← imports `../src/epds.css`
 │   └── preview-head.html             ← Google Fonts link for Storybook iframe
 └── .cursor/rules/design-system.mdc  ← this file
 ```
+
+## Library consumption (`npm run build`)
+
+- **Output**: `dist/epds.js` (ESM), `dist/epds.css` (tokens + reset + extracted SFC styles), `dist/index.d.ts` (types). `public/` is not copied into `dist` for lib builds.
+- **Peer dependency**: `vue` ^3.5 (see `package.json` `peerDependencies`).
+- **Install in a host app**: `npm install epds` (when published) or `"epds": "file:../EPDS"` / workspace protocol for local monorepos — run `npm run build` in EPDS first so `dist/` exists.
+- **Host app usage**:
+  ```ts
+  import { BaseButton, tokens } from 'epds'
+  ```
+  The package entry side-imports `epds.css`; bundlers should emit/load `dist/epds.css` automatically. Load **Roboto** (300/400/500/700) in the host app the same way as `index.html` / Storybook preview-head.
+- **App shell vs library**: `npm run build` writes **`dist/`** (publish this for npm). `npm run build:app` writes **`dist-app/`** so it never overwrites the library output; use `vite preview` after `build:app` if you need to check the shell. Storybook is unchanged (`npm run storybook` / `build-storybook`).
+- **New components**: add a barrel under `src/components/Name/` and register the export in `src/index.ts` (plus any public types already exported from the component `index.ts`).
 
 ## Components Built
 
@@ -541,7 +557,7 @@ The token system has three layers loaded in order:
 | **Semantic** | `src/tokens/semantic.css` | Intent aliases mapping purpose → primitive |
 | **Scales** | `src/tokens/tokens.css` | Brand-agnostic: spacing, border, shadow, opacity, typography |
 
-**To white-label for a new brand:** create `primitives/brand-b.css`, redefine the color vars and `--font-family-brand`, then swap the one import line in `main.ts` and `preview.ts`. No component changes needed.
+**To white-label for a new brand:** create `primitives/brand-b.css`, redefine the color vars and `--font-family-brand`, then point `src/epds.css` at that primitives file (or swap the `@import` there) — `main.ts`, Storybook `preview.ts`, and library consumers all pull tokens through `epds.css`. No component changes needed.
 
 ### Semantic token groups
 - `--color-action-primary[-hover|-press|-subtle]` — primary brand CTA color
@@ -565,6 +581,7 @@ The token system has three layers loaded in order:
 
 ## Component Rules
 - Every component in its own folder: `src/components/ComponentName/`
+- **Library**: export new components from `src/index.ts` after adding `ComponentName/index.ts` (and export shared types the same way as existing entries).
 - Use `<script setup lang="ts">`, `defineProps<{}>()`, `defineEmits<{}>()` — no Options API
 - `<style scoped>` only — no global selectors in component files
 - No inline styles unless dynamically computed
@@ -591,7 +608,7 @@ The token system has three layers loaded in order:
    - Call `get_design_context` (clientFrameworks: "vue", clientLanguages: "typescript,css")
    - Call `get_screenshot` immediately after (required)
    - Convert React+Tailwind output → Vue SFC + CSS custom properties
-   - Create `ComponentName.vue` + `ComponentName.stories.ts` + `index.ts`
+   - Create `ComponentName.vue` + `ComponentName.stories.ts` + `index.ts`, then add the component to `src/index.ts`
 3. **Extract tokens**: "extract tokens from this" →
    - Call `get_variable_defs` + `get_screenshot` simultaneously
    - If screenshot has values not in variable defs, call `get_design_context` for precise values
@@ -608,7 +625,7 @@ The token system has three layers loaded in order:
 ## Icon & Logo System
 
 ### SVG loader setup
-- **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — imported in `vite.config.ts`
+- **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — used in `vite.config.ts` and `vite.lib.config.ts`
 - **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`
 - **Types**: `src/vite-env.d.ts` declares `*.svg?component` (Vue component), `*.svg?url` (string URL), and `*.svg?raw` (inline SVG string for `v-html` / icons inside styled wrappers)
 

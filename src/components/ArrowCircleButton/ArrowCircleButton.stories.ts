@@ -45,10 +45,6 @@ type Story = StoryObj<typeof meta>
 // ─── Shared background styles ─────────────────────────────────────────────────
 
 const darkBg = { backgrounds: { default: 'dark' } }
-const imageBg = {
-  backgrounds: { default: 'dark' },
-  docs: { canvas: { style: { background: 'url("https://placehold.co/600x200/555/888") center/cover' } } },
-}
 
 // ─── Small — dark theme (right / left) ───────────────────────────────────────
 

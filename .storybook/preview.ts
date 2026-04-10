@@ -1,8 +1,5 @@
 import type { Preview } from '@storybook/vue3-vite'
-import '../src/tokens/primitives/echopark.css'
-import '../src/tokens/semantic.css'
-import '../src/tokens/tokens.css'
-import '../src/style.css'
+import '../src/epds.css'
 
 const preview: Preview = {
   parameters: {

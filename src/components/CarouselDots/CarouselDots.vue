@@ -1,12 +1,15 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  /** Total number of dots (one per slide) */
-  count: number
-  /** Index of the active dot (0-based, bind with v-model) */
-  modelValue?: number
-}>(), {
-  modelValue: 0,
-})
+withDefaults(
+  defineProps<{
+    /** Total number of dots (one per slide) */
+    count: number
+    /** Index of the active dot (0-based, bind with v-model) */
+    modelValue?: number
+  }>(),
+  {
+    modelValue: 0,
+  },
+)
 
 const emit = defineEmits<{
   'update:modelValue': [index: number]

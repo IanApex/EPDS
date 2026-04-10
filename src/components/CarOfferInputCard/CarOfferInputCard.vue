@@ -173,7 +173,7 @@ function onVinHelp(e: MouseEvent) {
           :model-value="vin"
           :disabled="disabled"
           :error="showVinError ? ERR_VIN : undefined"
-          maxlength="17"
+          :maxlength="17"
           autocomplete="off"
           @update:model-value="onVinUpdate"
           @blur="onVinBlur"

@@ -51,9 +51,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const wrap = (width: number) => `padding:24px;display:inline-block;`
-const wrapW = (w: number) => `padding:24px;display:inline-flex;`
-
 // ─── Tiles ────────────────────────────────────────────────────────────────────
 
 export const TileLgImageTop: Story = {

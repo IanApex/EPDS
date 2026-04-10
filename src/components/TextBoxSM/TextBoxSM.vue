@@ -9,7 +9,7 @@ const props = withDefaults(
     suffix?: string
     name?: string
     type?: string
-    inputmode?: string
+    inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'
     maxlength?: number
     disabled?: boolean
     error?: string
