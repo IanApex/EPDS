@@ -562,6 +562,67 @@ EPDS/
 - **Stories**: Large, Small, SideBySide, Interactive
 - **Storybook `title`**: `Molecules/ProtectionPlansGraphic`
 
+### `PackageCarousel` — `src/components/PackageCarousel/`
+- **Figma**: VDP "Installed packages & options" — horizontal card carousel for vehicle packages
+- **Props**: `label?: string` (default `'Packages:'`), `packages: PackageItem[]` (**required**, `{ title, description, seeMoreHref? }`)
+- **Type export**: `PackageItem` — `{ title: string, description: string, seeMoreHref?: string }`
+- **Card**: 272px wide, 16px border-radius (`--border-radius-lg`), 1px `--color-neutral-90` border, padding 24px top/sides, 8px gap between elements
+- **Card without link**: 164px min-height, 40px padding-bottom
+- **Card with link**: auto height, 16px padding-bottom; "See more" right-aligned, `--color-accent-40`, medium weight
+- **Typography**: title 16px bold `--color-neutral-0`; description 14px regular #313D47, 20px line-height, -0.28px letter-spacing
+- **Controls (≥ 3 items)**: progress bar + arrows; hidden when < 3 items
+- **Progress bar**: 2px height, `--color-neutral-90` track, `--color-base-primary-60` fill, 6px radius; fills proportionally as scroll position advances
+- **Arrows**: 48px circles, same accent-blue states as Pagination arrows; positioned at viewport edges with `box-shadow`; right edge has white gradient fade
+- **Scroll**: native CSS `overflow-x: auto` + `scroll-snap-type: x mandatory` for card-by-card snapping
+- **Resize**: `ResizeObserver` recalculates scroll dimensions on container resize
+- **Stories**: TwoPackages, ThreePackages, FivePackages, SixPackages, ConstrainedWidth, MobileWidth, AllVariants
+- **Storybook `title`**: `Organisms/PackageCarousel`
+
+### `Stepper` — `src/components/Stepper/`
+- **Figma**: "Stepper" — circular progress indicator showing current step in a multi-step flow
+- **Props**: `steps: StepperStep[]` (**required**, `{ label: string }`), `modelValue?: number` (default `1`, v-model, 1-based)
+- **Type export**: `StepperStep` — `{ label: string }`
+- **Progress**: Green arc fills `(currentStep - 1) / totalSteps` of the circle; e.g. step 3 of 5 = 40% (2 completed of 5)
+- **Circle**: 90×90px SVG; 8px stroke; track `--color-neutral-90`, fill `--color-base-primary-60` (green), `stroke-linecap: round`; animated with 0.4s transition
+- **Counter**: step number 26px bold + "of N" 14px regular, centered in the circle, baseline-aligned
+- **Text**: step label 26px bold `--color-neutral-0`; "Next: [label]" 14px regular #666B70; hidden on last step
+- **Layout**: flex row, 16px gap, 331px width; circle 90px fixed, text flex-1
+- **Usage**: Standard SCA flow (5 steps) or co-applicant flow (7 steps); step labels and count are CMS-editable via `steps` prop
+- **Accessibility**: `role="group"`, `aria-label` includes step number, total, and current label
+- **Stories**: Step1of5 through Step5of5, CoApplicantStep5of7, CoApplicantStep7of7, AllStepsStandard, AllStepsCoApplicant, Interactive
+- **Storybook `title`**: `Molecules/Stepper`
+
+### `Pagination` — `src/components/Pagination/`
+- **Figma**: "Pagination" — standard pagination control with arrow buttons and numbered pill
+- **Props**: `totalPages: number` (**required**), `modelValue?: number` (default `1`, v-model)
+- **Emits**: `update:modelValue: [page: number]`
+- **Anatomy**: Left arrow + pill container (page numbers + ellipsis) + right arrow; 8px gap between arrow and pill
+- **Arrow buttons**: 48×48px circles; Default (white bg, 1px `--color-neutral-90` border), Hover (`--color-accent-90` bg), Pressed (#C8E0E9 bg), Focus (3px `--color-accessibility-80` border); hidden via `opacity: 0` when at first/last page
+- **Number buttons**: 44×44px circles inside 48px pill (2px padding); Default (no bg, 14px regular), Hover (`--color-accent-90` bg, bold), Pressed (#C8E0E9, bold), Active (`--color-accent-40` bg, white bold), Focus (3px `--color-accessibility-80` border)
+- **Pill**: 48px height, 2px padding, `border-radius: 46px`, 1px `--color-neutral-90` border, white bg
+- **Ellipsis**: "..." in `--color-neutral-70`, shown when page gap exists
+- **Page window algorithm**: ≤5 pages shows all; page 1–3 active: `[1,2,3,4,...,last]`; near end: `[1,...,n-3,n-2,n-1,n]`; middle: `[1,...,c-1,c,c+1,...,last]`
+- **Mobile**: pill stretches (`flex: 1`) below 600px; pages spread with `justify-content: space-between`
+- **Arrow icons**: `Style=Arrows, Detail=Tail, Icon=Left/Right.svg?raw` — scales to 26px on hover/pressed
+- **Accessibility**: `<nav aria-label="Pagination">`, `aria-current="page"` on active number, `aria-label` on all buttons
+- **Stories**: FirstPageActive, Pages2To3Active, MiddlePageActive, LastPageActive, Only2Pages, Only3Pages, Interactive, AllPagePositions, MobileWidth
+- **Storybook `title`**: `Molecules/Pagination`
+
+### `Breadcrumbs` — `src/components/Breadcrumbs/`
+- **Figma**: "Breadcrumbs" — horizontal breadcrumb nav bar for wayfinding at the top of pages
+- **Props**: `items: BreadcrumbItem[]` (**required**, `{ label: string, href?: string }`), `phone?: string` (optional phone number shown on the right)
+- **Type export**: `BreadcrumbItem` — `{ label: string, href?: string }`
+- **Layout**: `height: 48px` (16px top/bottom padding), flex row, 24px gap between trail and phone
+- **Trail**: `<ol>` with inline `<li>` items; `/` separator between each item (12px horizontal margin)
+- **Typography**: Label style — 12px Roboto Regular, 0.2px letter-spacing, 16px line-height
+- **Colors**: links `--color-accent-30` (#004D80), current page + separators `--color-neutral-0`
+- **Current page**: last item without `href` renders as `<span aria-current="page">` (dark, not clickable)
+- **Phone**: 18px phone icon + 16px number text, flex-shrink-0, right-aligned; hidden on mobile (`max-width: 599px`)
+- **Wrapping**: breadcrumb list uses `flex-wrap: wrap` so long trails wrap on narrow viewports
+- **Accessibility**: `<nav aria-label="Breadcrumb">`, `<ol>` semantics, `aria-current="page"` on current item
+- **Stories**: Default, WithPhone, AccountPage, SRPWithPhone, ManyItems (wrapping), AllVariants
+- **Storybook `title`**: `Molecules/Breadcrumbs`
+
 ### `BlogArticleCard` — `src/components/BlogArticleCard/`
 - **Figma**: "Blog Articles" — teaser card with two states: "Article photo" and "Article Branded"
 - **Props**: `variant?: 'photo' | 'branded'` (default `'photo'`), `meta: string` (**required** — date + category), `title: string` (**required** — headline), `imageUrl?: string` (photo variant only), `href?: string`, `target?: string`
@@ -572,6 +633,18 @@ EPDS/
 - **Link mode**: When `href` provided, renders as `<a>`, title underlines on hover, focus ring on card
 - **Stories**: Photo, PhotoNoImage, Branded, AsLink, ThreeUp, AllVariants
 - **Storybook `title`**: `Molecules/BlogArticleCard`
+
+### `SeoCarousel` — `src/components/SeoCarousel/`
+- **Figma**: SEO link carousel — horizontal scrolling pill of keyword links with chevron arrows
+- **Props**: `heading: string` (**required**), `items: SeoCarouselItem[]` (**required**, `{ label, href }`)
+- **Anatomy**: heading (22px Roboto Light, Neutral0) + pill container (55px height, 12px border-radius, 1px `#D4D7D9` border, white bg)
+- **Links**: 16px Roboto Medium, Accent40, 48px gap, `white-space: nowrap`, scroll inside the pill
+- **Edge fades**: 30px white-to-transparent gradient on left; ~41px gradient + chevron arrows on right
+- **Arrows**: 24px No-Tail chevron icons (Left-Small / Right-Small); disabled state dims to `opacity: 0.5`
+- **Scrolling**: native `overflow-x: auto` (hidden scrollbar) with smooth `scrollBy`, 280px step
+- **Responsive**: works at any width (full-width SRP ~1071px, mobile ~327px) — items clip naturally
+- **Stories**: ByMake, ByBodyStyle, ByMakeInCity, FewItems, MobileWidth, AllVariants, AllVariantsMobile
+- **Storybook `title`**: `Molecules/SeoCarousel`
 
 ### Composite & layout components (compose primitives above)
 Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full props and states.
