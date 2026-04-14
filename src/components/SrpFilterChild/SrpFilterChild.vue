@@ -74,7 +74,7 @@ const emit = defineEmits<{
   box-sizing: border-box;
 
   background: var(--color-neutral-100);
-  border-top: var(--border-width-hairline) solid var(--color-neutral-90);
+  /* Bottom-only border — container wrapper supplies the top edge */
   border-bottom: var(--border-width-hairline) solid var(--color-neutral-90);
 
   cursor: pointer;
@@ -175,7 +175,6 @@ const emit = defineEmits<{
 /* ─── Pressed ──────────────────────────────────────────── */
 .srp-fc:active {
   background: var(--color-neutral-90);
-  border-top-color: var(--color-neutral-90);
   border-bottom-color: var(--color-neutral-90);
 }
 
@@ -189,7 +188,6 @@ const emit = defineEmits<{
 @media (hover: none) {
   .srp-fc:active {
     background: rgba(0, 111, 166, 0.15);
-    border-top-color: var(--color-action-accent);
     border-bottom-color: var(--color-action-accent);
   }
 }
@@ -197,15 +195,19 @@ const emit = defineEmits<{
 /* ─── Returning to selected ────────────────────────────── */
 .srp-fc--returning {
   background: var(--color-action-primary-subtle);
+  /* White 1px separator between adjacent returning items */
+  border-bottom-color: var(--color-neutral-100);
 }
 
 .srp-fc--returning:hover {
   background: var(--color-action-primary-subtle);
+  border-bottom-color: var(--color-neutral-100);
 }
 
 /* Slightly darker pressed state over the green bg */
 .srp-fc--returning:active {
   background: var(--color-action-primary-subtle);
+  border-bottom-color: var(--color-neutral-100);
 }
 
 .srp-fc--returning:active::after {

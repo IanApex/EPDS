@@ -493,8 +493,8 @@ EPDS/
 ### `Tooltip` — `src/components/Tooltip/`
 - **Figma**: "Components/Tooltip" — click-to-toggle context hint (dark bubble + caret, always above trigger)
 - **Props**: `text: string` (**required**), `ariaLabel: string` (**required**), `caretAlign?: 'center' | 'right' | 'left'` (default `'center'`), `closeOnClickOutside?: boolean`, `closeOnEscape?: boolean`
-- **Slots**: `#icon` — trigger icon (24×24 SVG, typically the info icon `Style=Alerts, Detail=Info, Icon=NA.svg`)
-- **Anatomy**: 24×24px trigger button + absolutely positioned dark panel above + caret triangle pointing down
+- **Slots**: `#icon` — trigger icon (16×16 SVG, typically the info icon `Style=Alerts, Detail=Info, Icon=NA.svg`)
+- **Anatomy**: 16×16px trigger button + absolutely positioned dark panel above + caret triangle pointing down
 - **Panel**: `background: --color-neutral-0`; `color: --color-neutral-100`; `border-radius: 6px`; `padding: 16px` (`--spacing-xxxs`); `max-width: 175px`; `width: max-content`; `bottom: calc(100% + 12px)`
 - **Typography**: `--text-label-size` (12px), `--text-label-line-height`, `--text-label-letter-spacing` (0.2px), `--font-weight-regular`, `text-align: center`
 - **Caret**: 16×8px CSS triangle pointing down, same `--color-neutral-0` fill
@@ -663,6 +663,7 @@ Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full 
 | `SrpFilterParent` | `Molecules/SRP Filters/FilterParent` | SRP filter shell |
 | `SrpFilterChild` | `Molecules/SRP Filters/FilterChild` | SRP filter row |
 | `SrpFilterChildTextLink` | `Molecules/SRP Filters/FilterChildTextLink` | Text-link variant for filters |
+| `SrpFilterPill` | `Molecules/SRP Filters/SrpFilterPill` | SRP active filter pills (`location` Map-Location icon + zip + distance · `dismissible` label + close); separate hit targets + Figma state styling |
 
 ## Token Reference
 
@@ -790,7 +791,7 @@ The token system has three layers loaded in order:
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
-  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/FilterParent'`**, **`FilterChild`**, **`FilterChildTextLink`**
+  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/FilterParent'`**, **`FilterChild`**, **`FilterChildTextLink`**, **`SrpFilterPill`**
   - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`
   - **Components**: reserved for future page-level / app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
 

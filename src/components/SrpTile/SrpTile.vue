@@ -166,16 +166,16 @@ function openTestDrive(e: MouseEvent) {
         <BadgePriceDrop :label="badgeLabel" variant="srp" />
       </div>
 
-    </div><!-- /.srpt__image-area -->
+      <!-- Carousel dots — straddling image/content boundary -->
+      <div v-if="imageCount > 1" class="srpt__dots">
+        <CarouselDots
+          :count="imageCount"
+          :modelValue="imageIndex"
+          @update:modelValue="emit('update:imageIndex', $event)"
+        />
+      </div>
 
-    <!-- Carousel dots — straddling image/content boundary -->
-    <div v-if="imageCount > 1" class="srpt__dots">
-      <CarouselDots
-        :count="imageCount"
-        :modelValue="imageIndex"
-        @update:modelValue="emit('update:imageIndex', $event)"
-      />
-    </div>
+    </div><!-- /.srpt__image-area -->
 
 
     <!-- ═══════════════════════════════════════════════════ -->
@@ -346,10 +346,9 @@ function openTestDrive(e: MouseEvent) {
 /* ─── Image area ───────────────────────────────────────────── */
 .srpt__image-area {
   position: relative;
-  height: 294px;
+  aspect-ratio: 4 / 3;
   flex-shrink: 0;
   background: var(--color-neutral-90);
-  overflow: hidden;
 }
 
 .srpt__photo,
@@ -442,9 +441,9 @@ function openTestDrive(e: MouseEvent) {
 /* ─── Carousel dots — straddle image/content boundary ─────── */
 .srpt__dots {
   position: absolute;
-  top: 294px;             /* = image area height */
+  bottom: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 50%);
   z-index: 5;
 }
 

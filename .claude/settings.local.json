@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__figma__use_figma",
+      "mcp__figma__get_design_context",
+      "Bash(rm -rf storybook-static)",
+      "Bash(rm -rf node_modules/.cache/storybook)",
+      "Bash(npm run:*)",
+      "Bash(node -e \"const i = JSON.parse\\(require\\('fs'\\).readFileSync\\('storybook-static/index.json','utf8'\\)\\); const ids = Object.keys\\(i.entries\\); console.log\\(ids.filter\\(id => id.includes\\('checkbox'\\) || id.includes\\('toggle'\\) || id.includes\\('boxselector'\\) || id.includes\\('modaltabs'\\) || id.includes\\('journey'\\) || id.includes\\('boxinput'\\) || id.includes\\('cta'\\)\\).sort\\(\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(ls \"C:/epds/icon/Style=Communication, Detail=Social\"*)"
+    ]
+  }
+}

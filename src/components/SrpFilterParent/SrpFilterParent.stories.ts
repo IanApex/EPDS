@@ -32,7 +32,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const w = 'width:306px;'
+/* Top border: single-row demos match list context (first row edge) */
+const w =
+  'width:306px;border-top:var(--border-width-hairline) solid var(--color-neutral-90);'
 
 // ─── Static states ────────────────────────────────────────────────────────────
 

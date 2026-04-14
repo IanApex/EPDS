@@ -55,7 +55,7 @@ const emit = defineEmits<{
 
   background: var(--color-neutral-100);
   border: none;
-  border-top: var(--border-width-hairline) solid var(--color-neutral-90);
+  /* Bottom edge only — avoids doubling with the next row’s divider */
   border-bottom: var(--border-width-hairline) solid var(--color-neutral-90);
 
   cursor: pointer;
@@ -111,7 +111,6 @@ const emit = defineEmits<{
 /* ─── Pressed ──────────────────────────────────────────── */
 .srp-fp:active:not(:disabled) {
   background: var(--color-neutral-90);
-  border-top-color: var(--color-neutral-90);
   border-bottom-color: var(--color-neutral-90);
 }
 
@@ -125,7 +124,6 @@ const emit = defineEmits<{
 @media (hover: none) {
   .srp-fp:active:not(:disabled) {
     background: rgba(0, 111, 166, 0.15);
-    border-top-color: var(--color-action-accent);
     border-bottom-color: var(--color-action-accent);
   }
 }

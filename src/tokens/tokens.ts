@@ -66,6 +66,7 @@ export const tokens = {
     accent: {
       a30: v('color-accent-30'),
       a40: v('color-accent-40'),
+      a55: v('color-accent-55'),
       a60: v('color-accent-60'),
       a80: v('color-accent-80'),
       a85: v('color-accent-85'),
@@ -117,6 +118,7 @@ export const tokens = {
     },
     accessibility: {
       a80: v('color-accessibility-80'),
+      a90: v('color-accessibility-90'),
     },
   },
 

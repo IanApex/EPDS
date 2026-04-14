@@ -33,6 +33,8 @@
    * ----------------------------------------------------------- */
   --color-accent-30:  #004D80;
   --color-accent-40:  #006FA6;
+  /* Between 40 & 60 — SRP filter pill zip segment hover (Figma) */
+  --color-accent-55:  #0084C7;
   --color-accent-60:  #047FBD;
   --color-accent-80:  #B2D4E1;
   --color-accent-85:  #C8E0E9;
@@ -101,4 +103,6 @@
    * Focus rings and high-contrast interactive indicators.
    * ----------------------------------------------------------- */
   --color-accessibility-80: #4095BF;
+  /* Light cyan focus indicator on blue / accent pills (Figma system blue 80) */
+  --color-accessibility-90: #6FCFFF;
 }

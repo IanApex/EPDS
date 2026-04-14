@@ -10,8 +10,8 @@ const meta = {
     docs: {
       description: {
         component:
-          'Carousel page-indicator dots. One dot per slide; the active dot is larger and darker.\n\n' +
-          '**Active dot:** 12×12px `--color-neutral-20` · **Inactive:** 8×8px `--color-neutral-90` · **Gap:** 5px\n\n' +
+          'Carousel page-indicator dots. One dot per slide; all dots share the same dark fill and light gray ring; the active dot is larger.\n\n' +
+          '**Fill:** `--color-neutral-20` · **Border:** 1px `--color-neutral-90` · **Inactive:** 8×8px · **Active:** 12×12px · **Gap:** `--spacing-xxxs` (16px)\n\n' +
           'Bind `v-model` to the carousel\'s current slide index (0-based). ' +
           'Clicking a dot emits the target index so the parent can sync the carousel.\n\n' +
           '```html\n' +

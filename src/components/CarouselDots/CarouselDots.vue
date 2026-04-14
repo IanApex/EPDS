@@ -34,28 +34,32 @@ const emit = defineEmits<{
 .cdots {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--spacing-xxxs);
 }
 
 .cdots__dot {
   display: block;
+  box-sizing: border-box;
   padding: 0;
-  border: none;
+  border: var(--border-width-hairline) solid var(--color-neutral-90);
   border-radius: var(--border-radius-circular);
-  background: var(--color-neutral-90);
+  background: var(--color-neutral-20);
   width: 8px;
   height: 8px;
   flex-shrink: 0;
   cursor: pointer;
   transition:
     width 0.2s ease,
-    height 0.2s ease,
-    background-color 0.15s ease;
+    height 0.2s ease;
 }
 
 .cdots__dot--active {
-  background: var(--color-neutral-20);
   width: 12px;
   height: 12px;
+}
+
+.cdots__dot:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 </style>

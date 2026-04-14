@@ -97,8 +97,8 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   padding: 0;
   border: none;
   background: none;
@@ -109,8 +109,8 @@ onUnmounted(() => {
 }
 
 .tooltip__trigger :deep(svg) {
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
 }
 
 .tooltip__trigger :deep(path) {
