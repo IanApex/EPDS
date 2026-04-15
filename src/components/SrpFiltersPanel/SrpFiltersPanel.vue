@@ -11,6 +11,11 @@ export interface FilterCategory {
   label: string
   /** True when one or more child options are selected — bolds the row label */
   hasSelection: boolean
+  /**
+   * When true, the standard child-title section is hidden.
+   * Use for filters that render their own header (e.g. `SrpFilterMakeModelTrim`).
+   */
+  hideTitle?: boolean
 }
 
 const props = withDefaults(defineProps<{
@@ -133,9 +138,9 @@ watch(activeKey, async (newKey) => {
           </button>
         </div>
 
-        <!-- Section title — e.g. "Body style" -->
+        <!-- Section title — e.g. "Body style" (hidden when the child renders its own header) -->
         <div
-          v-if="activeCategory"
+          v-if="activeCategory && !activeCategory.hideTitle"
           class="srp-filters-panel__child-title"
         >
           {{ activeCategory.label }}
@@ -283,6 +288,12 @@ watch(activeKey, async (newKey) => {
 .srp-filters-panel__child-header {
   padding: 2px var(--spacing-xxs) 22px;   /* 2px 24px 22px */
   flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .srp-filters-panel__child-header {
+    padding: var(--spacing-xxxs) var(--spacing-xxs);   /* 16px 24px */
+  }
 }
 
 .srp-filters-panel__back-btn {

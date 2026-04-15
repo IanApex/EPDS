@@ -7,10 +7,32 @@ import Pagination from '@/components/Pagination/Pagination.vue'
 import SeoCarousel from '@/components/SeoCarousel/SeoCarousel.vue'
 import SrpFiltersPanel from '@/components/SrpFiltersPanel/SrpFiltersPanel.vue'
 import SrpFilterChild from '@/components/SrpFilterChild/SrpFilterChild.vue'
+import SrpFilterMakeModelTrim from '@/components/SrpFilterMakeModelTrim/SrpFilterMakeModelTrim.vue'
 import SrpFilterPill from '@/components/SrpFilterPill/SrpFilterPill.vue'
 import SrpPricePaymentFilter from '@/components/SrpPricePaymentFilter/SrpPricePaymentFilter.vue'
+import SrpFilterYear from '@/components/SrpFilterYear/SrpFilterYear.vue'
+import SrpFilterMileage from '@/components/SrpFilterMileage/SrpFilterMileage.vue'
+import SrpFilterFeatures from '@/components/SrpFilterFeatures/SrpFilterFeatures.vue'
+import type { FeatureOption } from '@/components/SrpFilterFeatures/SrpFilterFeatures.vue'
+import SrpFilterMpgEngine from '@/components/SrpFilterMpgEngine/SrpFilterMpgEngine.vue'
+import type { EngineTypeOption } from '@/components/SrpFilterMpgEngine/SrpFilterMpgEngine.vue'
+import SrpFilterDriveTrans from '@/components/SrpFilterDriveTrans/SrpFilterDriveTrans.vue'
+import type { DriveTransOption } from '@/components/SrpFilterDriveTrans/SrpFilterDriveTrans.vue'
+import SrpFilterColor from '@/components/SrpFilterColor/SrpFilterColor.vue'
+import type { ColorOption } from '@/components/SrpFilterColor/SrpFilterColor.vue'
+
+import thirdRowSeatIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=3rd Row Seat.svg?raw'
+import backupCameraIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Backup Camera.svg?raw'
+import blindSpotIcon     from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Blind Spot.svg?raw'
+import heatedSeatsIcon   from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Heated Seats.svg?raw'
+import leatherSeatsIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Leather Seats.svg?raw'
+import sunroofIcon       from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Sunroof Moonroof.svg?raw'
+import SrpFilterDistance from '@/components/SrpFilterDistance/SrpFilterDistance.vue'
+import type { DistanceStoreItem } from '@/components/SrpFilterDistance/SrpFilterDistance.vue'
+import type { LocationStoreItem } from '@/components/SrpLocationFlyIn/SrpLocationFlyIn.vue'
 import type { SeoCarouselItem } from '@/components/SeoCarousel/SeoCarousel.vue'
 import type { FilterCategory } from '@/components/SrpFiltersPanel/SrpFiltersPanel.vue'
+import type { MakeItem } from '@/components/SrpFilterMakeModelTrim/SrpFilterMakeModelTrim.vue'
 
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 import filterIcon      from '@icons/Style=Display, Detail=Menu, Icon=Menu-Filter.svg?raw'
@@ -33,10 +55,43 @@ const DUMMY_CAR_IMAGE =
 const currentPage = ref(1)
 const totalPages = 217
 
+// ─── Makes / Models / Trims data ─────────────────────────────────────────────
+
+const MAKES_DATA: MakeItem[] = [
+  { value: 'Acura',     count: 34,  models: [{ value: 'ILX', count: 12, trims: [{ value: 'Premium', count: 8 }, { value: 'Technology', count: 4 }] }, { value: 'MDX', count: 10, trims: [] }, { value: 'RDX', count: 8, trims: [] }, { value: 'TLX', count: 4, trims: [{ value: '2.4L', count: 2 }, { value: 'V6 SH-AWD', count: 2 }] }] },
+  { value: 'Audi',      count: 82,  models: [{ value: 'A3', count: 11, trims: [{ value: '2.0T Premium', count: 4 }, { value: '2.0T Prestige', count: 7 }] }, { value: 'A4', count: 11, trims: [] }, { value: 'A5', count: 11, trims: [] }, { value: 'A6', count: 11, trims: [{ value: '2.0T Premium', count: 11 }, { value: '3.0T Prestige', count: 11 }, { value: '3.0T Prestige Plus', count: 11 }, { value: '3.0T Quattro Premium', count: 11 }, { value: '45 TFSI Premium Plus', count: 11 }, { value: '55 TFSI Premium Plus', count: 11 }, { value: 'competition', count: 11 }, { value: 'TDI Premium Plus', count: 11 }, { value: 'TDI Prestige', count: 11 }] }, { value: 'A7', count: 11, trims: [] }, { value: 'A8', count: 11, trims: [] }, { value: 'allroad', count: 11, trims: [] }, { value: 'e-tron', count: 11, trims: [] }, { value: 'Q3', count: 11, trims: [] }, { value: 'Q5', count: 11, trims: [] }, { value: 'S3', count: 11, trims: [] }, { value: 'S5', count: 11, trims: [] }] },
+  { value: 'BMW',       count: 57,  models: [{ value: '3 Series', count: 20, trims: [{ value: '330i', count: 12 }, { value: 'M340i', count: 8 }] }, { value: '5 Series', count: 22, trims: [] }, { value: 'X3', count: 15, trims: [] }] },
+  { value: 'Buick',     count: 21,  models: [{ value: 'Enclave', count: 10, trims: [] }, { value: 'Encore', count: 11, trims: [] }] },
+  { value: 'Cadillac',  count: 18,  models: [] },
+  { value: 'Chevrolet', count: 93,  models: [] },
+  { value: 'Chrysler',  count: 14,  models: [] },
+  { value: 'Dodge',     count: 29,  models: [] },
+  { value: 'Ford',      count: 112, models: [] },
+  { value: 'GMC',       count: 44,  models: [] },
+  { value: 'Honda',     count: 78,  models: [] },
+  { value: 'Hyundai',   count: 51,  models: [] },
+  { value: 'Infinity',  count: 22,  models: [] },
+  { value: 'Jaguar',    count: 11,  models: [] },
+  { value: 'Jeep',      count: 67,  models: [] },
+  { value: 'Kia',       count: 43,  models: [] },
+  { value: 'Lexus',     count: 38,  models: [] },
+  { value: 'Mazda',     count: 29,  models: [] },
+  { value: 'Mercedes-Benz', count: 46, models: [] },
+  { value: 'Nissan',    count: 61,  models: [] },
+  { value: 'Ram',       count: 33,  models: [] },
+  { value: 'Subaru',    count: 25,  models: [] },
+  { value: 'Toyota',    count: 88,  models: [] },
+  { value: 'Volkswagen', count: 19, models: [] },
+  { value: 'Volvo',     count: 14,  models: [] },
+]
+
 // ─── Filter state ────────────────────────────────────────────────────────────
 
 const activeFilter = ref<string | null>(null)
 const selectedBodyStyles  = ref<string[]>([])
+const selectedMakes       = ref<string[]>([])
+const selectedModels      = ref<string[]>([])
+const selectedTrims       = ref<string[]>([])
 
 /**
  * Snapshot of selectedBodyStyles taken the moment the body-style child panel
@@ -48,31 +103,50 @@ const committedBodyStyles = ref<string[]>([])
 
 watch(activeFilter, (newKey) => {
   if (newKey === 'body-style') {
-    // Snapshot current selections so they float to top as "returning"
     committedBodyStyles.value = [...selectedBodyStyles.value]
+  }
+  if (newKey === 'features') {
+    onFeaturesOpen()
+  }
+  if (newKey === 'mpg') {
+    onMpgEngineOpen()
+  }
+  if (newKey === 'drive') {
+    onDriveTransOpen()
+  }
+  if (newKey === 'color') {
+    onColorOpen()
   }
 })
 
 const BASE_CATEGORIES = [
-  { key: 'distance',   label: 'Distance & shipping',       alwaysSelected: true  },
-  { key: 'make',       label: 'Make/Model/Trim'                                   },
-  { key: 'body-style', label: 'Body style'                                        },
-  { key: 'price',      label: 'Price & payment'                                   },
-  { key: 'year',       label: 'Year'                                               },
-  { key: 'mileage',    label: 'Mileage'                                            },
-  { key: 'features',   label: 'Features'                                           },
-  { key: 'mpg',        label: 'MPG & engine type'                                 },
-  { key: 'drive',      label: 'Drive type & transmission'                         },
-  { key: 'color',      label: 'Color'                                              },
+  { key: 'distance',   label: 'Distance & stores',         alwaysSelected: true,  hideTitle: true  },
+  { key: 'make',       label: 'Make/Model/Trim',           alwaysSelected: false, hideTitle: true  },
+  { key: 'body-style', label: 'Body style',                alwaysSelected: false, hideTitle: false },
+  { key: 'price',      label: 'Price & payment',           alwaysSelected: false, hideTitle: false },
+  { key: 'year',       label: 'Year',                      alwaysSelected: false, hideTitle: false },
+  { key: 'mileage',    label: 'Mileage',                   alwaysSelected: false, hideTitle: false },
+  { key: 'features',   label: 'Features',                  alwaysSelected: false, hideTitle: false },
+  { key: 'mpg',        label: 'MPG & engine type',         alwaysSelected: false, hideTitle: false },
+  { key: 'drive',      label: 'Drive type & transmission', alwaysSelected: false, hideTitle: false },
+  { key: 'color',      label: 'Color',                     alwaysSelected: false, hideTitle: false },
 ]
 
 const filterCategories = computed<FilterCategory[]>(() =>
   BASE_CATEGORIES.map(c => ({
     key:          c.key,
     label:        c.label,
+    hideTitle:    c.hideTitle,
     hasSelection: c.alwaysSelected === true
+      || (c.key === 'make'       && (selectedMakes.value.length > 0 || selectedModels.value.length > 0 || selectedTrims.value.length > 0))
       || (c.key === 'body-style' && selectedBodyStyles.value.length > 0)
-      || (c.key === 'price'      && isPriceFiltered.value),
+      || (c.key === 'price'      && isPriceFiltered.value)
+      || (c.key === 'year'       && isYearFiltered.value)
+      || (c.key === 'mileage'    && isMileageFiltered.value)
+      || (c.key === 'features'   && isFeaturesFiltered.value)
+      || (c.key === 'mpg'        && isMpgEngineFiltered.value)
+      || (c.key === 'drive'      && isDriveTransFiltered.value)
+      || (c.key === 'color'      && isColorFiltered.value),
   })),
 )
 
@@ -96,6 +170,81 @@ function toggleBodyStyle(value: string, on: boolean) {
     selectedBodyStyles.value = selectedBodyStyles.value.filter(v => v !== value)
     // Remove from committed so the item immediately returns to its original position
     committedBodyStyles.value = committedBodyStyles.value.filter(v => v !== value)
+  }
+}
+
+// ─── Distance & stores filter state ──────────────────────────
+
+const DISTANCE_STORES: DistanceStoreItem[] = [
+  { id: 'co-springs',   name: 'EchoPark Colorado Springs', distanceMiles: 9  },
+  { id: 'centennial',   name: 'EchoPark Centennial',        distanceMiles: 29 },
+  { id: 'thornton',     name: 'EchoPark Thornton',          distanceMiles: 36 },
+  { id: 'aurora',       name: 'EchoPark Aurora',            distanceMiles: 44 },
+  { id: 'lakewood',     name: 'EchoPark Lakewood',          distanceMiles: 51 },
+  { id: 'fort-collins', name: 'EchoPark Fort Collins',      distanceMiles: 67 },
+  { id: 'boulder',      name: 'EchoPark Boulder',           distanceMiles: 72 },
+]
+
+/** Full store data used by the location fly-in (address + phone). */
+const LOCATION_STORES: LocationStoreItem[] = [
+  { id: 'co-springs',   name: 'EchoPark Colorado Springs', distanceMiles: 9,  address: '1234 Powers Blvd, Colorado Springs, CO 80920', phone: '(719) 555-0101' },
+  { id: 'centennial',   name: 'EchoPark Centennial',        distanceMiles: 29, address: '6820 S. Havana St, Centennial, CO 80112',      phone: '(720) 555-0202' },
+  { id: 'thornton',     name: 'EchoPark Thornton',          distanceMiles: 36, address: '9501 Grant St, Thornton, CO 80229',            phone: '(720) 555-0303' },
+  { id: 'aurora',       name: 'EchoPark Aurora',            distanceMiles: 44, address: '15500 E. Colfax Ave, Aurora, CO 80011',        phone: '(720) 555-0404' },
+  { id: 'lakewood',     name: 'EchoPark Lakewood',          distanceMiles: 51, address: '1950 S. Wadsworth Blvd, Lakewood, CO 80227',  phone: '(303) 555-0505' },
+  { id: 'fort-collins', name: 'EchoPark Fort Collins',      distanceMiles: 67, address: '2351 S. College Ave, Fort Collins, CO 80525', phone: '(970) 555-0606' },
+  { id: 'boulder',      name: 'EchoPark Boulder',           distanceMiles: 72, address: '1550 30th St, Boulder, CO 80303',             phone: '(303) 555-0707' },
+]
+
+const currentZipCode = ref('75214')
+
+function onZipChange(newZip: string) {
+  currentZipCode.value = newZip
+}
+
+const distanceMode           = ref<'radius' | 'store'>('radius')
+const distanceRadius         = ref(100)
+const distanceSelectedStores = ref<string[]>([])
+
+/** Stores whose distance is within the chosen radius (drives the count copy). */
+const storesInRadius = computed(() =>
+  DISTANCE_STORES.filter(s => s.distanceMiles <= distanceRadius.value).length,
+)
+
+/** Label for the persistent location pill's distance segment. */
+const locationDistanceLabel = computed(() =>
+  distanceMode.value === 'store'
+    ? 'Shop by store'
+    : `Cars within ${distanceRadius.value} mi`,
+)
+
+/** Dismissible pills for each selected store (store mode only). */
+const storePills = computed(() =>
+  distanceMode.value === 'store'
+    ? distanceSelectedStores.value.map(id => ({
+        key:   id,
+        label: DISTANCE_STORES.find(s => s.id === id)?.name ?? id,
+      }))
+    : [],
+)
+
+function dismissStorePill(storeId: string) {
+  const next = distanceSelectedStores.value.filter(id => id !== storeId)
+  distanceSelectedStores.value = next
+  if (next.length === 0) {
+    // No stores left — fall back to radius mode
+    distanceMode.value = 'radius'
+  }
+}
+
+/**
+ * Open the named child filter panel.
+ * On narrow viewports (sidebar hidden) also opens the mobile drawer.
+ */
+function openFilterFromPill(key: string) {
+  activeFilter.value = key
+  if (window.innerWidth < 1240) {
+    showMobileFilters.value = true
   }
 }
 
@@ -162,16 +311,324 @@ function resetPayment() {
   committedPaymentMax.value = PAYMENT_ABS_MAX
 }
 
+// ─── Year filter state ────────────────────────────────────────
+const YEAR_ABS_MIN = 2012
+const YEAR_ABS_MAX = 2026
+
+const yearMin          = ref(YEAR_ABS_MIN)
+const yearMax          = ref(YEAR_ABS_MAX)
+const committedYearMin = ref(YEAR_ABS_MIN)
+const committedYearMax = ref(YEAR_ABS_MAX)
+
+type YearCommit = { minYear: number; maxYear: number }
+function onYearCommit(p: YearCommit) {
+  committedYearMin.value = p.minYear
+  committedYearMax.value = p.maxYear
+}
+
+const isYearFiltered = computed(
+  () => committedYearMin.value !== YEAR_ABS_MIN || committedYearMax.value !== YEAR_ABS_MAX,
+)
+
+const yearPillLabel = computed(
+  () => `${committedYearMin.value} – ${committedYearMax.value}`,
+)
+
+function resetYear() {
+  yearMin.value          = YEAR_ABS_MIN
+  yearMax.value          = YEAR_ABS_MAX
+  committedYearMin.value = YEAR_ABS_MIN
+  committedYearMax.value = YEAR_ABS_MAX
+}
+
+// ─── Mileage filter state ─────────────────────────────────────
+const MILEAGE_ABS_MAX = 150_000
+
+const mileageMax = ref(MILEAGE_ABS_MAX)
+
+const isMileageFiltered = computed(
+  () => mileageMax.value !== MILEAGE_ABS_MAX,
+)
+
+const mileagePillLabel = computed(
+  () => `${mileageMax.value.toLocaleString('en-US')} mi or less`,
+)
+
+function resetMileage() {
+  mileageMax.value = MILEAGE_ABS_MAX
+}
+
+// ─── Features ─────────────────────────────────────────────────────────────────
+
+const POPULAR_FEATURES: FeatureOption[] = [
+  { value: '3rd-row-seat',       label: '3rd row seat',        count: 102, icon: thirdRowSeatIcon },
+  { value: 'backup-camera',      label: 'Backup camera',       count: 102, icon: backupCameraIcon },
+  { value: 'blind-spot-monitor', label: 'Blind spot monitor',  count: 102, icon: blindSpotIcon },
+  { value: 'heated-seats',       label: 'Heated seats',        count: 102, icon: heatedSeatsIcon },
+  { value: 'leather-seats',      label: 'Leather(ette) seats', count: 102, icon: leatherSeatsIcon },
+  { value: 'sunroof',            label: 'Sunroof/Moonroof',    count: 102, icon: sunroofIcon },
+]
+
+const MORE_FEATURES: FeatureOption[] = [
+  { value: 'adaptive-cruise',    label: 'Adaptive cruise control', count: 102 },
+  { value: 'android-auto',       label: 'Android Auto',            count: 102 },
+  { value: 'apple-carplay',      label: 'Apple CarPlay',           count: 102 },
+]
+
+const selectedFeatures  = ref<string[]>([])
+const committedFeatures = ref<string[]>([])
+
+function onFeaturesOpen() {
+  committedFeatures.value = [...selectedFeatures.value]
+}
+
+const isFeaturesFiltered = computed(
+  () => selectedFeatures.value.length > 0,
+)
+
+const ALL_FEATURES = [...POPULAR_FEATURES, ...MORE_FEATURES]
+
+const featurePills = computed(() =>
+  selectedFeatures.value.map(v => ({
+    key:   v,
+    label: ALL_FEATURES.find(o => o.value === v)?.label ?? v,
+  })),
+)
+
+function removeFeature(value: string) {
+  selectedFeatures.value = selectedFeatures.value.filter(v => v !== value)
+}
+
+function resetFeatures() {
+  selectedFeatures.value  = []
+  committedFeatures.value = []
+}
+
+// ─── MPG & Engine type ────────────────────────────────────────────────────────
+
+const MPG_ABS_MIN = 18
+const MPG_ABS_MAX = 100
+
+const ENGINE_TYPES: EngineTypeOption[] = [
+  { value: 'diesel-6',  label: 'Diesel 6-cyl', count: 8 },
+  { value: 'gas-3',     label: 'Gas 3-cyl',    count: 100 },
+  { value: 'gas-4',     label: 'Gas 4-cyl',    count: 2100 },
+  { value: 'gas-6',     label: 'Gas 6-cyl',    count: 845 },
+  { value: 'gas-8',     label: 'Gas 8-cyl',    count: 153 },
+  { value: 'hybrid',    label: 'Hybrid',        count: 34 },
+]
+
+const mpgMin = ref(MPG_ABS_MIN)
+const mpgMax = ref(MPG_ABS_MAX)
+const selectedEngines  = ref<string[]>([])
+const committedEngines = ref<string[]>([])
+
+function onMpgEngineOpen() {
+  committedEngines.value = [...selectedEngines.value]
+}
+
+const isMpgFiltered = computed(
+  () => mpgMin.value !== MPG_ABS_MIN || mpgMax.value !== MPG_ABS_MAX,
+)
+
+const isEngineFiltered = computed(
+  () => selectedEngines.value.length > 0,
+)
+
+const isMpgEngineFiltered = computed(
+  () => isMpgFiltered.value || isEngineFiltered.value,
+)
+
+const mpgPillLabel = computed(() => {
+  if (mpgMin.value !== MPG_ABS_MIN && mpgMax.value !== MPG_ABS_MAX) {
+    return `${mpgMin.value}–${mpgMax.value} MPG`
+  }
+  if (mpgMin.value !== MPG_ABS_MIN) return `${mpgMin.value}+ MPG`
+  return `Up to ${mpgMax.value} MPG`
+})
+
+const enginePills = computed(() =>
+  selectedEngines.value.map(v => ({
+    key:   v,
+    label: ENGINE_TYPES.find(o => o.value === v)?.label ?? v,
+  })),
+)
+
+function removeEngine(value: string) {
+  selectedEngines.value = selectedEngines.value.filter(v => v !== value)
+}
+
+function resetMpg() {
+  mpgMin.value = MPG_ABS_MIN
+  mpgMax.value = MPG_ABS_MAX
+}
+
+function resetMpgEngine() {
+  resetMpg()
+  selectedEngines.value  = []
+  committedEngines.value = []
+}
+
+// ─── Drive type & Transmission ────────────────────────────────────────────────
+
+const DRIVE_TYPES: DriveTransOption[] = [
+  { value: 'fwd', label: 'FWD',  count: 843 },
+  { value: 'awd', label: 'AWD',  count: 1843 },
+  { value: '4wd', label: '4WD',  count: 843 },
+  { value: 'rwd', label: 'RWD',  count: 843 },
+]
+
+const TRANSMISSIONS: DriveTransOption[] = [
+  { value: 'automatic', label: 'Automatic', count: 3444 },
+  { value: 'manual',    label: 'Manual',    count: 4 },
+]
+
+const selectedDriveTypes     = ref<string[]>([])
+const selectedTransmissions  = ref<string[]>([])
+const committedDriveTypes    = ref<string[]>([])
+const committedTransmissions = ref<string[]>([])
+
+function onDriveTransOpen() {
+  committedDriveTypes.value    = [...selectedDriveTypes.value]
+  committedTransmissions.value = [...selectedTransmissions.value]
+}
+
+const isDriveFiltered = computed(
+  () => selectedDriveTypes.value.length > 0,
+)
+
+const isTransFiltered = computed(
+  () => selectedTransmissions.value.length > 0,
+)
+
+const isDriveTransFiltered = computed(
+  () => isDriveFiltered.value || isTransFiltered.value,
+)
+
+const driveTypePills = computed(() =>
+  selectedDriveTypes.value.map(v => ({
+    key:   v,
+    label: DRIVE_TYPES.find(o => o.value === v)?.label ?? v,
+  })),
+)
+
+const transmissionPills = computed(() =>
+  selectedTransmissions.value.map(v => ({
+    key:   v,
+    label: TRANSMISSIONS.find(o => o.value === v)?.label ?? v,
+  })),
+)
+
+function removeDriveType(value: string) {
+  selectedDriveTypes.value = selectedDriveTypes.value.filter(v => v !== value)
+}
+
+function removeTransmission(value: string) {
+  selectedTransmissions.value = selectedTransmissions.value.filter(v => v !== value)
+}
+
+function resetDriveTrans() {
+  selectedDriveTypes.value     = []
+  selectedTransmissions.value  = []
+  committedDriveTypes.value    = []
+  committedTransmissions.value = []
+}
+
+// ─── Color filter state ───────────────────────────────────────────────────────
+
+const EXTERIOR_COLORS: ColorOption[] = [
+  { value: 'white',  label: 'White',  count: 8, swatch: 'radial-gradient(circle at 35% 35%, #ffffff, #e0e0e0)' },
+  { value: 'silver', label: 'Silver', count: 8, swatch: 'radial-gradient(circle at 35% 35%, #d0d3d6, #9ba0a5)' },
+  { value: 'gold',   label: 'Gold',   count: 8, swatch: 'radial-gradient(circle at 35% 35%, #e6b422, #b8860b)' },
+  { value: 'gray',   label: 'Gray',   count: 8, swatch: 'radial-gradient(circle at 35% 35%, #a0a4a8, #6b7075)' },
+  { value: 'red',    label: 'Red',    count: 8, swatch: 'radial-gradient(circle at 35% 35%, #e8242c, #a01020)' },
+  { value: 'orange', label: 'Orange', count: 8, swatch: 'radial-gradient(circle at 35% 35%, #f39c12, #d35400)' },
+  { value: 'yellow', label: 'Yellow', count: 8, swatch: 'radial-gradient(circle at 35% 35%, #f1c40f, #d4ac0d)' },
+  { value: 'green',  label: 'Green',  count: 8, swatch: 'radial-gradient(circle at 35% 35%, #3a7d28, #1a4a10)' },
+  { value: 'blue',   label: 'Blue',   count: 8, swatch: 'radial-gradient(circle at 35% 35%, #2980b9, #1a4f7a)' },
+  { value: 'purple', label: 'Purple', count: 8, swatch: 'radial-gradient(circle at 35% 35%, #9b59b6, #6c3483)' },
+  { value: 'beige',  label: 'Beige',  count: 8, swatch: 'radial-gradient(circle at 35% 35%, #f5e6c8, #d2b48c)' },
+  { value: 'brown',  label: 'Brown',  count: 8, swatch: 'radial-gradient(circle at 35% 35%, #a0724a, #6d4c2e)' },
+  { value: 'black',  label: 'Black',  count: 8, swatch: 'radial-gradient(circle at 35% 35%, #555555, #1a1a1a)' },
+]
+
+const INTERIOR_COLORS: ColorOption[] = [
+  { value: 'black',  label: 'Black',  count: 12, swatch: 'radial-gradient(circle at 35% 35%, #555555, #1a1a1a)' },
+  { value: 'gray',   label: 'Gray',   count: 10, swatch: 'radial-gradient(circle at 35% 35%, #a0a4a8, #6b7075)' },
+  { value: 'beige',  label: 'Beige',  count: 6,  swatch: 'radial-gradient(circle at 35% 35%, #f5e6c8, #d2b48c)' },
+  { value: 'brown',  label: 'Brown',  count: 4,  swatch: 'radial-gradient(circle at 35% 35%, #a0724a, #6d4c2e)' },
+  { value: 'red',    label: 'Red',    count: 2,  swatch: 'radial-gradient(circle at 35% 35%, #e8242c, #a01020)' },
+  { value: 'white',  label: 'White',  count: 1,  swatch: 'radial-gradient(circle at 35% 35%, #ffffff, #e0e0e0)' },
+]
+
+const colorMode              = ref<'exterior' | 'interior'>('exterior')
+const selectedExteriorColors = ref<string[]>([])
+const selectedInteriorColors = ref<string[]>([])
+const committedExteriorColors = ref<string[]>([])
+const committedInteriorColors = ref<string[]>([])
+
+function onColorOpen() {
+  committedExteriorColors.value = [...selectedExteriorColors.value]
+  committedInteriorColors.value = [...selectedInteriorColors.value]
+}
+
+const isColorFiltered = computed(
+  () => selectedExteriorColors.value.length > 0 || selectedInteriorColors.value.length > 0,
+)
+
+const colorPills = computed(() => {
+  const pills: { key: string; label: string; type: 'ext' | 'int' }[] = []
+  for (const v of selectedExteriorColors.value) {
+    pills.push({ key: `ext-${v}`, label: EXTERIOR_COLORS.find(c => c.value === v)?.label ?? v, type: 'ext' })
+  }
+  for (const v of selectedInteriorColors.value) {
+    pills.push({ key: `int-${v}`, label: `${INTERIOR_COLORS.find(c => c.value === v)?.label ?? v} (Int.)`, type: 'int' })
+  }
+  return pills
+})
+
+function removeColorPill(pill: { key: string; type: 'ext' | 'int' }) {
+  const raw = pill.key.replace(/^(ext|int)-/, '')
+  if (pill.type === 'ext') {
+    selectedExteriorColors.value = selectedExteriorColors.value.filter(v => v !== raw)
+  } else {
+    selectedInteriorColors.value = selectedInteriorColors.value.filter(v => v !== raw)
+  }
+}
+
+function resetColor() {
+  colorMode.value              = 'exterior'
+  selectedExteriorColors.value = []
+  selectedInteriorColors.value = []
+  committedExteriorColors.value = []
+  committedInteriorColors.value = []
+}
+
 function resetFilters() {
-  selectedBodyStyles.value  = []
-  priceMin.value            = PRICE_ABS_MIN
-  priceMax.value            = PRICE_ABS_MAX
-  paymentMin.value          = PAYMENT_ABS_MIN
-  paymentMax.value          = PAYMENT_ABS_MAX
-  committedPriceMin.value   = PRICE_ABS_MIN
-  committedPriceMax.value   = PRICE_ABS_MAX
-  committedPaymentMin.value = PAYMENT_ABS_MIN
-  committedPaymentMax.value = PAYMENT_ABS_MAX
+  selectedMakes.value           = []
+  selectedModels.value          = []
+  selectedTrims.value           = []
+  selectedBodyStyles.value      = []
+  distanceMode.value            = 'radius'
+  distanceRadius.value          = 100
+  distanceSelectedStores.value  = []
+  priceMin.value                = PRICE_ABS_MIN
+  priceMax.value                = PRICE_ABS_MAX
+  paymentMin.value              = PAYMENT_ABS_MIN
+  paymentMax.value              = PAYMENT_ABS_MAX
+  committedPriceMin.value       = PRICE_ABS_MIN
+  committedPriceMax.value       = PRICE_ABS_MAX
+  committedPaymentMin.value     = PAYMENT_ABS_MIN
+  committedPaymentMax.value     = PAYMENT_ABS_MAX
+  yearMin.value                 = YEAR_ABS_MIN
+  yearMax.value                 = YEAR_ABS_MAX
+  committedYearMin.value        = YEAR_ABS_MIN
+  committedYearMax.value        = YEAR_ABS_MAX
+  mileageMax.value              = MILEAGE_ABS_MAX
+  resetFeatures()
+  resetMpgEngine()
+  resetDriveTrans()
+  resetColor()
 }
 
 const bodyStylePills = computed(() =>
@@ -180,6 +637,105 @@ const bodyStylePills = computed(() =>
     label: bodyStyleOptions.find(o => o.value === v)?.label ?? v,
   })),
 )
+
+// ─── Make / Model / Trim pills — interleaved and ordered ────────────────────
+// Priority: for each selected make (alpha), immediately follow it with its
+// selected models (alpha), and each model with its selected trims (alpha).
+
+interface MmtPill {
+  key:   string
+  label: string
+  type:  'make' | 'model' | 'trim'
+}
+
+const mmtPills = computed((): MmtPill[] => {
+  const pills: MmtPill[] = []
+  const sortedMakes = [...selectedMakes.value].sort((a, b) => a.localeCompare(b))
+
+  for (const makeValue of sortedMakes) {
+    pills.push({ key: `make:${makeValue}`, label: makeValue, type: 'make' })
+
+    const makeData   = MAKES_DATA.find(m => m.value === makeValue)
+    const makeModels = makeData?.models ?? []
+
+    const sortedModels = makeModels
+      .filter(m => selectedModels.value.includes(m.value))
+      .sort((a, b) => a.value.localeCompare(b.value))
+
+    for (const model of sortedModels) {
+      pills.push({ key: `model:${model.value}`, label: model.value, type: 'model' })
+
+      const sortedTrims = (model.trims ?? [])
+        .filter(t => selectedTrims.value.includes(t.value))
+        .sort((a, b) => a.value.localeCompare(b.value))
+
+      for (const trim of sortedTrims) {
+        pills.push({ key: `trim:${trim.value}`, label: trim.value, type: 'trim' })
+      }
+    }
+  }
+
+  return pills
+})
+
+// ─── Cascade dismiss helpers ─────────────────────────────────────────────────
+
+function dismissMake(makeValue: string) {
+  selectedMakes.value = selectedMakes.value.filter(m => m !== makeValue)
+
+  // Cascade: remove all of this make's models
+  const makeData        = MAKES_DATA.find(m => m.value === makeValue)
+  const makeModelValues = (makeData?.models ?? []).map(m => m.value)
+  const removedModels   = makeModelValues.filter(m => selectedModels.value.includes(m))
+
+  if (removedModels.length > 0) {
+    selectedModels.value = selectedModels.value.filter(m => !removedModels.includes(m))
+    // Cascade: remove trims that belonged to any removed model
+    const trimsToRemove = removedModels.flatMap(modelValue => {
+      const model = makeData?.models?.find(m => m.value === modelValue)
+      return (model?.trims ?? []).map(t => t.value)
+    })
+    if (trimsToRemove.length > 0) {
+      selectedTrims.value = selectedTrims.value.filter(t => !trimsToRemove.includes(t))
+    }
+  }
+}
+
+function dismissModel(modelValue: string) {
+  selectedModels.value = selectedModels.value.filter(m => m !== modelValue)
+
+  // Cascade: remove all trims that belong to this model
+  const parentMake  = MAKES_DATA.find(m => m.models?.some(mo => mo.value === modelValue))
+  const modelData   = parentMake?.models?.find(m => m.value === modelValue)
+  const trimValues  = (modelData?.trims ?? []).map(t => t.value)
+
+  if (trimValues.length > 0) {
+    selectedTrims.value = selectedTrims.value.filter(t => !trimValues.includes(t))
+  }
+}
+
+function dismissTrim(trimValue: string) {
+  selectedTrims.value = selectedTrims.value.filter(t => t !== trimValue)
+}
+
+function dismissMmtPill(pill: MmtPill) {
+  if      (pill.type === 'make')  dismissMake(pill.label)
+  else if (pill.type === 'model') dismissModel(pill.label)
+  else                            dismissTrim(pill.label)
+}
+
+// ─── Auto-select parent make when a model is selected ────────────────────────
+// Ensures a model pill is never orphaned without its parent make pill.
+watch(selectedModels, (newModels, oldModels) => {
+  if (!oldModels) return
+  const added = newModels.filter(m => !oldModels.includes(m))
+  for (const modelValue of added) {
+    const parentMake = MAKES_DATA.find(m => m.models?.some(mo => mo.value === modelValue))
+    if (parentMake && !selectedMakes.value.includes(parentMake.value)) {
+      selectedMakes.value = [...selectedMakes.value, parentMake.value]
+    }
+  }
+})
 
 /**
  * When the body-style panel opens with prior selections, those items float to
@@ -296,8 +852,6 @@ const seoByBody: SeoCarouselItem[] = [
   { label: 'Wagons', href: '#' },
 ]
 
-const shipToStoreFilterActive = ref(true)
-
 function toggleFavorite(index: number) {
   listings.value[index].favorited = !listings.value[index].favorited
 }
@@ -320,8 +874,18 @@ function toggleFavorite(index: number) {
             @reset="resetFilters"
           >
             <template #child="{ activeFilter }">
+              <!-- Make / Model / Trim -->
+              <template v-if="activeFilter === 'make'">
+                <SrpFilterMakeModelTrim
+                  :makes="MAKES_DATA"
+                  v-model:selectedMakes="selectedMakes"
+                  v-model:selectedModels="selectedModels"
+                  v-model:selectedTrims="selectedTrims"
+                />
+              </template>
+
               <!-- Body style -->
-              <template v-if="activeFilter === 'body-style'">
+              <template v-else-if="activeFilter === 'body-style'">
                 <SrpFilterChild
                   v-for="opt in sortedBodyStyleOptions"
                   :key="opt.value"
@@ -357,6 +921,87 @@ function toggleFavorite(index: number) {
                 />
               </template>
 
+              <!-- Distance & stores -->
+              <template v-else-if="activeFilter === 'distance'">
+                <SrpFilterDistance
+                  v-model:mode="distanceMode"
+                  v-model:radius="distanceRadius"
+                  v-model:selectedStores="distanceSelectedStores"
+                  :zipCode="currentZipCode"
+                  :stores="DISTANCE_STORES"
+                  :locationStores="LOCATION_STORES"
+                  :storeCountInRadius="storesInRadius"
+                  @update:zipCode="onZipChange"
+                />
+              </template>
+
+              <!-- Year -->
+              <template v-else-if="activeFilter === 'year'">
+                <SrpFilterYear
+                  :absMin="YEAR_ABS_MIN"
+                  :absMax="YEAR_ABS_MAX"
+                  v-model:minYear="yearMin"
+                  v-model:maxYear="yearMax"
+                  @commit="onYearCommit"
+                />
+              </template>
+
+              <!-- Mileage -->
+              <template v-else-if="activeFilter === 'mileage'">
+                <SrpFilterMileage
+                  :absMax="MILEAGE_ABS_MAX"
+                  v-model="mileageMax"
+                />
+              </template>
+
+              <!-- Features -->
+              <template v-else-if="activeFilter === 'features'">
+                <SrpFilterFeatures
+                  :popular="POPULAR_FEATURES"
+                  :more="MORE_FEATURES"
+                  v-model:selected="selectedFeatures"
+                  :committed="committedFeatures"
+                />
+              </template>
+
+              <!-- MPG & Engine type -->
+              <template v-else-if="activeFilter === 'mpg'">
+                <SrpFilterMpgEngine
+                  :absMin="MPG_ABS_MIN"
+                  :absMax="MPG_ABS_MAX"
+                  :engineTypes="ENGINE_TYPES"
+                  v-model:minMpg="mpgMin"
+                  v-model:maxMpg="mpgMax"
+                  v-model:selectedEngines="selectedEngines"
+                  :committedEngines="committedEngines"
+                />
+              </template>
+
+              <!-- Drive type & Transmission -->
+              <template v-else-if="activeFilter === 'drive'">
+                <SrpFilterDriveTrans
+                  :driveTypes="DRIVE_TYPES"
+                  :transmissions="TRANSMISSIONS"
+                  v-model:selectedDriveTypes="selectedDriveTypes"
+                  v-model:selectedTransmissions="selectedTransmissions"
+                  :committedDriveTypes="committedDriveTypes"
+                  :committedTransmissions="committedTransmissions"
+                />
+              </template>
+
+              <!-- Color -->
+              <template v-else-if="activeFilter === 'color'">
+                <SrpFilterColor
+                  :exteriorColors="EXTERIOR_COLORS"
+                  :interiorColors="INTERIOR_COLORS"
+                  v-model:mode="colorMode"
+                  v-model:selectedExterior="selectedExteriorColors"
+                  v-model:selectedInterior="selectedInteriorColors"
+                  :committedExterior="committedExteriorColors"
+                  :committedInterior="committedInteriorColors"
+                />
+              </template>
+
               <!-- Placeholder for unimplemented child filters -->
               <template v-else-if="activeFilter">
                 <div class="srp-page__filter-placeholder">
@@ -367,6 +1012,7 @@ function toggleFavorite(index: number) {
           </SrpFiltersPanel>
         </div>
       </aside>
+
 
       <!-- Right content area -->
       <div class="srp-page__content">
@@ -419,35 +1065,124 @@ function toggleFavorite(index: number) {
         <!-- Active filter chips -->
         <div class="srp-page__chips-bar">
           <div class="srp-page__chips">
+            <!-- 1. Persistent location pill -->
             <SrpFilterPill
               variant="location"
-              zipCode="75214"
-              distanceLabel="Cars within 100 mi"
+              :zipCode="currentZipCode"
+              :distanceLabel="locationDistanceLabel"
+              @distanceClick="openFilterFromPill('distance')"
             />
+            <!-- 1b. Selected store pills (store mode only) -->
             <SrpFilterPill
-              v-if="shipToStoreFilterActive"
+              v-for="pill in storePills"
+              :key="pill.key"
               variant="dismissible"
-              label="Ship to store"
-              @dismiss="shipToStoreFilterActive = false"
+              :label="pill.label"
+              @labelClick="openFilterFromPill('distance')"
+              @dismiss="dismissStorePill(pill.key)"
             />
+            <!-- 2. Make / Model / Trim — interleaved: make, then its models, then their trims -->
+            <SrpFilterPill
+              v-for="pill in mmtPills"
+              :key="pill.key"
+              variant="dismissible"
+              :label="pill.label"
+              @labelClick="openFilterFromPill('make')"
+              @dismiss="dismissMmtPill(pill)"
+            />
+            <!-- 3. Body style -->
             <SrpFilterPill
               v-for="pill in bodyStylePills"
               :key="pill.key"
               variant="dismissible"
               :label="pill.label"
+              @labelClick="openFilterFromPill('body-style')"
               @dismiss="toggleBodyStyle(pill.key, false)"
             />
+            <!-- 4. Price range -->
             <SrpFilterPill
               v-if="isPriceRangeFiltered"
               variant="dismissible"
               :label="pricePillLabel"
+              @labelClick="openFilterFromPill('price')"
               @dismiss="resetPriceRange"
             />
+            <!-- 5. Payment -->
             <SrpFilterPill
               v-if="isPaymentFiltered"
               variant="dismissible"
               :label="paymentPillLabel"
+              @labelClick="openFilterFromPill('price')"
               @dismiss="resetPayment"
+            />
+            <!-- 6. Year -->
+            <SrpFilterPill
+              v-if="isYearFiltered"
+              variant="dismissible"
+              :label="yearPillLabel"
+              @labelClick="openFilterFromPill('year')"
+              @dismiss="resetYear"
+            />
+            <!-- 7. Mileage -->
+            <SrpFilterPill
+              v-if="isMileageFiltered"
+              variant="dismissible"
+              :label="mileagePillLabel"
+              @labelClick="openFilterFromPill('mileage')"
+              @dismiss="resetMileage"
+            />
+            <!-- 8. Features (AND — each pill is one feature) -->
+            <SrpFilterPill
+              v-for="fp in featurePills"
+              :key="fp.key"
+              variant="dismissible"
+              :label="fp.label"
+              @labelClick="openFilterFromPill('features')"
+              @dismiss="removeFeature(fp.key)"
+            />
+            <!-- 9. MPG -->
+            <SrpFilterPill
+              v-if="isMpgFiltered"
+              variant="dismissible"
+              :label="mpgPillLabel"
+              @labelClick="openFilterFromPill('mpg')"
+              @dismiss="resetMpg"
+            />
+            <!-- 10. Engine type (each pill is one engine) -->
+            <SrpFilterPill
+              v-for="ep in enginePills"
+              :key="ep.key"
+              variant="dismissible"
+              :label="ep.label"
+              @labelClick="openFilterFromPill('mpg')"
+              @dismiss="removeEngine(ep.key)"
+            />
+            <!-- 11. Drive type -->
+            <SrpFilterPill
+              v-for="dp in driveTypePills"
+              :key="dp.key"
+              variant="dismissible"
+              :label="dp.label"
+              @labelClick="openFilterFromPill('drive')"
+              @dismiss="removeDriveType(dp.key)"
+            />
+            <!-- 12. Transmission -->
+            <SrpFilterPill
+              v-for="tp in transmissionPills"
+              :key="tp.key"
+              variant="dismissible"
+              :label="tp.label"
+              @labelClick="openFilterFromPill('drive')"
+              @dismiss="removeTransmission(tp.key)"
+            />
+            <!-- 13. Color -->
+            <SrpFilterPill
+              v-for="cp in colorPills"
+              :key="cp.key"
+              variant="dismissible"
+              :label="cp.label"
+              @labelClick="openFilterFromPill('color')"
+              @dismiss="removeColorPill(cp)"
             />
           </div>
         </div>
@@ -601,34 +1336,122 @@ function toggleFavorite(index: number) {
           <div class="srp-mobile-drawer__pills">
             <SrpFilterPill
               variant="location"
-              zipCode="75214"
-              distanceLabel="Cars within 100 mi"
+              :zipCode="currentZipCode"
+              :distanceLabel="locationDistanceLabel"
+              @distanceClick="openFilterFromPill('distance')"
             />
             <div class="srp-mobile-drawer__pill-row">
+              <!-- Selected store pills (store mode only) -->
               <SrpFilterPill
-                v-if="shipToStoreFilterActive"
+                v-for="pill in storePills"
+                :key="pill.key"
                 variant="dismissible"
-                label="Ship to store"
-                @dismiss="shipToStoreFilterActive = false"
+                :label="pill.label"
+                @labelClick="openFilterFromPill('distance')"
+                @dismiss="dismissStorePill(pill.key)"
               />
+              <!-- Make / Model / Trim — interleaved -->
+              <SrpFilterPill
+                v-for="pill in mmtPills"
+                :key="pill.key"
+                variant="dismissible"
+                :label="pill.label"
+                @labelClick="openFilterFromPill('make')"
+                @dismiss="dismissMmtPill(pill)"
+              />
+              <!-- Body style -->
               <SrpFilterPill
                 v-for="pill in bodyStylePills"
                 :key="pill.key"
                 variant="dismissible"
                 :label="pill.label"
+                @labelClick="openFilterFromPill('body-style')"
                 @dismiss="toggleBodyStyle(pill.key, false)"
               />
+              <!-- Price range -->
               <SrpFilterPill
                 v-if="isPriceRangeFiltered"
                 variant="dismissible"
                 :label="pricePillLabel"
+                @labelClick="openFilterFromPill('price')"
                 @dismiss="resetPriceRange"
               />
+              <!-- Payment -->
               <SrpFilterPill
                 v-if="isPaymentFiltered"
                 variant="dismissible"
                 :label="paymentPillLabel"
+                @labelClick="openFilterFromPill('price')"
                 @dismiss="resetPayment"
+              />
+              <!-- Year -->
+              <SrpFilterPill
+                v-if="isYearFiltered"
+                variant="dismissible"
+                :label="yearPillLabel"
+                @labelClick="openFilterFromPill('year')"
+                @dismiss="resetYear"
+              />
+              <!-- Mileage -->
+              <SrpFilterPill
+                v-if="isMileageFiltered"
+                variant="dismissible"
+                :label="mileagePillLabel"
+                @labelClick="openFilterFromPill('mileage')"
+                @dismiss="resetMileage"
+              />
+              <!-- Features (AND — each pill is one feature) -->
+              <SrpFilterPill
+                v-for="fp in featurePills"
+                :key="fp.key"
+                variant="dismissible"
+                :label="fp.label"
+                @labelClick="openFilterFromPill('features')"
+                @dismiss="removeFeature(fp.key)"
+              />
+              <!-- MPG -->
+              <SrpFilterPill
+                v-if="isMpgFiltered"
+                variant="dismissible"
+                :label="mpgPillLabel"
+                @labelClick="openFilterFromPill('mpg')"
+                @dismiss="resetMpg"
+              />
+              <!-- Engine type -->
+              <SrpFilterPill
+                v-for="ep in enginePills"
+                :key="ep.key"
+                variant="dismissible"
+                :label="ep.label"
+                @labelClick="openFilterFromPill('mpg')"
+                @dismiss="removeEngine(ep.key)"
+              />
+              <!-- Drive type -->
+              <SrpFilterPill
+                v-for="dp in driveTypePills"
+                :key="dp.key"
+                variant="dismissible"
+                :label="dp.label"
+                @labelClick="openFilterFromPill('drive')"
+                @dismiss="removeDriveType(dp.key)"
+              />
+              <!-- Transmission -->
+              <SrpFilterPill
+                v-for="tp in transmissionPills"
+                :key="tp.key"
+                variant="dismissible"
+                :label="tp.label"
+                @labelClick="openFilterFromPill('drive')"
+                @dismiss="removeTransmission(tp.key)"
+              />
+              <!-- Color -->
+              <SrpFilterPill
+                v-for="cp in colorPills"
+                :key="cp.key"
+                variant="dismissible"
+                :label="cp.label"
+                @labelClick="openFilterFromPill('color')"
+                @dismiss="removeColorPill(cp)"
               />
             </div>
           </div>
@@ -648,7 +1471,17 @@ function toggleFavorite(index: number) {
             @reset="resetFilters"
           >
             <template #child="{ activeFilter: mobileActiveFilter }">
-              <template v-if="mobileActiveFilter === 'body-style'">
+              <!-- Make / Model / Trim -->
+              <template v-if="mobileActiveFilter === 'make'">
+                <SrpFilterMakeModelTrim
+                  :makes="MAKES_DATA"
+                  v-model:selectedMakes="selectedMakes"
+                  v-model:selectedModels="selectedModels"
+                  v-model:selectedTrims="selectedTrims"
+                />
+              </template>
+
+              <template v-else-if="mobileActiveFilter === 'body-style'">
                 <SrpFilterChild
                   v-for="opt in sortedBodyStyleOptions"
                   :key="opt.value"
@@ -679,6 +1512,73 @@ function toggleFavorite(index: number) {
                   v-model:paymentMin="paymentMin"
                   v-model:paymentMax="paymentMax"
                   @commit="onPricePaymentCommit"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'distance'">
+                <SrpFilterDistance
+                  v-model:mode="distanceMode"
+                  v-model:radius="distanceRadius"
+                  v-model:selectedStores="distanceSelectedStores"
+                  :zipCode="currentZipCode"
+                  :stores="DISTANCE_STORES"
+                  :locationStores="LOCATION_STORES"
+                  :storeCountInRadius="storesInRadius"
+                  @update:zipCode="onZipChange"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'year'">
+                <SrpFilterYear
+                  :absMin="YEAR_ABS_MIN"
+                  :absMax="YEAR_ABS_MAX"
+                  v-model:minYear="yearMin"
+                  v-model:maxYear="yearMax"
+                  @commit="onYearCommit"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'mileage'">
+                <SrpFilterMileage
+                  :absMax="MILEAGE_ABS_MAX"
+                  v-model="mileageMax"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'features'">
+                <SrpFilterFeatures
+                  :popular="POPULAR_FEATURES"
+                  :more="MORE_FEATURES"
+                  v-model:selected="selectedFeatures"
+                  :committed="committedFeatures"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'mpg'">
+                <SrpFilterMpgEngine
+                  :absMin="MPG_ABS_MIN"
+                  :absMax="MPG_ABS_MAX"
+                  :engineTypes="ENGINE_TYPES"
+                  v-model:minMpg="mpgMin"
+                  v-model:maxMpg="mpgMax"
+                  v-model:selectedEngines="selectedEngines"
+                  :committedEngines="committedEngines"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'drive'">
+                <SrpFilterDriveTrans
+                  :driveTypes="DRIVE_TYPES"
+                  :transmissions="TRANSMISSIONS"
+                  v-model:selectedDriveTypes="selectedDriveTypes"
+                  v-model:selectedTransmissions="selectedTransmissions"
+                  :committedDriveTypes="committedDriveTypes"
+                  :committedTransmissions="committedTransmissions"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'color'">
+                <SrpFilterColor
+                  :exteriorColors="EXTERIOR_COLORS"
+                  :interiorColors="INTERIOR_COLORS"
+                  v-model:mode="colorMode"
+                  v-model:selectedExterior="selectedExteriorColors"
+                  v-model:selectedInterior="selectedInteriorColors"
+                  :committedExterior="committedExteriorColors"
+                  :committedInterior="committedInteriorColors"
                 />
               </template>
               <template v-else-if="mobileActiveFilter">
@@ -730,10 +1630,12 @@ function toggleFavorite(index: number) {
 .srp-page__sidebar-sticky {
   position: sticky;
   top: 0;
+  height: 100%;
   max-height: 100vh;
   overflow-y: auto;
-  overflow-x: hidden; /* SrpFiltersPanel's own overflow:hidden clips the slide animation */
+  overflow-x: hidden; /* clips both the child-panel slide-right and fly-in slide-left */
 }
+
 
 /* ─── Body style trailing icon (vehicle silhouette) ──────── */
 .srp-page__body-icon {
@@ -1140,7 +2042,9 @@ function toggleFavorite(index: number) {
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
+  overflow: hidden; /* clips the fly-in slide animation */
 }
+
 
 @media (max-width: 624px) {
   .srp-mobile-drawer {

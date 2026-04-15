@@ -665,6 +665,104 @@ Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full 
 | `SrpFilterChildTextLink` | `Molecules/SRP Filters/FilterChildTextLink` | Text-link variant for filters |
 | `SrpFilterPill` | `Molecules/SRP Filters/SrpFilterPill` | SRP active filter pills (`location` Map-Location icon + zip + distance · `dismissible` label + close); separate hit targets + Figma state styling |
 
+### SRP filter components — full panel + 10 child filters
+
+### `SrpFiltersPanel` — `src/components/SrpFiltersPanel/`
+- **Figma**: "SRP Filters" — sliding parent/child panel; parent list shows filter categories, child panel slides in from right
+- **Props**: `categories: FilterCategory[]` (**required**), `modelValue?: string | null` (v-model, active child key or `null` for parent), `hideHeader?: boolean` (default `false`)
+- **Type export**: `FilterCategory` — `{ key: string, label: string, hasSelection: boolean, hideTitle?: boolean }`
+- **Emits**: `update:modelValue`, `reset`
+- **Slot**: `#child="{ activeFilter }"` — parent renders the active child filter component via this slot
+- **Behaviour**: Two-pane slide animation (parent slides left, child slides in from right); back button returns to parent list; optional `hideTitle` per category suppresses the built-in child title heading; `hideHeader` suppresses the "Filters / Reset" header (for mobile drawer use)
+- **Composes**: `SrpFilterParent`
+- **Storybook `title`**: `Organisms/SRP Filters/FiltersPanel`
+
+### `SrpPricePaymentFilter` — `src/components/SrpPricePaymentFilter/`
+- **Figma**: "Price & Payment Filter" — segmented price/payment toggle with min/max inputs + dual-thumb slider
+- **Props**: `priceAbsMin/priceAbsMax/priceMin/priceMax` (price range), `paymentAbsMin/paymentAbsMax/paymentMin/paymentMax` (payment range) — all `number` with sensible defaults
+- **Emits**: `update:priceMin`, `update:priceMax`, `update:paymentMin`, `update:paymentMax`, `commit: [{ priceMin, priceMax, paymentMin, paymentMax }]`
+- **Internal mode**: `'price' | 'payment'` toggle (not exposed as prop)
+- **Composes**: `SegmentedControl`, `BaseSlider`
+- **Key behaviour**: Formatted currency inputs (focus → raw number, blur → formatted); step snapping (`$1,000` price / `$50` payment); `commit` on blur, Enter, and slider `pointerup`; live updates during drag
+- **Storybook `title`**: `Molecules/SRP Filters/PricePaymentFilter`
+
+### `SrpFilterDistance` — `src/components/SrpFilterDistance/`
+- **Figma**: "Distance & Stores" — shop by radius / shop by store toggle with zip code location fly-in
+- **Props**: `mode?: 'radius' | 'store'`, `zipCode?: string`, `radius?: number` (default 100), `selectedStores?: string[]`, `stores?: DistanceStoreItem[]`, `storeCountInRadius?: number`, `locationStores?: LocationStoreItem[]`
+- **Type export**: `DistanceStoreItem` — `{ id: string, name: string, distanceMiles: number }`
+- **Emits**: `update:mode`, `update:radius`, `update:selectedStores`, `update:zipCode`
+- **Key behaviour**: Radius options 25–250 mi via `SelectDropdown`; switching mode resets selections; "Shop by store" auto-selects closest store; expand/collapse store list; internal drill-down sub-panel for `SrpLocationFlyIn` (slides in from right); dynamic store-count copy; renders its own title (parent sets `hideTitle: true`)
+- **Composes**: `SegmentedControl`, `SelectDropdown`, `SrpLocationFlyIn`, `SrpFilterChild`
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterDistance`
+
+### `SrpLocationFlyIn` — `src/components/SrpLocationFlyIn/`
+- **Figma**: "Location fly-in" — zip code entry panel with store list
+- **Props**: `zipCode?: string`, `stores?: LocationStoreItem[]`, `hideHeader?: boolean`
+- **Type export**: `LocationStoreItem` — `{ id: string, name: string, distanceMiles: number, address: string, phone: string }`
+- **Emits**: `close`, `update:zipCode`
+- **Composes**: `LinkCta`
+- **Key behaviour**: Text input for 5-digit zip; "Change" button applies new zip and updates store list (without closing); each store shows name, address, phone, distance, and directions link; `hideHeader` hides the back button (used when embedded inside `SrpFilterDistance`)
+- **Storybook `title`**: `Molecules/SRP Filters/SrpLocationFlyIn`
+
+### `SrpFilterMakeModelTrim` — `src/components/SrpFilterMakeModelTrim/`
+- **Figma**: "Make/Model/Trim Filter" — three-level drill-down with search
+- **Props**: `makes: MakeItem[]` (**required**), `selectedMakes/selectedModels/selectedTrims?: string[]`, `initialView?: 'make' | 'model' | 'trim'`, `initialMake/initialModel?: string`
+- **Type exports**: `MakeItem`, `ModelItem`, `TrimItem`
+- **Emits**: `update:selectedMakes`, `update:selectedModels`, `update:selectedTrims`
+- **Key behaviour**: Three sub-views (make → model → trim) with slide animation; live search (word-start matching, activates from 2 chars); committed selections float to top on return (returning green style); initial view/make/model only honoured at mount; renders its own title/navigation (parent sets `hideTitle: true`)
+- **Storybook `title`**: `Molecules/SRP Filters/MakeModelTrimFilter`
+
+### `SrpFilterYear` — `src/components/SrpFilterYear/`
+- **Figma**: "Year Filter" — min/max dropdowns + dual-thumb range slider
+- **Props**: `absMin/absMax?: number` (bounds), `minYear/maxYear?: number` (v-model)
+- **Emits**: `update:minYear`, `update:maxYear`, `commit: [{ minYear, maxYear }]`
+- **Composes**: `BaseSlider` (range, step 1)
+- **Key behaviour**: Min dropdown ascending (oldest first), max dropdown descending (newest first); cross-clamp ensures min ≤ max; `commit` on dropdown change and slider `pointerup`
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterYear`
+
+### `SrpFilterMileage` — `src/components/SrpFilterMileage/`
+- **Figma**: "Mileage Filter" — single dropdown for max mileage
+- **Props**: `absMax?: number` (default 150,000), `modelValue?: number` (v-model)
+- **Emits**: `update:modelValue`
+- **Key behaviour**: Options generated in 10,000-mile increments; labels formatted as "X or less"; custom chevron via SVG data-URI
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterMileage`
+
+### `SrpFilterFeatures` — `src/components/SrpFilterFeatures/`
+- **Figma**: "Features Filter" — two-section checkbox filter (Popular with icons + More features without)
+- **Props**: `popular: FeatureOption[]` (**required**), `more: FeatureOption[]` (**required**), `selected?: string[]`, `committed?: string[]`
+- **Type export**: `FeatureOption` — `{ value: string, label: string, count: number, icon?: string }`
+- **Emits**: `update:selected`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: **AND relationship** (not OR like other filters); "Popular" section items have trailing vehicle descriptor icons; committed selections float to top in original order (popular first, then more); alpha order within each section
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterFeatures`
+
+### `SrpFilterMpgEngine` — `src/components/SrpFilterMpgEngine/`
+- **Figma**: "MPG & Engine Type Filter" — MPG min/max text inputs + slider, plus engine type checkboxes
+- **Props**: `absMin/absMax?: number` (MPG bounds), `minMpg/maxMpg?: number` (v-model), `engineTypes: EngineTypeOption[]` (**required**), `selectedEngines?: string[]`, `committedEngines?: string[]`
+- **Type export**: `EngineTypeOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:minMpg`, `update:maxMpg`, `update:selectedEngines`
+- **Composes**: `BaseSlider` (range, step 1), `SrpFilterChild`
+- **Key behaviour**: Auto-clamp on blur (no error state); engine types listed alphabetically; selected engines float to top of Engine type section (not above MPG) on return
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterMpgEngine`
+
+### `SrpFilterDriveTrans` — `src/components/SrpFilterDriveTrans/`
+- **Figma**: "Drive type & Transmission Filter" — two-section checkbox filter
+- **Props**: `driveTypes: DriveTransOption[]` (**required**), `transmissions: DriveTransOption[]` (**required**), `selectedDriveTypes/selectedTransmissions?: string[]`, `committedDriveTypes/committedTransmissions?: string[]`
+- **Type export**: `DriveTransOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:selectedDriveTypes`, `update:selectedTransmissions`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: Listed in inventory order; selected items float to top of their own section (drive or transmission, not across sections); independent committed state per section
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterDriveTrans`
+
+### `SrpFilterColor` — `src/components/SrpFilterColor/`
+- **Figma**: "Color Filter" — Exterior/Interior segmented toggle with color swatch rows
+- **Props**: `exteriorColors/interiorColors: ColorOption[]` (**required**), `mode?: 'exterior' | 'interior'`, `selectedExterior/selectedInterior?: string[]`, `committedExterior/committedInterior?: string[]`
+- **Type export**: `ColorOption` — `{ value: string, label: string, count: number, swatch: string }`
+- **Emits**: `update:mode`, `update:selectedExterior`, `update:selectedInterior`
+- **Composes**: `SegmentedControl`, `SrpFilterChild`
+- **Key behaviour**: 40px circular swatches (CSS radial gradients) in trailing-icon slot; separate selection state per mode; committed selections float to top on return; parent `SrpFiltersPanel` renders title (no internal title)
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterColor`
+
 ## Token Reference
 
 ### Figma variable name → CSS custom property convention
@@ -791,8 +889,8 @@ The token system has three layers loaded in order:
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
-  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/FilterParent'`**, **`FilterChild`**, **`FilterChildTextLink`**, **`SrpFilterPill`**
-  - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`
+  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`
+  - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SRP Filters/FiltersPanel'`
   - **Components**: reserved for future page-level / app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
 
 ## Figma MCP Workflow

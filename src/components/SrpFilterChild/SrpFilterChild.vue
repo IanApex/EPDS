@@ -146,10 +146,8 @@ const emit = defineEmits<{
 .srp-fc__trailing {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
-  width: 48px;
-  height: 20px;
-  overflow: hidden;
 }
 
 .srp-fc__trailing :deep(img) {
