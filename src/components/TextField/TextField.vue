@@ -129,7 +129,7 @@ function onBlur() {
     top 0.15s ease;
 }
 
-.text-field--focused .text-field__label,
+.text-field--focused:not(.text-field--feedback) .text-field__label,
 .text-field--has-value .text-field__label {
   top: -12px;
   opacity: 1;
@@ -140,7 +140,7 @@ function onBlur() {
   color: var(--color-neutral-70);
 }
 
-.text-field--light.text-field--focused .text-field__label {
+.text-field--light.text-field--focused:not(.text-field--feedback) .text-field__label {
   color: var(--color-action-accent-hover);
 }
 
@@ -149,7 +149,7 @@ function onBlur() {
   color: var(--color-neutral-85);
 }
 
-.text-field--dark.text-field--focused .text-field__label {
+.text-field--dark.text-field--focused:not(.text-field--feedback) .text-field__label {
   color: var(--color-focus-ring);
 }
 
@@ -210,7 +210,7 @@ function onBlur() {
 }
 
 /* Hide placeholder when focused or has value (label replaces it) */
-.text-field--focused .text-field__input::placeholder,
+.text-field--focused:not(.text-field--feedback) .text-field__input::placeholder,
 .text-field--has-value .text-field__input::placeholder {
   color: transparent;
 }
