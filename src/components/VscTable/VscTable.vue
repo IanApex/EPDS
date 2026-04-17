@@ -111,7 +111,7 @@ withDefaults(defineProps<{
 
 .vsc-table__banner-highlight {
   font-weight: var(--font-weight-bold);
-  color: var(--color-base-primary-50);
+  color: var(--color-action-primary);
 }
 
 /* ── Grid ── */
@@ -167,7 +167,7 @@ withDefaults(defineProps<{
 }
 
 .vsc-table__header-title--green {
-  color: var(--color-base-primary-50);
+  color: var(--color-action-primary);
 }
 
 .vsc-table__header-sub {
@@ -196,7 +196,7 @@ withDefaults(defineProps<{
 .vsc-table__plan-cell {
   justify-content: center;
   font-weight: var(--font-weight-bold);
-  color: var(--color-base-primary-50);
+  color: var(--color-action-primary);
   white-space: nowrap;
 }
 

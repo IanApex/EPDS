@@ -105,7 +105,7 @@ const emit = defineEmits<{
 
 /* ─── Hover ────────────────────────────────────────────── */
 .journey-selector:hover:not(:disabled):not([aria-disabled='true']) {
-  background: var(--color-accent-85); /* #C8E0E9 */
+  background: var(--color-action-accent-tint); /* #C8E0E9 */
   box-shadow: inset 0 0 0 2px var(--color-action-accent);
   color: var(--color-action-accent-hover);      /* #004D80 */
 }
@@ -121,7 +121,7 @@ const emit = defineEmits<{
 
 /* Selected + hover: keep selected border, change bg */
 .journey-selector--selected:hover:not(:disabled):not([aria-disabled='true']) {
-  background: var(--color-accent-85);
+  background: var(--color-action-accent-tint);
   box-shadow: inset 0 0 0 2px var(--color-action-accent-hover);
 }
 

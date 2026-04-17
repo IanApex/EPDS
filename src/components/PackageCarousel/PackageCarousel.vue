@@ -205,7 +205,7 @@ onUnmounted(() => {
   font-size: var(--text-body-lg-size);
   font-weight: var(--font-weight-medium);
   line-height: var(--text-body-lg-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   text-decoration: none;
   text-align: right;
   align-self: flex-end;
@@ -243,8 +243,8 @@ onUnmounted(() => {
 }
 
 .pkg-carousel__arrow:hover {
-  background: var(--color-accent-90);
-  border-color: var(--color-accent-90);
+  background: var(--color-action-accent-subtle);
+  border-color: var(--color-action-accent-subtle);
 }
 
 .pkg-carousel__arrow:focus-visible {
@@ -299,7 +299,7 @@ onUnmounted(() => {
 
 .pkg-carousel__progress-fill {
   height: 100%;
-  background: var(--color-base-primary-60);
+  background: var(--color-action-primary-vivid);
   border-radius: 6px;
   transition: width 0.3s ease;
 }

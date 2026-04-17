@@ -5,7 +5,7 @@ import epLogoRaw from '@logos/Property 1=EP-GreenWhite.svg?raw'
 
 const props = withDefaults(
   defineProps<{
-    /** `photo` — hero image card; `branded` — green panel + EchoPark logo */
+    /** `photo` — hero image card; `branded` — green panel with brand logo */
     variant?: 'photo' | 'branded'
     /** Date + category line, e.g. "August 10, 2021 • Buying tips" */
     meta: string
@@ -16,10 +16,13 @@ const props = withDefaults(
     /** Makes the entire card a link */
     href?: string
     target?: string
+    /** Accessible brand name for the branded-variant logo (default: "EchoPark Automotive") */
+    brandName?: string
   }>(),
   {
     variant: 'photo',
     imageUrl: '',
+    brandName: 'EchoPark Automotive',
   },
 )
 
@@ -53,12 +56,11 @@ const linkRel = computed(() =>
 
     <!-- Branded variant -->
     <div v-else class="blog-card__media blog-card__media--branded">
-      <span
-        class="blog-card__logo"
-        role="img"
-        aria-label="EchoPark Automotive"
-        v-html="epLogoRaw"
-      />
+      <span class="blog-card__logo" role="img" :aria-label="brandName">
+        <slot name="brand-logo">
+          <span v-html="epLogoRaw" style="display: contents" />
+        </slot>
+      </span>
     </div>
 
     <div class="blog-card__text">

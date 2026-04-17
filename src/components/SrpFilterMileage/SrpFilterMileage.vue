@@ -91,6 +91,6 @@ function onChange(e: Event) {
 }
 
 .srp-mileage__select:focus {
-  border-color: var(--color-accent-30);
+  border-color: var(--color-action-accent-hover);
 }
 </style>

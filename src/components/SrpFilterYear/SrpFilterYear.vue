@@ -174,6 +174,6 @@ function onMaxSelect(e: Event) {
 }
 
 .srp-year__select:focus {
-  border-color: var(--color-accent-30);
+  border-color: var(--color-action-accent-hover);
 }
 </style>

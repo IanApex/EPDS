@@ -233,7 +233,7 @@ function toggleEngine(value: string, on: boolean) {
 }
 
 .srp-mpg-engine__input:focus {
-  border-color: var(--color-accent-30);
+  border-color: var(--color-action-accent-hover);
 }
 
 /* ─── Engine type section ──────────────────────────────────── */

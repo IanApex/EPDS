@@ -147,7 +147,7 @@ onUnmounted(() => {
   font-weight: var(--font-weight-medium);
   line-height: 16px;
   letter-spacing: 0.4px;
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   text-decoration: none;
   white-space: nowrap;
 }

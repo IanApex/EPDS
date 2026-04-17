@@ -1,6 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import GlobalHeader from './GlobalHeader.vue'
 
+import saLogoUrl from '../../../Logos/Color=SA-FullColor.svg?url'
+
+const sonicArgs = {
+  brandName:  'Sonic Automotive',
+  logoUrl:    saLogoUrl,
+  navLinks: [
+    { label: 'New cars' },
+    { label: 'Used cars' },
+    { label: 'Sell your car' },
+    { label: 'More', dropdown: true },
+  ],
+}
+
 const meta = {
   title: 'Organisms/GlobalHeader',
   component: GlobalHeader,
@@ -182,5 +195,47 @@ export const AllVariants: Story = {
         <GlobalHeader variant="purchase" phone-number="888-475-7268" />
       </div>
     `,
+  }),
+}
+
+// ─── Sonic Automotive brand ────────────────────────────────────────────────────
+
+export const SonicGlobal: Story = {
+  name: 'Sonic — Global (signed in)',
+  args: { ...sonicArgs, variant: 'global', guest: false },
+  render: (args) => ({
+    components: { GlobalHeader },
+    setup() { return { args } },
+    template: `<GlobalHeader v-bind="args" />`,
+  }),
+}
+
+export const SonicGlobalGuest: Story = {
+  name: 'Sonic — Global (guest)',
+  args: { ...sonicArgs, variant: 'global', guest: true },
+  render: (args) => ({
+    components: { GlobalHeader },
+    setup() { return { args } },
+    template: `<GlobalHeader v-bind="args" />`,
+  }),
+}
+
+export const SonicGlobalSearch: Story = {
+  name: 'Sonic — GlobalSearch',
+  args: { ...sonicArgs, variant: 'global-search', guest: false },
+  render: (args) => ({
+    components: { GlobalHeader },
+    setup() { return { args } },
+    template: `<GlobalHeader v-bind="args" />`,
+  }),
+}
+
+export const SonicPurchase: Story = {
+  name: 'Sonic — Purchase',
+  args: { ...sonicArgs, variant: 'purchase', phoneNumber: '866-766-4287' },
+  render: (args) => ({
+    components: { GlobalHeader },
+    setup() { return { args } },
+    template: `<GlobalHeader v-bind="args" />`,
   }),
 }

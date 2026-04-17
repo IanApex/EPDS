@@ -124,12 +124,12 @@ withDefaults(defineProps<{
 
 .gap-graphic__bracket--right {
   flex: 39;
-  border-color: var(--color-base-primary-60);
+  border-color: var(--color-action-primary-vivid);
 }
 
 .gap-graphic__bracket--right::before,
 .gap-graphic__bracket--right::after {
-  background: var(--color-base-primary-60);
+  background: var(--color-action-primary-vivid);
 }
 
 /* ── Car image ── */

@@ -38,6 +38,12 @@ export { Divider } from './components/Divider'
 export { default as FaqBlogTab } from './components/FaqBlogTab'
 export { GapGraphic } from './components/GapGraphic'
 export { default as GlobalFooter } from './components/GlobalFooter'
+export type {
+  FooterLinkColumn,
+  SocialLink,
+  TrustBadge,
+  LegalLink,
+} from './components/GlobalFooter'
 export type { NavLink } from './components/GlobalHeader'
 export { default as GlobalHeader } from './components/GlobalHeader'
 export { IconButton } from './components/IconButton'

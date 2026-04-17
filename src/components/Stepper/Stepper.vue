@@ -87,7 +87,7 @@ const progressOffset = computed(() => {
 
 .stepper__fill {
   fill: none;
-  stroke: var(--color-base-primary-60);
+  stroke: var(--color-action-primary-vivid);
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.4s ease;

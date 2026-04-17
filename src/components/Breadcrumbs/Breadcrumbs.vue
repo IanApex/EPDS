@@ -90,7 +90,7 @@ withDefaults(defineProps<{
   font-weight: var(--font-weight-regular);
   line-height: var(--text-label-line-height);
   letter-spacing: var(--text-label-letter-spacing);
-  color: var(--color-accent-30);
+  color: var(--color-action-accent-hover);
   text-decoration: none;
 }
 

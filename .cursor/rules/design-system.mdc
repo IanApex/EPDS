@@ -42,15 +42,19 @@ EPDS/
 │   ├── Service and protection/
 │   └── VDP cars/
 ├── Logos/                            ← Brand + 3rd-party logos (multi-colour SVGs)
-│   ├── Color=*.svg                   ← EchoPark brand logo variants
-│   ├── Property 1=*.svg
+│   ├── Color=EP-FullColor.svg        ← EchoPark full-colour logo (dark bg)
+│   ├── Color=EP-GreenWhite.svg       ← EchoPark green/white logo (transparent header)
+│   ├── Color=SA-FullColor.svg        ← Sonic Automotive full-colour logo
+│   ├── Property 1=EP-FullColor.svg   ← EchoPark alternate exports
+│   ├── Property 1=EP-GreenWhite.svg
 │   └── 3rd Party/                   ← Partner/trust logos
 ├── src/
 │   ├── index.ts                      ← Library public API (re-exports components + tokens); side-effect import of epds.css
 │   ├── epds.css                      ← Token layers + global reset (same order as consumed by the library)
 │   ├── tokens/
 │   │   ├── primitives/
-│   │   │   └── echopark.css          ← Brand color palette + --font-family-brand (swap to white-label)
+│   │   │   ├── echopark.css          ← EchoPark brand palette + --font-family-brand
+│   │   │   └── sonic.css             ← Sonic Automotive brand palette (red primary, steel-blue accent)
 │   │   ├── semantic.css              ← Intent aliases: --color-action-*, --color-focus-ring, --color-feedback-*
 │   │   ├── tokens.css                ← Brand-agnostic scales: spacing, border, shadow, opacity, typography
 │   │   ├── tokens.ts                 ← TypeScript token map (tokens.semantic.* + tokens.color.*)
@@ -60,6 +64,9 @@ EPDS/
 │   │       ├── ComponentName.vue
 │   │       ├── ComponentName.stories.ts
 │   │       └── index.ts
+│   ├── pages/                        ← Full-page compositions (not published as library components)
+│   │   ├── SrpPage.vue              ← SRP demo page; brand-aware via `brandName` prop
+│   │   └── SrpPage.stories.ts
 │   ├── stories/                      ← Foundation/asset gallery stories
 │   │   ├── Icons.stories.ts
 │   │   └── Logos.stories.ts
@@ -658,12 +665,47 @@ Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full 
 | `LocationTileVdp` | `Molecules/LocationTileVdp` | VDP-oriented location tile |
 | `SrpTile` | `Molecules/SRPTile` | SRP vehicle card; composes `SmallIconButton`, `ArrowCircleButton`, `MediumIconButton`, `TileCta`, `CarouselDots` |
 | `CarOfferInputCard` | `Molecules/CarOfferInputCard` | Car offer entry (Figma); composes `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` |
-| `GlobalHeader` | `Organisms/GlobalHeader` | Site header |
-| `GlobalFooter` | `Organisms/GlobalFooter` | Site footer |
+| `GlobalHeader` | `Organisms/GlobalHeader` | Site header (brand-configurable via props — see full docs below) |
+| `GlobalFooter` | `Organisms/GlobalFooter` | Site footer (brand-configurable via props — see full docs below) |
 | `SrpFilterParent` | `Molecules/SRP Filters/FilterParent` | SRP filter shell |
 | `SrpFilterChild` | `Molecules/SRP Filters/FilterChild` | SRP filter row |
 | `SrpFilterChildTextLink` | `Molecules/SRP Filters/FilterChildTextLink` | Text-link variant for filters |
 | `SrpFilterPill` | `Molecules/SRP Filters/SrpFilterPill` | SRP active filter pills (`location` Map-Location icon + zip + distance · `dismissible` label + close); separate hit targets + Figma state styling |
+
+### `GlobalHeader` — `src/components/GlobalHeader/`
+- **Figma**: Site header — full-width, responsive (DT/TB/MB via CSS media queries)
+- **Props**: `variant?: 'global' | 'global-search' | 'homepage' | 'homepage-search' | 'purchase'` (default `'global'`), `guest?: boolean` (default `false`), `zipCode?: string`, `phoneNumber?: string`, `searchPlaceholder?: string`, `logoHref?: string`, `logoUrl?: string`, `logoLightUrl?: string`, `brandName?: string` (default `'EchoPark Automotive'`), `navLinks?: NavLink[]`
+- **Type export**: `NavLink` — `{ label: string, href?: string, dropdown?: boolean }`
+- **Emits**: `search`, `menu-click`, `location-click`, `favorites-click`, `profile-click`, `sign-in-click`, `more-click`
+- **Brand configuration**: All brand-specific content (logo, brand name, nav links) is prop-driven. Pass Sonic values via props — no component changes needed.
+- **Stories**: EP variants (global, global-search, homepage, homepage-search, purchase) + Sonic variants (global, global-guest, global-search, purchase)
+- **Storybook `title`**: `Organisms/GlobalHeader`
+
+### `GlobalFooter` — `src/components/GlobalFooter/`
+- **Figma**: Site footer — full-width, responsive (DT/TB/MB via CSS container queries)
+- **Props**: `phoneNumber?: string`, `logoHref?: string`, `logoUrl?: string`, `brandName?: string` (default `'EchoPark Automotive'`), `linkColumns?: FooterLinkColumn[]`, `socialLinks?: SocialLink[]`, `trustBadges?: TrustBadge[]`, `legalLinks?: LegalLink[]`, `copyrightText?: string`
+- **Type exports**:
+  - `FooterLinkColumn` — `{ heading: string, links: { label: string, href: string }[] }`
+  - `SocialLink` — `{ platform: string, href: string, ariaLabel: string }` (icon resolved from built-in platform→SVG map; supported platforms: `facebook`, `x`, `youtube`, `instagram`, `tiktok`)
+  - `TrustBadge` — `{ src: string, alt: string, height?: number }`
+  - `LegalLink` — `{ label: string, href: string }`
+- **Brand configuration**: All content (link columns, social links, badges, legal links, copyright) is prop-driven with EchoPark defaults. Consumers pass brand-specific arrays — no component changes needed. Pass `trustBadges: []` to hide badges entirely.
+- **Stories**: EP viewports (Desktop, Tablet, Mobile, AllViewports) + Sonic variants (Desktop, Mobile, AllViewports)
+- **Storybook `title`**: `Organisms/GlobalFooter`
+
+### Brand configuration pattern (GlobalHeader + GlobalFooter)
+Both site chrome components follow the same pattern: **EchoPark content is the default; other brands override via props.** This keeps the components reusable without duplication.
+- **Colours** adapt automatically via the semantic token / primitives swap (e.g. `--color-action-primary` becomes red for Sonic).
+- **Content** (logos, links, badges, phone numbers) is passed as structured props.
+- **Storybook** stories for each brand demonstrate the configuration; use the Brand toolbar toggle to preview colour theming.
+
+### `SrpPage` — `src/pages/SrpPage.vue`
+- **Role**: Full SRP (Search Results Page) composition — not a published library component, used for Storybook page-level demos
+- **Props**: `brandName?: string` (default `'EchoPark'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
+- **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalHeader` (logo, nav links) and `GlobalFooter` (logo, link columns, social links, trust badges, legal links, copyright). When not Sonic, all overrides return `undefined` so the components fall back to their EchoPark defaults.
+- **Composes**: `GlobalHeader`, `GlobalFooter`, `SrpTile`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all 10 SRP filter components, `SrpFilterPill`, `BaseButton`
+- **Stories** (`Pages/SRP`): `EchoPark Brand` (default brand + globals) and `Sonic Automotive Brand` (passes `brandName: 'Sonic Automotive'` + Sonic globals for primitives toggle)
+- **Storybook `title`**: `Pages/SRP`
 
 ### SRP filter components — full panel + 10 child filters
 
@@ -844,15 +886,25 @@ The token system has three layers loaded in order:
 
 | Layer | File | Purpose |
 |---|---|---|
-| **Primitives** | `src/tokens/primitives/echopark.css` | Concrete brand values: color palette + `--font-family-brand` |
+| **Primitives** | `src/tokens/primitives/echopark.css` (or `sonic.css`) | Concrete brand values: color palette + `--font-family-brand` |
 | **Semantic** | `src/tokens/semantic.css` | Intent aliases mapping purpose → primitive |
 | **Scales** | `src/tokens/tokens.css` | Brand-agnostic: spacing, border, shadow, opacity, typography |
 
+### Registered brands
+
+| Brand | Primitives file | Font | Primary | Accent |
+|---|---|---|---|---|
+| EchoPark | `primitives/echopark.css` | Roboto (300/400/500/700) | Green (#3E8500) | Blue (#006FA6) |
+| Sonic Automotive | `primitives/sonic.css` | Roboto (300/400/500/700) | Red (#EE4128) | Steel blue (#2B4560) |
+
 **To white-label for a new brand:** create `primitives/brand-b.css`, redefine the color vars and `--font-family-brand`, then point `src/epds.css` at that primitives file (or swap the `@import` there) — `main.ts`, Storybook `preview.ts`, and library consumers all pull tokens through `epds.css`. No component changes needed.
 
+### Storybook brand toggle
+A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches between EchoPark and Sonic at dev time. The decorator injects the Sonic primitives CSS as a runtime override — no rebuild needed. Both brand fonts are loaded in `.storybook/preview-head.html`.
+
 ### Semantic token groups
-- `--color-action-primary[-hover|-press|-subtle]` — primary brand CTA color
-- `--color-action-accent[-hover|-press|-subtle]` — secondary/link color
+- `--color-action-primary[-hover|-press|-vivid|-subtle]` — primary brand CTA color
+- `--color-action-accent[-hover|-press|-active|-muted|-tint|-subtle]` — secondary/link color
 - `--color-focus-ring` — universal focus indicator
 - `--color-surface-disabled`, `--color-text-disabled` — disabled state
 - `--color-feedback-error[-text|-surface]` — error/destructive states
@@ -884,14 +936,15 @@ The token system has three layers loaded in order:
 - Stories co-located in component folder, CSF3 format (`satisfies Meta<typeof Component>`)
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
-- **Top-level sidebar groups**: **`Atoms`**, **`Molecules`**, **`Organisms`**, **`Components`**. Set each story’s `title` on `Meta`; order is controlled in **`.storybook/preview.ts`** via the inline `storySort` comparator (`order` array — **must stay inline** for Storybook 10 static analysis; **no TypeScript types inside that function**).
+- **Top-level sidebar groups**: **`Atoms`**, **`Molecules`**, **`Organisms`**, **`Pages`**, **`Components`**. Set each story’s `title` on `Meta`; order is controlled in **`.storybook/preview.ts`** via the inline `storySort` comparator (`order` array — **must stay inline** for Storybook 10 static analysis; **no TypeScript types inside that function**).
   - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
   - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`
   - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SRP Filters/FiltersPanel'`
-  - **Components**: reserved for future page-level / app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
+  - **Pages** (`src/pages/`): `'Pages/SRP'` — full-page compositions showing components in context; each page story has per-brand variants (EchoPark + Sonic)
+  - **Components**: reserved for future standalone app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
 
 ## Figma MCP Workflow
 1. **Select node in Figma** (Figma must be open and the desktop app focused)
@@ -911,7 +964,7 @@ The token system has three layers loaded in order:
 - Components: PascalCase (`BaseButton`, `FormInput`, `NavigationBar`)
 - Props: camelCase; emits: camelCase (`"update:modelValue"`, `"click"`, `"dismiss"`)
 - CSS custom properties: kebab-case matching Figma variable name pattern (see mapping above)
-- Story titles: `'Atoms/…'`, `'Molecules/…'`, `'Organisms/…'`, `'Components/…'` — see Storybook Rules and `.storybook/preview.ts` sort order
+- Story titles: `'Atoms/…'`, `'Molecules/…'`, `'Organisms/…'`, `'Pages/…'`, `'Components/…'` — see Storybook Rules and `.storybook/preview.ts` sort order
 
 ## Icon & Logo System
 
@@ -936,8 +989,10 @@ The token system has three layers loaded in order:
 - Three size variants: Large (48px), Medium (32px), Small (16px)
 
 ### Logos (`Logos/`)
-- Always import with `?url` to preserve multi-colour fills: `import epLogo from '@logos/Color=Default.svg?url'`
+- Always import with `?url` to preserve multi-colour fills: `import epLogo from '@logos/Color=EP-FullColor.svg?url'`
 - Use in `<img src="epLogo" alt="EchoPark" />` — NEVER as inline Vue component
+- **EchoPark logos**: `Color=EP-FullColor.svg` (dark/standard), `Color=EP-GreenWhite.svg` (light-on-dark for transparent headers)
+- **Sonic Automotive logos**: `Color=SA-FullColor.svg` (full-colour)
 - **Gallery story**: `src/stories/Logos.stories.ts` (`Atoms/Logos`)
 - Subdirectory `Logos/3rd Party/` contains partner/trust badge logos (same `?url` approach)
 

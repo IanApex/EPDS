@@ -1,7 +1,110 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+
+const props = withDefaults(
+  defineProps<{
+    brandName?: string
+    phoneNumber?: string
+  }>(),
+  { brandName: 'EchoPark', phoneNumber: '(877) 708-4049' },
+)
+
+const isSonic = computed(() => props.brandName.toLowerCase().includes('sonic'))
+
+const headerLogoUrl = computed(() =>
+  isSonic.value ? saLogoDefaultUrl : undefined
+)
+
+const headerNavLinks = computed<NavLink[] | undefined>(() =>
+  isSonic.value
+    ? [
+        { label: 'New cars' },
+        { label: 'Used cars' },
+        { label: 'Sell your car' },
+        { label: 'More', dropdown: true },
+      ]
+    : undefined
+)
+
+const footerLogoUrl = computed(() =>
+  isSonic.value ? saLogoDefaultUrl : undefined
+)
+
+const footerLinkColumns = computed<FooterLinkColumn[] | undefined>(() =>
+  isSonic.value
+    ? [
+        {
+          heading: 'Shop',
+          links: [
+            { label: 'New vehicles', href: '#' },
+            { label: 'Used vehicles', href: '#' },
+            { label: 'Sell your car', href: '#' },
+            { label: 'Finance', href: '#' },
+            { label: 'Service & parts', href: '#' },
+            { label: 'Special offers', href: '#' },
+          ],
+        },
+        {
+          heading: 'About',
+          links: [
+            { label: 'Find a dealership', href: '#' },
+            { label: 'About Sonic Automotive', href: '#' },
+            { label: 'Reviews', href: '#' },
+            { label: 'Careers', href: '#' },
+            { label: 'Investor relations', href: '#' },
+          ],
+        },
+        {
+          heading: 'Support',
+          links: [
+            { label: 'Help center', href: '#' },
+            { label: 'Contact us', href: '#' },
+            { label: 'Accessibility', href: '#' },
+            { label: 'Manage cookies', href: '#' },
+            { label: 'Sitemap', href: '#' },
+          ],
+        },
+      ]
+    : undefined
+)
+
+const footerSocialLinks = computed<SocialLink[] | undefined>(() =>
+  isSonic.value
+    ? [
+        { platform: 'facebook',  href: 'https://facebook.com/sonicautomotive',  ariaLabel: 'Facebook' },
+        { platform: 'x',         href: 'https://x.com/sonicautomotive',         ariaLabel: 'X' },
+        { platform: 'youtube',   href: 'https://youtube.com/sonicautomotive',   ariaLabel: 'YouTube' },
+        { platform: 'instagram', href: 'https://instagram.com/sonicautomotive', ariaLabel: 'Instagram' },
+      ]
+    : undefined
+)
+
+const footerLegalLinks = computed<LegalLink[] | undefined>(() =>
+  isSonic.value
+    ? [
+        { label: 'Privacy policy', href: '#' },
+        { label: 'Terms of use',   href: '#' },
+      ]
+    : undefined
+)
+
+const footerTrustBadges = computed(() =>
+  isSonic.value ? [] : undefined
+)
+
+const footerCopyrightText = computed(() =>
+  isSonic.value
+    ? `Copyright \u00A9 2026 Sonic Automotive, Inc. All Rights Reserved.`
+    : undefined
+)
+
 import GlobalHeader from '@/components/GlobalHeader/GlobalHeader.vue'
+import type { NavLink } from '@/components/GlobalHeader/GlobalHeader.vue'
 import GlobalFooter from '@/components/GlobalFooter/GlobalFooter.vue'
+import type { FooterLinkColumn, SocialLink, LegalLink } from '@/components/GlobalFooter/GlobalFooter.vue'
+
+import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
+
 import SrpTile from '@/components/SrpTile/SrpTile.vue'
 import Pagination from '@/components/Pagination/Pagination.vue'
 import SeoCarousel from '@/components/SeoCarousel/SeoCarousel.vue'
@@ -175,26 +278,25 @@ function toggleBodyStyle(value: string, on: boolean) {
 
 // ─── Distance & stores filter state ──────────────────────────
 
-const DISTANCE_STORES: DistanceStoreItem[] = [
-  { id: 'co-springs',   name: 'EchoPark Colorado Springs', distanceMiles: 9  },
-  { id: 'centennial',   name: 'EchoPark Centennial',        distanceMiles: 29 },
-  { id: 'thornton',     name: 'EchoPark Thornton',          distanceMiles: 36 },
-  { id: 'aurora',       name: 'EchoPark Aurora',            distanceMiles: 44 },
-  { id: 'lakewood',     name: 'EchoPark Lakewood',          distanceMiles: 51 },
-  { id: 'fort-collins', name: 'EchoPark Fort Collins',      distanceMiles: 67 },
-  { id: 'boulder',      name: 'EchoPark Boulder',           distanceMiles: 72 },
-]
+const distanceStores = computed<DistanceStoreItem[]>(() => [
+  { id: 'co-springs',   name: `${props.brandName} Colorado Springs`, distanceMiles: 9  },
+  { id: 'centennial',   name: `${props.brandName} Centennial`,        distanceMiles: 29 },
+  { id: 'thornton',     name: `${props.brandName} Thornton`,          distanceMiles: 36 },
+  { id: 'aurora',       name: `${props.brandName} Aurora`,            distanceMiles: 44 },
+  { id: 'lakewood',     name: `${props.brandName} Lakewood`,          distanceMiles: 51 },
+  { id: 'fort-collins', name: `${props.brandName} Fort Collins`,      distanceMiles: 67 },
+  { id: 'boulder',      name: `${props.brandName} Boulder`,           distanceMiles: 72 },
+])
 
-/** Full store data used by the location fly-in (address + phone). */
-const LOCATION_STORES: LocationStoreItem[] = [
-  { id: 'co-springs',   name: 'EchoPark Colorado Springs', distanceMiles: 9,  address: '1234 Powers Blvd, Colorado Springs, CO 80920', phone: '(719) 555-0101' },
-  { id: 'centennial',   name: 'EchoPark Centennial',        distanceMiles: 29, address: '6820 S. Havana St, Centennial, CO 80112',      phone: '(720) 555-0202' },
-  { id: 'thornton',     name: 'EchoPark Thornton',          distanceMiles: 36, address: '9501 Grant St, Thornton, CO 80229',            phone: '(720) 555-0303' },
-  { id: 'aurora',       name: 'EchoPark Aurora',            distanceMiles: 44, address: '15500 E. Colfax Ave, Aurora, CO 80011',        phone: '(720) 555-0404' },
-  { id: 'lakewood',     name: 'EchoPark Lakewood',          distanceMiles: 51, address: '1950 S. Wadsworth Blvd, Lakewood, CO 80227',  phone: '(303) 555-0505' },
-  { id: 'fort-collins', name: 'EchoPark Fort Collins',      distanceMiles: 67, address: '2351 S. College Ave, Fort Collins, CO 80525', phone: '(970) 555-0606' },
-  { id: 'boulder',      name: 'EchoPark Boulder',           distanceMiles: 72, address: '1550 30th St, Boulder, CO 80303',             phone: '(303) 555-0707' },
-]
+const locationStores = computed<LocationStoreItem[]>(() => [
+  { id: 'co-springs',   name: `${props.brandName} Colorado Springs`, distanceMiles: 9,  address: '1234 Powers Blvd, Colorado Springs, CO 80920', phone: '(719) 555-0101' },
+  { id: 'centennial',   name: `${props.brandName} Centennial`,        distanceMiles: 29, address: '6820 S. Havana St, Centennial, CO 80112',      phone: '(720) 555-0202' },
+  { id: 'thornton',     name: `${props.brandName} Thornton`,          distanceMiles: 36, address: '9501 Grant St, Thornton, CO 80229',            phone: '(720) 555-0303' },
+  { id: 'aurora',       name: `${props.brandName} Aurora`,            distanceMiles: 44, address: '15500 E. Colfax Ave, Aurora, CO 80011',        phone: '(720) 555-0404' },
+  { id: 'lakewood',     name: `${props.brandName} Lakewood`,          distanceMiles: 51, address: '1950 S. Wadsworth Blvd, Lakewood, CO 80227',  phone: '(303) 555-0505' },
+  { id: 'fort-collins', name: `${props.brandName} Fort Collins`,      distanceMiles: 67, address: '2351 S. College Ave, Fort Collins, CO 80525', phone: '(970) 555-0606' },
+  { id: 'boulder',      name: `${props.brandName} Boulder`,           distanceMiles: 72, address: '1550 30th St, Boulder, CO 80303',             phone: '(303) 555-0707' },
+])
 
 const currentZipCode = ref('75214')
 
@@ -208,7 +310,7 @@ const distanceSelectedStores = ref<string[]>([])
 
 /** Stores whose distance is within the chosen radius (drives the count copy). */
 const storesInRadius = computed(() =>
-  DISTANCE_STORES.filter(s => s.distanceMiles <= distanceRadius.value).length,
+  distanceStores.value.filter(s => s.distanceMiles <= distanceRadius.value).length,
 )
 
 /** Label for the persistent location pill's distance segment. */
@@ -223,7 +325,7 @@ const storePills = computed(() =>
   distanceMode.value === 'store'
     ? distanceSelectedStores.value.map(id => ({
         key:   id,
-        label: DISTANCE_STORES.find(s => s.id === id)?.name ?? id,
+        label: distanceStores.value.find(s => s.id === id)?.name ?? id,
       }))
     : [],
 )
@@ -861,7 +963,14 @@ function toggleFavorite(index: number) {
 <template>
   <div class="srp-page">
     <!-- Header -->
-    <GlobalHeader variant="global-search" zipCode="75214" phoneNumber="(877) 708-4049" />
+    <GlobalHeader
+      variant="global-search"
+      zipCode="75214"
+      :phoneNumber="phoneNumber"
+      :brandName="brandName"
+      :logoUrl="headerLogoUrl"
+      :navLinks="headerNavLinks"
+    />
 
     <!-- Main content -->
     <div class="srp-page__main">
@@ -928,8 +1037,8 @@ function toggleFavorite(index: number) {
                   v-model:radius="distanceRadius"
                   v-model:selectedStores="distanceSelectedStores"
                   :zipCode="currentZipCode"
-                  :stores="DISTANCE_STORES"
-                  :locationStores="LOCATION_STORES"
+                  :stores="distanceStores"
+                  :locationStores="locationStores"
                   :storeCountInRadius="storesInRadius"
                   @update:zipCode="onZipChange"
                 />
@@ -1192,7 +1301,7 @@ function toggleFavorite(index: number) {
           <!-- Results header -->
           <div class="srp-page__results-header">
             <div class="srp-page__results-count">
-              2,110 used cars at EchoPark
+              2,110 used cars at {{ brandName }}
             </div>
             <div class="srp-page__sort">
               <span class="srp-page__sort-label">Sort by</span>
@@ -1268,7 +1377,7 @@ function toggleFavorite(index: number) {
             <!-- Legal disclaimer -->
             <div class="srp-page__legal">
               <p>
-                EchoPark advertised pricing is subject to the following based on the vehicle's physical location: in
+                {{ brandName }} advertised pricing is subject to the following based on the vehicle's physical location: in
                 <strong>AL</strong>, price excludes required taxes, tag, title, other governmental fees, and a $699 documentary fee; in
                 <strong>AZ</strong>, price excludes required taxes, tag, title, other governmental fees, and a $699 documentary fee; in
                 <strong>CA</strong>, price excludes government fees and taxes, any finance charges, any dealer document processing charge ($85), any electronic filing charge, and any emission testing charge; in
@@ -1293,7 +1402,16 @@ function toggleFavorite(index: number) {
     </div>
 
     <!-- Footer -->
-    <GlobalFooter phoneNumber="(877) 708-4049" />
+    <GlobalFooter
+      :phoneNumber="phoneNumber"
+      :brandName="brandName"
+      :logoUrl="footerLogoUrl"
+      :linkColumns="footerLinkColumns"
+      :socialLinks="footerSocialLinks"
+      :trustBadges="footerTrustBadges"
+      :legalLinks="footerLegalLinks"
+      :copyrightText="footerCopyrightText"
+    />
 
     <!-- ─── Mobile filter drawer (≤1239px) ──────────────────── -->
     <Teleport to="body">
@@ -1520,8 +1638,8 @@ function toggleFavorite(index: number) {
                   v-model:radius="distanceRadius"
                   v-model:selectedStores="distanceSelectedStores"
                   :zipCode="currentZipCode"
-                  :stores="DISTANCE_STORES"
-                  :locationStores="LOCATION_STORES"
+                  :stores="distanceStores"
+                  :locationStores="locationStores"
                   :storeCountInRadius="storesInRadius"
                   @update:zipCode="onZipChange"
                 />
@@ -1754,11 +1872,11 @@ function toggleFavorite(index: number) {
   font-size: var(--text-body-lg-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--text-body-lg-line-height);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
 }
 
 .srp-page__sort-value {
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
 }
 
 .srp-page__sort-trigger:hover .srp-page__sort-value {
@@ -1817,7 +1935,7 @@ function toggleFavorite(index: number) {
 
 .srp-page__sort-option--active {
   font-weight: var(--font-weight-bold);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
 }
 
 /* ─── Filter/Sort bar (≤1239px collapsed layout) ────────── */
@@ -1858,14 +1976,14 @@ function toggleFavorite(index: number) {
 }
 
 .srp-page__fsb-icon :deep(path) {
-  fill: var(--color-accent-40);
+  fill: var(--color-action-accent);
 }
 
 .srp-page__fsb-label {
   font-family: var(--font-family-base);
   font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-medium);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   white-space: nowrap;
 }
 
@@ -1915,7 +2033,7 @@ function toggleFavorite(index: number) {
   font-family: var(--font-family-base);
   font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-medium);
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   white-space: nowrap;
 }
 

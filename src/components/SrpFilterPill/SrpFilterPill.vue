@@ -120,8 +120,8 @@ function onDismissLabelClick(e: MouseEvent) {
   padding: 4px 12px 4px 0;
   gap: var(--spacing-nano);
   border-radius: 34px;
-  border: var(--border-width-hairline) solid var(--color-accent-40);
-  background: var(--color-accent-40);
+  border: var(--border-width-hairline) solid var(--color-action-accent);
+  background: var(--color-action-accent);
   color: var(--color-neutral-100);
 }
 
@@ -144,11 +144,11 @@ function onDismissLabelClick(e: MouseEvent) {
 }
 
 .sfp__zip:hover {
-  background: var(--color-accent-55);
+  background: var(--color-action-accent-active);
 }
 
 .sfp__zip:active {
-  background: var(--color-accent-60);
+  background: var(--color-action-accent-press);
 }
 
 .sfp__zip:focus-visible {
@@ -227,9 +227,9 @@ function onDismissLabelClick(e: MouseEvent) {
   padding: 4px 1px 4px 12px;
   gap: var(--spacing-quarck);
   border-radius: 32px;
-  border: var(--border-width-hairline) solid var(--color-accent-40);
-  background: var(--color-accent-90);
-  color: var(--color-accent-40);
+  border: var(--border-width-hairline) solid var(--color-action-accent);
+  background: var(--color-action-accent-subtle);
+  color: var(--color-action-accent);
 }
 
 .sfp--dismissible .sfp__text {
@@ -239,7 +239,7 @@ function onDismissLabelClick(e: MouseEvent) {
   border-radius: var(--border-radius-sm);
   background: transparent;
   cursor: pointer;
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   text-decoration: none;
   text-decoration-color: transparent;
   white-space: nowrap;
@@ -256,7 +256,7 @@ function onDismissLabelClick(e: MouseEvent) {
 .sfp--dismissible .sfp__text:active {
   text-decoration: underline;
   text-decoration-skip-ink: none;
-  color: var(--color-accent-30);
+  color: var(--color-action-accent-hover);
 }
 
 .sfp--dismissible .sfp__text:focus-visible {
@@ -279,21 +279,21 @@ function onDismissLabelClick(e: MouseEvent) {
   border-radius: 24px;
   background: transparent;
   cursor: pointer;
-  color: var(--color-accent-40);
+  color: var(--color-action-accent);
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sfp__dismiss:hover {
-  background: var(--color-accent-85);
+  background: var(--color-action-accent-tint);
 }
 
 .sfp__dismiss:active {
-  background: var(--color-accent-80);
+  background: var(--color-action-accent-muted);
 }
 
 .sfp__dismiss:focus-visible {
   outline: none;
-  background: var(--color-accent-85);
+  background: var(--color-action-accent-tint);
   box-shadow: 0 0 0 1px var(--color-accessibility-90);
 }
 

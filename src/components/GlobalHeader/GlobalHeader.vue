@@ -9,8 +9,8 @@ import profileSvg from '../../../icon/Style=Account, Detail=Profile-Circle, Icon
 import phoneSvg   from '../../../icon/Style=Communication, Detail=Support, Icon=Phone.svg?raw'
 import downSvg    from '../../../icon/Style=Arrows, Detail=No-Tail, Icon=Down-Small.svg?raw'
 
-import logoDefaultUrl    from '../../../Logos/Color=Default.svg?url'
-import logoGreenWhiteUrl from '../../../Logos/Color=GreenWhite.svg?url'
+import epLogoDefaultUrl    from '../../../Logos/Color=Default.svg?url'
+import epLogoGreenWhiteUrl from '../../../Logos/Color=GreenWhite.svg?url'
 
 export interface NavLink {
   label:    string
@@ -41,6 +41,12 @@ const props = withDefaults(defineProps<{
   searchPlaceholder?: string
   /** href for the logo link */
   logoHref?: string
+  /** Logo image URL for the default (dark) header */
+  logoUrl?: string
+  /** Logo image URL for the homepage (light-on-dark) header */
+  logoLightUrl?: string
+  /** Accessible brand name (used in alt text and aria-labels) */
+  brandName?: string
   /** Desktop nav link items. The last item with `dropdown: true` gets a chevron. */
   navLinks?: NavLink[]
 }>(), {
@@ -50,6 +56,9 @@ const props = withDefaults(defineProps<{
   phoneNumber:       '000-000-0000',
   searchPlaceholder: 'Search make, model, or feature',
   logoHref:          '/',
+  logoUrl:           epLogoDefaultUrl,
+  logoLightUrl:      epLogoGreenWhiteUrl,
+  brandName:         'EchoPark Automotive',
   navLinks: () => [
     { label: 'Shop cars' },
     { label: 'Sell/Trade' },
@@ -84,7 +93,7 @@ const hasSearch  = computed(() =>
 )
 
 const logoSrc = computed(() =>
-  isHomepage.value ? logoGreenWhiteUrl : logoDefaultUrl
+  isHomepage.value ? props.logoLightUrl : props.logoUrl
 )
 
 const searchQuery = ref('')
@@ -104,7 +113,7 @@ function submitSearch() {
          ═══════════════════════════════════════════════ -->
     <div v-if="isPurchase" class="gh__purchase">
       <a :href="logoHref" class="gh__logo-wrap">
-        <img :src="logoDefaultUrl" alt="EchoPark Automotive" class="gh__logo gh__logo--lg" />
+        <img :src="logoUrl" :alt="brandName" class="gh__logo gh__logo--lg" />
       </a>
       <div class="gh__phone">
         <span class="gh__phone-icon" aria-hidden="true" v-html="phoneSvg" />
@@ -135,8 +144,8 @@ function submitSearch() {
           </button>
 
           <!-- Logo — TB/MB only (inside left column) -->
-          <a :href="logoHref" class="gh__logo-wrap gh__logo-wrap--compact" aria-label="EchoPark home">
-            <img :src="logoSrc" alt="EchoPark Automotive" class="gh__logo gh__logo--sm" />
+          <a :href="logoHref" class="gh__logo-wrap gh__logo-wrap--compact" :aria-label="`${brandName} home`">
+            <img :src="logoSrc" :alt="brandName" class="gh__logo gh__logo--sm" />
           </a>
 
           <!-- Nav links — DT only -->
@@ -158,8 +167,8 @@ function submitSearch() {
         </div>
 
         <!-- Center column: logo — DT only -->
-        <a :href="logoHref" class="gh__logo-wrap gh__logo-wrap--center" aria-label="EchoPark home">
-          <img :src="logoSrc" alt="EchoPark Automotive" class="gh__logo gh__logo--lg" />
+        <a :href="logoHref" class="gh__logo-wrap gh__logo-wrap--center" :aria-label="`${brandName} home`">
+          <img :src="logoSrc" :alt="brandName" class="gh__logo gh__logo--lg" />
         </a>
 
         <!-- Right column: location + icons -->

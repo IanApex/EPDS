@@ -35,7 +35,7 @@ withDefaults(defineProps<{
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--color-base-primary-90);
+  background: var(--color-action-primary-subtle);
   white-space: nowrap;
 }
 
@@ -64,7 +64,7 @@ withDefaults(defineProps<{
   height: 24px;
   flex-shrink: 0;
   border-radius: var(--border-radius-pill);
-  background: var(--color-base-primary-40);
+  background: var(--color-action-primary-hover);
   color: var(--color-neutral-100);
 }
 
@@ -83,6 +83,6 @@ withDefaults(defineProps<{
   font-size: var(--text-body-sm-size);
   font-weight: var(--font-weight-bold);
   line-height: var(--text-body-sm-line-height);
-  color: var(--color-base-primary-40);
+  color: var(--color-action-primary-hover);
 }
 </style>

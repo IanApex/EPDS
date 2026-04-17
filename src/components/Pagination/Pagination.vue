@@ -111,8 +111,8 @@ function go(page: number) {
 }
 
 .pagination__arrow:hover:not(:disabled) {
-  background: var(--color-accent-90);
-  border-color: var(--color-accent-90);
+  background: var(--color-action-accent-subtle);
+  border-color: var(--color-action-accent-subtle);
 }
 
 .pagination__arrow:active:not(:disabled) {
@@ -192,7 +192,7 @@ function go(page: number) {
 }
 
 .pagination__number:hover:not(.pagination__number--active) {
-  background: var(--color-accent-90);
+  background: var(--color-action-accent-subtle);
   font-weight: var(--font-weight-bold);
 }
 
@@ -207,7 +207,7 @@ function go(page: number) {
 }
 
 .pagination__number--active {
-  background: var(--color-accent-40);
+  background: var(--color-action-accent);
   color: var(--color-neutral-100);
   font-weight: var(--font-weight-bold);
   cursor: default;

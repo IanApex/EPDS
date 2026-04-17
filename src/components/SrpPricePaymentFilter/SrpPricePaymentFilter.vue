@@ -289,7 +289,7 @@ function applyMax() {
 }
 
 .srp-ppf__input:focus {
-  border-color: var(--color-accent-30);
+  border-color: var(--color-action-accent-hover);
 }
 
 /* ─── SegmentedControl: fixed 88px chips, centred ───────────── */

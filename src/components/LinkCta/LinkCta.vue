@@ -102,7 +102,7 @@ defineEmits<{
 
 /* ─── Dark theme ───────────────────────────────────────── */
 .link-cta--dark {
-  color: var(--color-accent-80);
+  color: var(--color-action-accent-muted);
 }
 
 .link-cta--dark:hover:not(:disabled):not([aria-disabled='true']) {

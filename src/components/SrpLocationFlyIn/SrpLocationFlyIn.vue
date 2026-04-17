@@ -424,7 +424,7 @@ function applyZip() {
 }
 
 .loc-fly__directions-btn:hover {
-  background: var(--color-accent-90);
+  background: var(--color-action-accent-subtle);
 }
 
 .loc-fly__directions-btn:focus-visible {

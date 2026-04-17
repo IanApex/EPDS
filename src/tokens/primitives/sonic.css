@@ -1,0 +1,105 @@
+/*
+ * Sonic Automotive brand primitives
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Concrete brand values for Sonic Automotive.
+ * Mirrors every variable defined in echopark.css so the semantic + scale
+ * layers cascade correctly.
+ *
+ * Primary: Sonic red
+ * Accent:  Steel blue
+ * Font:    Roboto (same as EchoPark)
+ *
+ * Load order: primitives/sonic.css → semantic.css → tokens.css
+ */
+
+:root {
+  /* ─── Brand Font ──────────────────────────────────────────────
+   * Sonic uses Roboto (300/400/500/700) — same as EchoPark.
+   * ----------------------------------------------------------- */
+  --font-family-brand: "Roboto", sans-serif;
+
+  /* ─── Base Colors: Primary (red) ────────────────────────────────
+   * Sonic primary red palette — actions, CTAs, brand elements.
+   * Values from Figma foundations.
+   * ----------------------------------------------------------- */
+  --color-base-primary-40: #EC2E13;
+  --color-base-primary-50: #EE4128;
+  --color-base-primary-55: #F0543E;
+  --color-base-primary-60: #F16753;
+  --color-base-primary-90: #f7ccc6;
+
+  /* ─── Accent Colors (steel blue) ────────────────────────────────
+   * Sonic accent steel-blue — links, icon buttons, highlights.
+   * 60/85/90 from Figma; 30/40/55/80 derived to complete the scale.
+   * ----------------------------------------------------------- */
+  --color-accent-30:  #1E3448;
+  --color-accent-40:  #2B4560;
+  --color-accent-55:  #3A5568;
+  --color-accent-60:  #425363;
+  --color-accent-80:  #6C8CA0;
+  --color-accent-85:  #84A8BE;
+  --color-accent-90:  #EAEFF2;
+
+  /* ─── Neutral Colors ──────────────────────────────────────────
+   * Same as EchoPark — shared neutral palette per Figma.
+   * ----------------------------------------------------------- */
+  --color-neutral-0:   #242C33;
+  --color-neutral-20:  #313D47;
+  --color-neutral-40:  #666B70;
+  --color-neutral-70:  #A2A6AB;
+  --color-neutral-80:  #BCBFC2;
+  --color-neutral-85:  #D4D7D9;
+  --color-neutral-90:  #E8E9EB;
+  --color-neutral-95:  #F4F5F7;
+  --color-neutral-100: #FFFFFF;
+
+  /* ─── Secondary Neutral Colors ────────────────────────────────
+   * Same as EchoPark.
+   * ----------------------------------------------------------- */
+  --color-neutral-secondary-40: #85776F;
+  --color-neutral-secondary-70: #A39A93;
+  --color-neutral-secondary-80: #BDB7B3;
+  --color-neutral-secondary-85: #DAD6D3;
+  --color-neutral-secondary-90: #EEECEA;
+  --color-neutral-secondary-95: #F5F4F3;
+
+  /* ─── Tertiary Neutral Colors ─────────────────────────────────
+   * Same as EchoPark.
+   * ----------------------------------------------------------- */
+  --color-neutral-tertiary-70: #E1D0A5;
+  --color-neutral-tertiary-80: #EBDDB9;
+  --color-neutral-tertiary-85: #F0E9DA;
+  --color-neutral-tertiary-90: #F5F1E9;
+  --color-neutral-tertiary-95: #FAF9F5;
+
+  /* ─── Named Aliases ───────────────────────────────────────────
+   * ----------------------------------------------------------- */
+  --color-white:      #FFFFFF;
+  --color-parkgray-0: #242C33;
+
+  /* ─── Feedback: Warning (red) ─────────────────────────────────
+   * Same as EchoPark.
+   * ----------------------------------------------------------- */
+  --color-warning-40: #B30715;
+  --color-warning-50: #F42434;
+  --color-warning-90: #FFEBEC;
+
+  /* ─── Feedback: Alert (amber/orange) ──────────────────────────
+   * Same as EchoPark.
+   * ----------------------------------------------------------- */
+  --color-alert-50: #AC6000;
+  --color-alert-70: #FF8500;
+  --color-alert-80: #FACD46;
+  --color-alert-90: #FEF6E7;
+
+  /* ─── Feedback: System ────────────────────────────────────────
+   * Same as EchoPark.
+   * ----------------------------------------------------------- */
+  --color-system-red-60: #F42434;
+
+  /* ─── Feedback: Accessibility ─────────────────────────────────
+   * Same as EchoPark.
+   * ----------------------------------------------------------- */
+  --color-accessibility-80: #4095BF;
+  --color-accessibility-90: #6FCFFF;
+}

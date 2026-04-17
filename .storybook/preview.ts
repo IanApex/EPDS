@@ -1,7 +1,45 @@
 import type { Preview } from '@storybook/vue3-vite'
 import '../src/epds.css'
+import sonicCss from '../src/tokens/primitives/sonic.css?raw'
 
 const preview: Preview = {
+  globalTypes: {
+    brand: {
+      description: 'Brand theme',
+      toolbar: {
+        title: 'Brand',
+        icon: 'paintbrush',
+        items: [
+          { value: 'echopark', title: 'EchoPark' },
+          { value: 'sonic', title: 'Sonic Automotive' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+  initialGlobals: {
+    brand: 'echopark',
+  },
+  decorators: [
+    (story, context) => {
+      const brand = context.globals.brand || 'echopark'
+      const id = 'epds-brand-override'
+      let el = document.getElementById(id) as HTMLStyleElement | null
+
+      if (brand === 'sonic') {
+        if (!el) {
+          el = document.createElement('style')
+          el.id = id
+          document.head.appendChild(el)
+        }
+        el.textContent = sonicCss
+      } else {
+        el?.remove()
+      }
+
+      return story()
+    },
+  ],
   parameters: {
     options: {
       /**
@@ -10,7 +48,7 @@ const preview: Preview = {
        * Change the `order` array to reorder Atoms / Molecules / Organisms / Components.
        */
       storySort: (a, b) => {
-        const order = ['Atoms', 'Molecules', 'Organisms', 'Components']
+        const order = ['Atoms', 'Molecules', 'Organisms', 'Components', 'Pages']
         const root = (title) => (title.split('/')[0] ?? '')
         const rank = (title) => {
           const i = order.indexOf(root(title))

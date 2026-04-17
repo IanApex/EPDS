@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import facebookSvg  from '../../../icon/Style=Communication, Detail=Social, Icon=Facebook.svg?raw'
 import xSvg         from '../../../icon/Style=Communication, Detail=Social, Icon=X.svg?raw'
 import youtubeSvg   from '../../../icon/Style=Communication, Detail=Social, Icon=YouTube.svg?raw'
@@ -6,17 +8,120 @@ import instagramSvg from '../../../icon/Style=Communication, Detail=Social, Icon
 import tiktokSvg    from '../../../icon/Style=Communication, Detail=Social, Icon=tiktok.svg?raw'
 import phoneSvg     from '../../../icon/Style=Communication, Detail=Support, Icon=Phone.svg?raw'
 
-import logoUrl from '../../../Logos/Property 1=EP-GreenWhite.svg?url'
+import epLogoUrl from '../../../Logos/Property 1=EP-GreenWhite.svg?url'
 import bbbUrl  from '../../../Logos/3rd Party/badges-bbb-new-version.svg?url'
 import sealUrl from '../../../Logos/3rd Party/2026-seal 1.svg?url'
 
-withDefaults(defineProps<{
+export interface FooterLinkColumn {
+  heading: string
+  links: { label: string; href: string }[]
+}
+
+export interface SocialLink {
+  platform: string
+  href: string
+  ariaLabel: string
+}
+
+export interface TrustBadge {
+  src: string
+  alt: string
+  height?: number
+}
+
+export interface LegalLink {
+  label: string
+  href: string
+}
+
+const socialIconMap: Record<string, string> = {
+  facebook:  facebookSvg,
+  x:         xSvg,
+  youtube:   youtubeSvg,
+  instagram: instagramSvg,
+  tiktok:    tiktokSvg,
+}
+
+const props = withDefaults(defineProps<{
   phoneNumber?: string
   logoHref?: string
+  /** Logo image URL */
+  logoUrl?: string
+  /** Accessible brand name (used in alt text, aria-labels, and copyright) */
+  brandName?: string
+  /** Footer navigation link columns */
+  linkColumns?: FooterLinkColumn[]
+  /** Social media icon links */
+  socialLinks?: SocialLink[]
+  /** Trust/award badge images shown in the bottom bar */
+  trustBadges?: TrustBadge[]
+  /** Legal / privacy links shown in the bottom bar */
+  legalLinks?: LegalLink[]
+  /** Override the default copyright line (otherwise derived from brandName) */
+  copyrightText?: string
 }>(), {
   phoneNumber: '(877) 708-4049',
   logoHref:    '/',
+  logoUrl:     epLogoUrl,
+  brandName:   'EchoPark Automotive',
+  linkColumns: () => [
+    {
+      heading: 'Shop',
+      links: [
+        { label: 'Shop cars', href: '#' },
+        { label: 'Sell/Trade', href: '#' },
+        { label: 'Finance', href: '#' },
+        { label: 'Protection plans', href: '#' },
+        { label: 'Get financing', href: '#' },
+        { label: 'Shop brand-new cars', href: '#' },
+        { label: 'Shop powersports', href: '#' },
+      ],
+    },
+    {
+      heading: 'About',
+      links: [
+        { label: 'Find a location', href: '#' },
+        { label: 'About EchoPark', href: '#' },
+        { label: 'Reviews', href: '#' },
+        { label: 'Blog', href: '#' },
+        { label: 'Careers', href: '#' },
+        { label: 'Investor relations', href: '#' },
+      ],
+    },
+    {
+      heading: 'Support',
+      links: [
+        { label: 'Help center & FAQs', href: '#' },
+        { label: 'OwnerZone', href: '#' },
+        { label: 'Contact us', href: '#' },
+        { label: 'Accessibility', href: '#' },
+        { label: 'Manage cookies', href: '#' },
+        { label: 'Sitemap', href: '#' },
+        { label: 'Share feedback', href: '#' },
+      ],
+    },
+  ],
+  socialLinks: () => [
+    { platform: 'facebook',  href: 'https://facebook.com/echopark',  ariaLabel: 'Facebook' },
+    { platform: 'x',         href: 'https://x.com/echopark',         ariaLabel: 'X' },
+    { platform: 'youtube',   href: 'https://youtube.com/echopark',   ariaLabel: 'YouTube' },
+    { platform: 'instagram', href: 'https://instagram.com/echopark', ariaLabel: 'Instagram' },
+    { platform: 'tiktok',    href: 'https://tiktok.com/@echopark',   ariaLabel: 'TikTok' },
+  ],
+  trustBadges: () => [
+    { src: bbbUrl,  alt: 'Better Business Bureau', height: 40 },
+    { src: sealUrl, alt: '2026 Award Seal',        height: 50 },
+  ],
+  legalLinks: () => [
+    { label: 'Privacy policy',      href: '#' },
+    { label: 'Terms of use',        href: '#' },
+    { label: 'Do not sell my info', href: '#' },
+  ],
 })
+
+const copyrightLine = computed(() =>
+  props.copyrightText ?? `Copyright \u00A9 2026 ${props.brandName}, Inc. All Rights Reserved.`
+)
 </script>
 
 <template>
@@ -43,8 +148,8 @@ withDefaults(defineProps<{
         -->
         <div class="gf__brand">
           <div class="gf__brand-top">
-            <a :href="logoHref" class="gf__logo-link" aria-label="EchoPark Automotive — home">
-              <img class="gf__logo" :src="logoUrl" alt="EchoPark Automotive" />
+            <a :href="logoHref" class="gf__logo-link" :aria-label="`${brandName} — home`">
+              <img class="gf__logo" :src="logoUrl" :alt="brandName" />
             </a>
             <!-- Phone: right side of brand-top on MB/TB; hidden on DT -->
             <div class="gf__phone gf__phone--brand" aria-label="Call us">
@@ -56,12 +161,16 @@ withDefaults(defineProps<{
           </div>
 
           <!-- Single social row — always inside brand, centered on MB/TB, left on DT -->
-          <div class="gf__social" aria-label="Social media">
-            <a href="https://facebook.com/echopark"  class="gf__social-link" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><span class="gf__social-icon" v-html="facebookSvg" /></a>
-            <a href="https://x.com/echopark"         class="gf__social-link" target="_blank" rel="noopener noreferrer" aria-label="X"><span class="gf__social-icon" v-html="xSvg" /></a>
-            <a href="https://youtube.com/echopark"   class="gf__social-link" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><span class="gf__social-icon" v-html="youtubeSvg" /></a>
-            <a href="https://instagram.com/echopark" class="gf__social-link" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span class="gf__social-icon" v-html="instagramSvg" /></a>
-            <a href="https://tiktok.com/@echopark"   class="gf__social-link" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><span class="gf__social-icon" v-html="tiktokSvg" /></a>
+          <div v-if="socialLinks.length" class="gf__social" aria-label="Social media">
+            <a
+              v-for="social in socialLinks"
+              :key="social.platform"
+              :href="social.href"
+              class="gf__social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="social.ariaLabel"
+            ><span class="gf__social-icon" v-html="socialIconMap[social.platform]" /></a>
           </div>
         </div>
 
@@ -69,39 +178,12 @@ withDefaults(defineProps<{
              On DT: display:contents makes the 3 cols direct flex children of gf__main
              On MB/TB: grid container                                            -->
         <nav class="gf__links" aria-label="Footer navigation">
-          <div class="gf__link-col">
-            <h3 class="gf__link-heading">Shop</h3>
+          <div v-for="col in linkColumns" :key="col.heading" class="gf__link-col">
+            <h3 class="gf__link-heading">{{ col.heading }}</h3>
             <ul class="gf__link-list">
-              <li><a href="#" class="gf__link">Shop cars</a></li>
-              <li><a href="#" class="gf__link">Sell/Trade</a></li>
-              <li><a href="#" class="gf__link">Finance</a></li>
-              <li><a href="#" class="gf__link">Protection plans</a></li>
-              <li><a href="#" class="gf__link">Get financing</a></li>
-              <li><a href="#" class="gf__link">Shop brand-new cars</a></li>
-              <li><a href="#" class="gf__link">Shop powersports</a></li>
-            </ul>
-          </div>
-          <div class="gf__link-col">
-            <h3 class="gf__link-heading">About</h3>
-            <ul class="gf__link-list">
-              <li><a href="#" class="gf__link">Find a location</a></li>
-              <li><a href="#" class="gf__link">About EchoPark</a></li>
-              <li><a href="#" class="gf__link">Reviews</a></li>
-              <li><a href="#" class="gf__link">Blog</a></li>
-              <li><a href="#" class="gf__link">Careers</a></li>
-              <li><a href="#" class="gf__link">Investor relations</a></li>
-            </ul>
-          </div>
-          <div class="gf__link-col">
-            <h3 class="gf__link-heading">Support</h3>
-            <ul class="gf__link-list">
-              <li><a href="#" class="gf__link">Help center &amp; FAQs</a></li>
-              <li><a href="#" class="gf__link">OwnerZone</a></li>
-              <li><a href="#" class="gf__link">Contact us</a></li>
-              <li><a href="#" class="gf__link">Accessibility</a></li>
-              <li><a href="#" class="gf__link">Manage cookies</a></li>
-              <li><a href="#" class="gf__link">Sitemap</a></li>
-              <li><a href="#" class="gf__link">Share feedback</a></li>
+              <li v-for="link in col.links" :key="link.label">
+                <a :href="link.href" class="gf__link">{{ link.label }}</a>
+              </li>
             </ul>
           </div>
         </nav>
@@ -119,20 +201,23 @@ withDefaults(defineProps<{
       <!-- ── Bottom bar ───────────────────────────────────── -->
       <div class="gf__bottom">
         <div class="gf__legal">
-          <p class="gf__copyright">
-            Copyright &copy; 2026 EchoPark Automotive, Inc. All Rights Reserved.
-          </p>
-          <p class="gf__privacy">
-            <a href="#" class="gf__legal-link">Privacy policy</a>
-            <span class="gf__sep" aria-hidden="true">|</span>
-            <a href="#" class="gf__legal-link">Terms of use</a>
-            <span class="gf__sep" aria-hidden="true">|</span>
-            <a href="#" class="gf__legal-link">Do not sell my info</a>
+          <p class="gf__copyright">{{ copyrightLine }}</p>
+          <p v-if="legalLinks.length" class="gf__privacy">
+            <template v-for="(link, i) in legalLinks" :key="link.label">
+              <span v-if="i > 0" class="gf__sep" aria-hidden="true">|</span>
+              <a :href="link.href" class="gf__legal-link">{{ link.label }}</a>
+            </template>
           </p>
         </div>
-        <div class="gf__badges">
-          <img class="gf__badge gf__badge--bbb"  :src="bbbUrl"  alt="Better Business Bureau" />
-          <img class="gf__badge gf__badge--seal" :src="sealUrl" alt="2026 Award Seal" />
+        <div v-if="trustBadges.length" class="gf__badges">
+          <img
+            v-for="badge in trustBadges"
+            :key="badge.alt"
+            class="gf__badge"
+            :src="badge.src"
+            :alt="badge.alt"
+            :style="badge.height ? { height: `${badge.height}px`, width: 'auto' } : undefined"
+          />
         </div>
       </div>
 
@@ -387,9 +472,7 @@ withDefaults(defineProps<{
   gap: var(--spacing-xxs);    /* 24px */
 }
 
-.gf__badge { display: block; object-fit: contain; }
-.gf__badge--bbb  { height: 40px; width: auto; }
-.gf__badge--seal { height: 50px; width: auto; }
+.gf__badge { display: block; object-fit: contain; height: 40px; width: auto; }
 
 /* ──────────────────────────────────────────────────────────────
    Tablet  — component width ≥ 600px

@@ -21,6 +21,7 @@
   --color-action-primary:        var(--color-base-primary-50);
   --color-action-primary-hover:  var(--color-base-primary-40);
   --color-action-primary-press:  var(--color-base-primary-55);
+  --color-action-primary-vivid:  var(--color-base-primary-60);
   --color-action-primary-subtle: var(--color-base-primary-90);
 
   /* ─── Action: Accent ──────────────────────────────────────────
@@ -31,6 +32,9 @@
   --color-action-accent:        var(--color-accent-40);
   --color-action-accent-hover:  var(--color-accent-30);
   --color-action-accent-press:  var(--color-accent-60);
+  --color-action-accent-active: var(--color-accent-55);
+  --color-action-accent-muted:  var(--color-accent-80);
+  --color-action-accent-tint:   var(--color-accent-85);
   --color-action-accent-subtle: var(--color-accent-90);
 
   /* ─── Focus Ring ──────────────────────────────────────────────
