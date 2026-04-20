@@ -58,7 +58,7 @@ defineEmits<{
   align-items: center;
   justify-content: center;
   max-width: 336px;
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--button-border-radius);
   cursor: pointer;
   font-family: var(--font-family-btn);
   font-weight: var(--font-weight-btn);
