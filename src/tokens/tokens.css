@@ -111,6 +111,12 @@
   --border-radius-pill:     9999px;
   --border-radius-circular: 50%;
 
+  /* ─── Component Radius ────────────────────────────────────────
+   * Semantic radius tokens consumed by components.
+   * Brands may override these in primitives/[brand].css.
+   * ------------------------------------------------------------ */
+  --button-border-radius: var(--border-radius-pill);
+
   /* ─── Border Width ────────────────────────────────────────────  */
   --border-width-none:     0px;
   --border-width-hairline: 1px;

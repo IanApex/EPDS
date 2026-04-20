@@ -102,4 +102,11 @@
    * ----------------------------------------------------------- */
   --color-accessibility-80: #4095BF;
   --color-accessibility-90: #6FCFFF;
+
+  /* ─── Component Radius Overrides ──────────────────────────────
+   * Sonic buttons use a 6px radius instead of the default pill
+   * shape. Overrides the semantic --button-border-radius token
+   * defined in tokens.css.
+   * ----------------------------------------------------------- */
+  --button-border-radius: 6px;
 }
