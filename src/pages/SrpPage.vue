@@ -123,6 +123,8 @@ import SrpFilterDriveTrans from '@/components/SrpFilterDriveTrans/SrpFilterDrive
 import type { DriveTransOption } from '@/components/SrpFilterDriveTrans/SrpFilterDriveTrans.vue'
 import SrpFilterColor from '@/components/SrpFilterColor/SrpFilterColor.vue'
 import type { ColorOption } from '@/components/SrpFilterColor/SrpFilterColor.vue'
+import SrpFilterCondition from '@/components/SrpFilterCondition/SrpFilterCondition.vue'
+import type { ConditionOption } from '@/components/SrpFilterCondition/SrpFilterCondition.vue'
 
 import thirdRowSeatIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=3rd Row Seat.svg?raw'
 import backupCameraIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Backup Camera.svg?raw'
@@ -220,23 +222,37 @@ watch(activeFilter, (newKey) => {
   if (newKey === 'color') {
     onColorOpen()
   }
+  if (newKey === 'condition') {
+    onConditionOpen()
+  }
 })
 
-const BASE_CATEGORIES = [
-  { key: 'distance',   label: 'Distance & stores',         alwaysSelected: true,  hideTitle: true  },
-  { key: 'make',       label: 'Make/Model/Trim',           alwaysSelected: false, hideTitle: true  },
-  { key: 'body-style', label: 'Body style',                alwaysSelected: false, hideTitle: false },
-  { key: 'price',      label: 'Price & payment',           alwaysSelected: false, hideTitle: false },
-  { key: 'year',       label: 'Year',                      alwaysSelected: false, hideTitle: false },
-  { key: 'mileage',    label: 'Mileage',                   alwaysSelected: false, hideTitle: false },
-  { key: 'features',   label: 'Features',                  alwaysSelected: false, hideTitle: false },
-  { key: 'mpg',        label: 'MPG & engine type',         alwaysSelected: false, hideTitle: false },
-  { key: 'drive',      label: 'Drive type & transmission', alwaysSelected: false, hideTitle: false },
-  { key: 'color',      label: 'Color',                     alwaysSelected: false, hideTitle: false },
-]
+/**
+ * Base filter categories. Condition is Sonic-only — EchoPark exclusively sells
+ * used vehicles, so the filter would be a no-op. It's inserted right after
+ * Distance so shoppers can narrow by inventory type early in their journey.
+ */
+const baseCategories = computed(() => {
+  const items = [
+    { key: 'distance',   label: 'Distance & stores',         alwaysSelected: true,  hideTitle: true  },
+    { key: 'make',       label: 'Make/Model/Trim',           alwaysSelected: false, hideTitle: true  },
+    { key: 'body-style', label: 'Body style',                alwaysSelected: false, hideTitle: false },
+    { key: 'price',      label: 'Price & payment',           alwaysSelected: false, hideTitle: false },
+    { key: 'year',       label: 'Year',                      alwaysSelected: false, hideTitle: false },
+    { key: 'mileage',    label: 'Mileage',                   alwaysSelected: false, hideTitle: false },
+    { key: 'features',   label: 'Features',                  alwaysSelected: false, hideTitle: false },
+    { key: 'mpg',        label: 'MPG & engine type',         alwaysSelected: false, hideTitle: false },
+    { key: 'drive',      label: 'Drive type & transmission', alwaysSelected: false, hideTitle: false },
+    { key: 'color',      label: 'Color',                     alwaysSelected: false, hideTitle: false },
+  ]
+  if (isSonic.value) {
+    items.splice(1, 0, { key: 'condition', label: 'Condition', alwaysSelected: false, hideTitle: false })
+  }
+  return items
+})
 
 const filterCategories = computed<FilterCategory[]>(() =>
-  BASE_CATEGORIES.map(c => ({
+  baseCategories.value.map(c => ({
     key:          c.key,
     label:        c.label,
     hideTitle:    c.hideTitle,
@@ -249,7 +265,8 @@ const filterCategories = computed<FilterCategory[]>(() =>
       || (c.key === 'features'   && isFeaturesFiltered.value)
       || (c.key === 'mpg'        && isMpgEngineFiltered.value)
       || (c.key === 'drive'      && isDriveTransFiltered.value)
-      || (c.key === 'color'      && isColorFiltered.value),
+      || (c.key === 'color'      && isColorFiltered.value)
+      || (c.key === 'condition'  && isConditionFiltered.value),
   })),
 )
 
@@ -706,6 +723,41 @@ function resetColor() {
   committedInteriorColors.value = []
 }
 
+// ─── Condition filter state (Sonic only) ──────────────────────────────────────
+
+const CONDITION_OPTIONS: ConditionOption[] = [
+  { value: 'new',                 label: 'New',                 count: 1245 },
+  { value: 'pre-owned',           label: 'Pre-owned',           count: 2110 },
+  { value: 'certified-pre-owned', label: 'Certified pre-owned', count: 389  },
+]
+
+const selectedCondition  = ref<string[]>([])
+const committedCondition = ref<string[]>([])
+
+function onConditionOpen() {
+  committedCondition.value = [...selectedCondition.value]
+}
+
+const isConditionFiltered = computed(
+  () => selectedCondition.value.length > 0,
+)
+
+const conditionPills = computed(() =>
+  selectedCondition.value.map(v => ({
+    key:   v,
+    label: CONDITION_OPTIONS.find(o => o.value === v)?.label ?? v,
+  })),
+)
+
+function removeCondition(value: string) {
+  selectedCondition.value = selectedCondition.value.filter(v => v !== value)
+}
+
+function resetCondition() {
+  selectedCondition.value  = []
+  committedCondition.value = []
+}
+
 function resetFilters() {
   selectedMakes.value           = []
   selectedModels.value          = []
@@ -731,6 +783,7 @@ function resetFilters() {
   resetMpgEngine()
   resetDriveTrans()
   resetColor()
+  resetCondition()
 }
 
 const bodyStylePills = computed(() =>
@@ -1044,6 +1097,15 @@ function toggleFavorite(index: number) {
                 />
               </template>
 
+              <!-- Condition (Sonic only) -->
+              <template v-else-if="activeFilter === 'condition' && isSonic">
+                <SrpFilterCondition
+                  :options="CONDITION_OPTIONS"
+                  v-model:selected="selectedCondition"
+                  :committed="committedCondition"
+                />
+              </template>
+
               <!-- Year -->
               <template v-else-if="activeFilter === 'year'">
                 <SrpFilterYear
@@ -1189,6 +1251,15 @@ function toggleFavorite(index: number) {
               :label="pill.label"
               @labelClick="openFilterFromPill('distance')"
               @dismiss="dismissStorePill(pill.key)"
+            />
+            <!-- 1c. Condition (Sonic only) -->
+            <SrpFilterPill
+              v-for="cp in conditionPills"
+              :key="`cond-${cp.key}`"
+              variant="dismissible"
+              :label="cp.label"
+              @labelClick="openFilterFromPill('condition')"
+              @dismiss="removeCondition(cp.key)"
             />
             <!-- 2. Make / Model / Trim — interleaved: make, then its models, then their trims -->
             <SrpFilterPill
@@ -1468,6 +1539,15 @@ function toggleFavorite(index: number) {
                 @labelClick="openFilterFromPill('distance')"
                 @dismiss="dismissStorePill(pill.key)"
               />
+              <!-- Condition (Sonic only) -->
+              <SrpFilterPill
+                v-for="cp in conditionPills"
+                :key="`cond-${cp.key}`"
+                variant="dismissible"
+                :label="cp.label"
+                @labelClick="openFilterFromPill('condition')"
+                @dismiss="removeCondition(cp.key)"
+              />
               <!-- Make / Model / Trim — interleaved -->
               <SrpFilterPill
                 v-for="pill in mmtPills"
@@ -1642,6 +1722,13 @@ function toggleFavorite(index: number) {
                   :locationStores="locationStores"
                   :storeCountInRadius="storesInRadius"
                   @update:zipCode="onZipChange"
+                />
+              </template>
+              <template v-else-if="mobileActiveFilter === 'condition' && isSonic">
+                <SrpFilterCondition
+                  :options="CONDITION_OPTIONS"
+                  v-model:selected="selectedCondition"
+                  :committed="committedCondition"
                 />
               </template>
               <template v-else-if="mobileActiveFilter === 'year'">

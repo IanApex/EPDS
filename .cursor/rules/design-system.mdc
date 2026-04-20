@@ -703,7 +703,7 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Role**: Full SRP (Search Results Page) composition — not a published library component, used for Storybook page-level demos
 - **Props**: `brandName?: string` (default `'EchoPark'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
 - **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalHeader` (logo, nav links) and `GlobalFooter` (logo, link columns, social links, trust badges, legal links, copyright). When not Sonic, all overrides return `undefined` so the components fall back to their EchoPark defaults.
-- **Composes**: `GlobalHeader`, `GlobalFooter`, `SrpTile`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all 10 SRP filter components, `SrpFilterPill`, `BaseButton`
+- **Composes**: `GlobalHeader`, `GlobalFooter`, `SrpTile`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Condition is Sonic-only; EchoPark shows 10, Sonic shows 11), `SrpFilterPill`, `BaseButton`
 - **Stories** (`Pages/SRP`): `EchoPark Brand` (default brand + globals) and `Sonic Automotive Brand` (passes `brandName: 'Sonic Automotive'` + Sonic globals for primitives toggle)
 - **Storybook `title`**: `Pages/SRP`
 
@@ -795,6 +795,18 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Composes**: `SrpFilterChild`
 - **Key behaviour**: Listed in inventory order; selected items float to top of their own section (drive or transmission, not across sections); independent committed state per section
 - **Storybook `title`**: `Molecules/SRP Filters/SrpFilterDriveTrans`
+
+### `SrpFilterCondition` — `src/components/SrpFilterCondition/`
+- **Figma**: Sonic SRP only — not present on EchoPark SRP because EchoPark only sells used vehicles
+- **Role**: Multi-select checkbox filter letting Sonic shoppers narrow inventory by **New**, **Pre-owned**, and **Certified pre-owned**
+- **Props**: `options: ConditionOption[]` (**required**), `selected?: string[]`, `committed?: string[]`
+- **Type export**: `ConditionOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:selected`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: Committed selections float to top in the "returning" green style on re-open (same pattern as `SrpFilterDriveTrans` / `SrpFilterFeatures`); no internal section headings — renders a flat list in the order supplied
+- **SrpPage integration**: `SrpPage` conditionally inserts a `condition` category (key: `'condition'`, label: `'Condition'`) **only when `isSonic` is true**, placed right after `distance` in the filter list. Active selections surface as dismissible pills in the chip bar and mobile drawer.
+- **Stories**: Default, NewSelected, MultipleSelected, AllSelected, Returning, Interactive
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterCondition`
 
 ### `SrpFilterColor` — `src/components/SrpFilterColor/`
 - **Figma**: "Color Filter" — Exterior/Interior segmented toggle with color swatch rows
@@ -941,7 +953,7 @@ A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
-  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`
+  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`
   - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SRP Filters/FiltersPanel'`
   - **Pages** (`src/pages/`): `'Pages/SRP'` — full-page compositions showing components in context; each page story has per-brand variants (EchoPark + Sonic)
   - **Components**: reserved for future standalone app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
