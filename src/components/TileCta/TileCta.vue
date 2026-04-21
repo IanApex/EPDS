@@ -58,7 +58,7 @@ defineEmits<{
   padding: 0 12px;
 
   border: none;
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--button-border-radius);
   background: none;
   cursor: pointer;
   text-decoration: none;

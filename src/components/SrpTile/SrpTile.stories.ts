@@ -14,8 +14,8 @@ const meta = {
       description: {
         component:
           'Search Results Page vehicle tile. Reuses `SmallIconButton`, `ArrowCircleButton`, ' +
-          '`MediumIconButton`, `TileCta`, and `CarouselDots`.\n\n' +
-          '**Props** — bind `v-model:favorited` and `v-model:imageIndex` for two-way state. ' +
+          '`MediumIconButton`, `TileCta`, `CarouselDots`, and `CompareButton`.\n\n' +
+          '**Props** — bind `v-model:favorited`, `v-model:compared`, and `v-model:imageIndex` for two-way state. ' +
           'Listen for `@calculator` and `@test-drive` events to open the respective flows.\n\n' +
           '**ADA**: 10 distinct focusable elements per spec. Stock # has `user-select: text` ' +
           'so store associates can copy it on tablets.',
@@ -40,6 +40,10 @@ const meta = {
     imageCount:      { control: { type: 'number', min: 1 } },
     imageIndex:      { control: { type: 'number', min: 0 } },
     favorited:       { control: 'boolean' },
+    compared:        { control: 'boolean' },
+    vehicleStatus:   { control: 'inline-radio', options: [undefined, 'on-lot', 'in-transit'] },
+    onLotLabel:      { control: 'text' },
+    inTransitLabel:  { control: 'text' },
     href:            { control: 'text' },
     badgeLabel:      { control: 'text' },
   },
@@ -58,6 +62,7 @@ const meta = {
     imageCount:       1,
     imageIndex:       0,
     favorited:        false,
+    compared:         false,
     href:             VDP_HREF,
   },
 } satisfies Meta<typeof SrpTile>
@@ -67,12 +72,26 @@ type Story = StoryObj<typeof meta>
 
 // ─── Default ───────────────────────────────────────────────────────────────────
 
+/**
+ * Shared render for simple stories — binds args and also writes
+ * favourite / compare toggles back to args so clicks visibly flip state.
+ */
+const simpleTemplate = `
+  <div style="padding:32px;">
+    <SrpTile
+      v-bind="args"
+      @update:favorited="args.favorited = $event"
+      @update:compared="args.compared = $event"
+    />
+  </div>
+`
+
 export const Default: Story = {
   name: 'Default',
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -84,7 +103,7 @@ export const NoImage: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -96,7 +115,24 @@ export const Favorited: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
+  }),
+}
+
+// ─── Compared ─────────────────────────────────────────────────────────────────
+
+export const Compared: Story = {
+  name: 'In compare list',
+  args: { compared: true },
+  parameters: {
+    docs: {
+      description: { story: 'Vehicle is already in the compare list — `CompareButton` is in its filled (selected) state.' },
+    },
+  },
+  render: (args) => ({
+    components: { SrpTile },
+    setup() { return { args } },
+    template: simpleTemplate,
   }),
 }
 
@@ -137,7 +173,7 @@ export const LastImageOverlay: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -149,7 +185,7 @@ export const NoDelivery: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -161,7 +197,7 @@ export const NoMonthlyPayment: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -178,7 +214,7 @@ export const StaticCard: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -190,7 +226,7 @@ export const WithBadge: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -200,7 +236,7 @@ export const WithBadgeAmount: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
   }),
 }
 
@@ -221,8 +257,9 @@ export const Interactive: Story = {
     components: { SrpTile },
     setup() {
       const favorited  = ref(false)
+      const compared   = ref(false)
       const imageIndex = ref(0)
-      return { favorited, imageIndex }
+      return { favorited, compared, imageIndex }
     },
     template: `
       <div style="padding:32px;">
@@ -241,14 +278,16 @@ export const Interactive: Story = {
           :imageCount="9"
           :imageIndex="imageIndex"
           :favorited="favorited"
+          :compared="compared"
           href="#"
           @update:favorited="favorited = $event"
+          @update:compared="compared = $event"
           @update:imageIndex="imageIndex = $event"
           @calculator="console.log('calculator')"
           @test-drive="console.log('test-drive')"
         />
         <p style="margin-top:16px;font-size:14px;color:#666;">
-          Favorited: {{ favorited }} · Image: {{ imageIndex }}
+          Favorited: {{ favorited }} · In compare: {{ compared }} · Image: {{ imageIndex }}
         </p>
       </div>
     `,
@@ -267,6 +306,45 @@ export const ShippingVariant: Story = {
   render: (args) => ({
     components: { SrpTile },
     setup() { return { args } },
-    template: `<div style="padding:32px;"><SrpTile v-bind="args" /></div>`,
+    template: simpleTemplate,
+  }),
+}
+
+// ─── Vehicle status variants ──────────────────────────────────────────────────
+
+export const StatusOnLot: Story = {
+  name: 'Vehicle status: On the lot',
+  args: {
+    vehicleStatus: 'on-lot',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When `vehicleStatus="on-lot"` is provided, the delivery block is replaced by a single **"On the lot"** status line. Any `deliveryLabel` / `deliveryStore` / `deliveryDistance` values are ignored while the status is set.',
+      },
+    },
+  },
+  render: (args) => ({
+    components: { SrpTile },
+    setup() { return { args } },
+    template: simpleTemplate,
+  }),
+}
+
+export const StatusInTransit: Story = {
+  name: 'Vehicle status: In transit',
+  args: {
+    vehicleStatus: 'in-transit',
+  },
+  parameters: {
+    docs: {
+      description: { story: 'When `vehicleStatus="in-transit"` is set, the tile shows **"In transit"** in the delivery column — ideal for vehicles being shipped between stores.' },
+    },
+  },
+  render: (args) => ({
+    components: { SrpTile },
+    setup() { return { args } },
+    template: simpleTemplate,
   }),
 }

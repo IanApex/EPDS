@@ -34,7 +34,7 @@ const emit = defineEmits<{
 .cdots {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xxxs);
+  gap: var(--spacing-nano);
 }
 
 .cdots__dot {

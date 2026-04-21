@@ -358,6 +358,46 @@ EPDS/
 - **Stories**: SrpDefault, SrpWithAmount, SrpNoIcon, VdpDefault, VdpNoIcon, AllVariants, Interactive, OnSrpTile, OnSrpTileWithAmount
 - **Storybook `title`**: `Atoms/BadgePriceDrop`
 
+### `CompareButton` — `src/components/CompareButton/`
+- **Figma**: "Buttons/Compare" — 32×32 pill-shaped toggle used on SRP tiles to add/remove a vehicle from the compare list. Figma only defines six states (Un-added / Added × default / hover / focus); there is no disabled state.
+- **Props**: `selected?: boolean` (v-model via `v-model:selected`), `compareLabel?: string` (default `'Compare'`), `removeLabel?: string` (default `'Remove'`), `ariaLabelUnselected?: string` (default `'Add to compare'`), `ariaLabelSelected?: string` (default `'Remove from compare'`)
+- **Emits**: `update:selected: [boolean]`, `click: [event: MouseEvent]`
+- **Behaviour**: Hover/focus expands the pill **to the left** to reveal the label (animated via `grid-template-columns: 0fr → 1fr`, 0.25s). Click toggles `selected`. Mouse off collapses back to the circle. Icon switches from `+` (Add.svg) when unselected to ✓ (Check.svg) when selected.
+- **No-bounce rule**: The component renders as a 32×32 `position: relative` anchor slot containing a `position: absolute; right: 0` button. This pins the button's right edge regardless of parent layout (normal flow, flex, grid, absolute) — the button grows **leftward** only. `padding-right` is also held constant at 3px so the icon stays exactly 4px (border + pad) from the outer right edge throughout the animation. `z-index: 1` is applied on hover/focus so the expanded pill sits above adjacent content.
+- **States**:
+  - Un-added (default): 32×32 white circle, 1px `--color-neutral-90` border, `+` icon in **`--color-action-primary`** (green for EchoPark, red for Sonic)
+  - Un-added hover/focus: expanded pill with "Compare" label in `--color-neutral-0`; `+` icon stays `--color-action-primary`; focus swaps border to `--color-focus-ring`
+  - Added (default): 32×32 `--color-action-primary` circle, 1px `--color-neutral-90` border, white check icon
+  - Added hover/focus: expanded pill with "Remove" label in white; focus swaps border to `--color-focus-ring`
+- **Icon vs label colour**: icon colour is controlled on `.compare-btn__icon` (brand-primary when unselected, white when selected) — it is intentionally **decoupled** from the label text colour so the unselected `+` can remain brand-coloured while the hover label renders in dark `Neutral0`.
+- **Brand awareness**: Both the unselected icon colour and the selected fill use `--color-action-primary`, so the button automatically themes green (EchoPark) or red (Sonic) — no brand prop needed.
+- **Dimensions**: 32×32 collapsed; height fixed at 32px when expanded (padding `0 3px 0 8px`, 5px gap, 24×24 icon on right, 14px Roboto Medium label on left)
+- **Accessibility**: `aria-pressed` reflects `selected`; `aria-label` is always applied (not a decorative button); focus ring uses `--color-focus-ring`
+- **Icons**: `icon/Style=Display, Detail=Default, Icon=Add.svg?raw` and `icon/Style=Display, Detail=Default, Icon=Check.svg?raw`, both rendered via `v-html` so `:deep(path) { fill: currentColor }` inherits the icon wrapper's `color`
+- **Usage**: Designed for the SRP tile — see `SrpTile` integration below. `SrpTile` places the button 16px from the tile's right edge, straddling the image/content boundary on the same horizontal line as the carousel dots. In standalone use the component renders a 32×32 anchor slot that reserves layout space while the button absolutely positions over it (`position: absolute; right: 0`), so the icon stays pinned when the pill expands to the left — works inside flex, grid, or positioned parents.
+- **SrpTile integration**: `SrpTile` exposes `compared?: boolean` (`v-model:compared`) and emits `update:compared`. The button is placed via `.srpt__compare` at `bottom: 0; right: 16px; transform: translateY(50%); z-index: 6;` inside the image area — above the carousel dots (z-index 5) so the hover expansion never gets clipped. Click handler calls `preventDefault()` + `stopPropagation()` so the underlying `srpt__image-link` does not navigate to the VDP.
+- **Stories**: UnaddedDefault, UnaddedHover, UnaddedFocus, AddedDefault, AddedHover, AddedFocus, AllStates, Interactive, SrpTileContext
+- **Storybook `title`**: `Atoms/Buttons/CompareButton`
+
+### `CompareTray` — `src/components/CompareTray/`
+- **Figma**: nodes `13945:38154` (count + CTA) and `13945:38159` (prompt-only) — floating notification card that appears once the user flags a vehicle on an SRP tile.
+- **Props**: `count: number` (**required** — vehicles currently in the compare list), `ctaThreshold?: number` (default `2`), `addMoreLabel?: string` (default `'Add more to compare'`), `selectedLabel?: string` (default `'vehicles selected'`), `compareLabel?: string` (default `'Compare'`), `ariaLabel?: string`
+- **Emits**: `compare: [event: MouseEvent]` — fired when the user clicks the **Compare** CTA (parent routes to the compare page).
+- **Behaviour**:
+  - `count === 0` → the component renders nothing (tray is hidden).
+  - `0 < count < ctaThreshold` → 85px card with the **prompt** text only (`addMoreLabel`).
+  - `count >= ctaThreshold` → 149px card showing `<count> {selectedLabel}` (count is bold, rest Light 300) plus a 148×56 `BaseButton variant="primary"` labelled `compareLabel`.
+- **Layout**:
+  - **Desktop (≥600px)**: 412px fixed-width card, `position: fixed; right: 0; bottom: 0; z-index: 900`, shadow `-4px -4px 20.7px rgba(0,0,0,0.16)` (falls up-and-left so the card reads as floating above page content).
+  - **Mobile (<600px)**: stretches to 100vw, pinned to the bottom of the viewport, shadow changes to `0 -4px 20.7px rgba(0,0,0,0.16)` (straight up).
+- **Animation**: fade + slide-up on enter/leave (`transition: transform 0.25s ease, opacity 0.2s ease`). `@media (prefers-reduced-motion)` drops the transform.
+- **Typography**: Prompt + count label share Roboto Light 22px, line-height 1.2, `--color-neutral-0`. The count number is `font-weight: 700`.
+- **Brand awareness**: The CTA uses `BaseButton variant="primary"` so the filled background automatically themes `--color-action-primary` (green for EchoPark, red for Sonic).
+- **Accessibility**: Rendered as a `<aside role="status" aria-live="polite">` so assistive tech announces state changes. `aria-label` defaults to a human-readable description of the current state and can be overridden via the `ariaLabel` prop.
+- **SrpPage integration**: `SrpPage` derives `comparedCount = listings.filter(l => l.compared).length` and renders `<CompareTray :count="comparedCount" @compare="onCompareAction" />` once at the page root (after `GlobalFooter`, outside the `Teleport`). `onCompareAction` will eventually route to the compare page.
+- **Stories**: AddMorePrompt, TwoSelected, ThreeSelected, Hidden, Interactive, Mobile
+- **Storybook `title`**: `Molecules/CompareTray`
+
 ### `SmallIconButton` — `src/components/SmallIconButton/`
 - **Figma**: "IconButtons/Favorite" (32×32 toggle button)
 - **Props**: `ariaLabel: string` (**required**), `selected?: boolean` (default `false`), `disabled?: boolean`
@@ -663,7 +703,7 @@ Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full 
 | `FaqBlogTab` | `Molecules/FaqBlogTab` | FAQ / blog tab switcher |
 | `LocationTile` | `Molecules/LocationTile` | Store picker tile (radio group) |
 | `LocationTileVdp` | `Molecules/LocationTileVdp` | VDP-oriented location tile |
-| `SrpTile` | `Molecules/SRPTile` | SRP vehicle card; composes `SmallIconButton`, `ArrowCircleButton`, `MediumIconButton`, `TileCta`, `CarouselDots` |
+| `SrpTile` | `Molecules/SRPTile` | SRP vehicle card; composes `SmallIconButton`, `ArrowCircleButton`, `MediumIconButton`, `TileCta`, `CarouselDots`, `CompareButton`. Supports `vehicleStatus?: 'on-lot' \| 'in-transit'` which replaces the delivery block with a single status row: 16×16 leading icon (`Style=Location, Detail=Store` for `on-lot`, `Style=Arrows, Detail=Tail, Icon=Right` for `in-transit`) + status label (`onLotLabel` / `inTransitLabel`). Icons inherit `currentColor` via `:deep(path) { fill: currentColor }`. Stories: `StatusOnLot`, `StatusInTransit`. |
 | `CarOfferInputCard` | `Molecules/CarOfferInputCard` | Car offer entry (Figma); composes `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` |
 | `GlobalHeader` | `Organisms/GlobalHeader` | Site header (brand-configurable via props — see full docs below) |
 | `GlobalFooter` | `Organisms/GlobalFooter` | Site footer (brand-configurable via props — see full docs below) |
@@ -703,7 +743,8 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Role**: Full SRP (Search Results Page) composition — not a published library component, used for Storybook page-level demos
 - **Props**: `brandName?: string` (default `'EchoPark'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
 - **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalHeader` (logo, nav links) and `GlobalFooter` (logo, link columns, social links, trust badges, legal links, copyright). When not Sonic, all overrides return `undefined` so the components fall back to their EchoPark defaults.
-- **Composes**: `GlobalHeader`, `GlobalFooter`, `SrpTile`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Condition is Sonic-only; EchoPark shows 10, Sonic shows 11), `SrpFilterPill`, `BaseButton`
+- **Composes**: `GlobalHeader`, `GlobalFooter`, `SrpTile`, `CompareTray`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Vehicle status + Condition are both Sonic-only; EchoPark shows 10, Sonic shows 12 with Vehicle status directly above Condition at the top of the list after Distance), `SrpFilterPill`, `BaseButton`
+- **Vehicle-status filtering**: `SrpPage` seeds each listing with an optional `vehicleStatus` and derives `visibleListings = listings.filter(...)` that honours the Vehicle-status filter selections. Tiles in the grid iterate over `visibleListings`, and `toggleFavorite` / `toggleCompared` now key off `car.id` (not array index) so filtered views still write back to the right listing. The `vehicleStatus` prop is only passed to tiles when `isSonic` — EchoPark tiles always render the delivery block, even if seeded data has a status.
 - **Stories** (`Pages/SRP`): `EchoPark Brand` (default brand + globals) and `Sonic Automotive Brand` (passes `brandName: 'Sonic Automotive'` + Sonic globals for primitives toggle)
 - **Storybook `title`**: `Pages/SRP`
 
@@ -807,6 +848,18 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **SrpPage integration**: `SrpPage` conditionally inserts a `condition` category (key: `'condition'`, label: `'Condition'`) **only when `isSonic` is true**, placed right after `distance` in the filter list. Active selections surface as dismissible pills in the chip bar and mobile drawer.
 - **Stories**: Default, NewSelected, MultipleSelected, AllSelected, Returning, Interactive
 - **Storybook `title`**: `Molecules/SRP Filters/SrpFilterCondition`
+
+### `SrpFilterVehicleStatus` — `src/components/SrpFilterVehicleStatus/`
+- **Figma**: Sonic SRP only — not shown on the EchoPark SRP.
+- **Role**: Multi-select checkbox filter letting Sonic shoppers narrow inventory by **On the lot** vs **In transit** (future statuses such as `At auction` can be added by extending the `options` prop).
+- **Props**: `options: VehicleStatusOption[]` (**required**), `selected?: string[]`, `committed?: string[]`
+- **Type export**: `VehicleStatusOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:selected`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: Structurally identical to `SrpFilterCondition` — committed selections float to the top in the "returning" green style on re-open, no internal section headings, flat list in `options` order.
+- **SrpPage integration**: Sonic-only. `SrpPage` splices both `vehicle-status` and `condition` into position 1 of the category list (right after `distance`) when `isSonic` is true, with **Vehicle status appearing directly above Condition**. Desktop + mobile panel mounts are guarded by `&& isSonic` (mirrors the Condition guard). Active selections surface as dismissible pills (`vehicleStatusPills`) in both the desktop chip bar and mobile drawer. `SrpPage` exposes `visibleListings` — a computed that filters `listings` by the `vehicleStatus` field when this filter is active (listings without an explicit status are treated as `'on-lot'`). On EchoPark the tile receives `:vehicleStatus="undefined"` so seeded demo statuses don't leak onto the EP SRP.
+- **Stories**: Default, OnLotSelected, InTransitSelected, BothSelected, Returning, Interactive
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterVehicleStatus`
 
 ### `SrpFilterColor` — `src/components/SrpFilterColor/`
 - **Figma**: "Color Filter" — Exterior/Interior segmented toggle with color swatch rows
@@ -949,11 +1002,11 @@ A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
 - **Top-level sidebar groups**: **`Atoms`**, **`Molecules`**, **`Organisms`**, **`Pages`**, **`Components`**. Set each story’s `title` on `Meta`; order is controlled in **`.storybook/preview.ts`** via the inline `storySort` comparator (`order` array — **must stay inline** for Storybook 10 static analysis; **no TypeScript types inside that function**).
-  - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
+  - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `CompareButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
-  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`
+  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/CompareTray'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`, `SrpFilterVehicleStatus`
   - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SRP Filters/FiltersPanel'`
   - **Pages** (`src/pages/`): `'Pages/SRP'` — full-page compositions showing components in context; each page story has per-brand variants (EchoPark + Sonic)
   - **Components**: reserved for future standalone app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)

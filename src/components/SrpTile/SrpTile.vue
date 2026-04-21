@@ -5,6 +5,7 @@ import ArrowCircleButton from '../ArrowCircleButton/ArrowCircleButton.vue'
 import MediumIconButton  from '../MediumIconButton/MediumIconButton.vue'
 import TileCta           from '../TileCta/TileCta.vue'
 import CarouselDots      from '../CarouselDots/CarouselDots.vue'
+import CompareButton     from '../CompareButton/CompareButton.vue'
 
 import BadgePriceDrop  from '../BadgePriceDrop/BadgePriceDrop.vue'
 import TooltipComp     from '../Tooltip/Tooltip.vue'
@@ -13,6 +14,8 @@ import heartFilledSvg  from '../../../icon/Style=Account, Detail=Heart-Filled, I
 import calculatorSvg   from '../../../icon/Style=Finance, Detail=Payment, Icon=Calculator.svg?raw'
 import infoSvg         from '../../../icon/Style=Alerts, Detail=Info, Icon=NA.svg?raw'
 import testDriveSvg    from '../../../icon/Icon Type=Vehicle Descriptors, Size=Small, Theme=Test Drive.svg?raw'
+import storeSvg        from '../../../icon/Style=Location, Detail=Store, Icon=NA.svg?raw'
+import tailRightSvg    from '../../../icon/Style=Arrows, Detail=Tail, Icon=Right.svg?raw'
 
 const props = withDefaults(defineProps<{
   /** Model year, e.g. "2020" */
@@ -35,6 +38,16 @@ const props = withDefaults(defineProps<{
   deliveryStore?: string
   /** Distance string, e.g. "(125 mi)" */
   deliveryDistance?: string
+  /**
+   * Inventory availability status. When set, the delivery/store/distance block
+   * is replaced with a single right-aligned status line — `"On the lot"` or
+   * `"In transit"` (or the caller's custom label via `onLotLabel` / `inTransitLabel`).
+   */
+  vehicleStatus?: 'on-lot' | 'in-transit'
+  /** Override copy for the `on-lot` status. */
+  onLotLabel?: string
+  /** Override copy for the `in-transit` status. */
+  inTransitLabel?: string
   /** Vehicle photo URL */
   imageUrl?: string
   /** Total number of vehicle photos — drives carousel dots */
@@ -43,18 +56,24 @@ const props = withDefaults(defineProps<{
   imageIndex?: number
   /** Whether this vehicle is saved to favorites (bind with v-model:favorited) */
   favorited?: boolean
+  /** Whether this vehicle is in the compare list (bind with v-model:compared) */
+  compared?: boolean
   /** Link to the Vehicle Detail Page */
   href?: string
   /** Price-drop badge text — when set, shows a BadgePriceDrop overlay on the image */
   badgeLabel?: string
 }>(), {
-  imageCount: 1,
-  imageIndex: 0,
-  favorited:  false,
+  imageCount:     1,
+  imageIndex:     0,
+  favorited:      false,
+  compared:       false,
+  onLotLabel:     'On the lot',
+  inTransitLabel: 'In transit',
 })
 
 const emit = defineEmits<{
   'update:favorited':   [value: boolean]
+  'update:compared':    [value: boolean]
   'update:imageIndex':  [index: number]
   /** Calculator button or payment range row clicked */
   'calculator':         []
@@ -65,6 +84,20 @@ const emit = defineEmits<{
 const isLastImage = computed(() =>
   props.imageCount > 1 && props.imageIndex === props.imageCount - 1
 )
+
+/** Resolved status label when `vehicleStatus` is set — otherwise null. */
+const statusText = computed(() => {
+  if (props.vehicleStatus === 'on-lot')     return props.onLotLabel
+  if (props.vehicleStatus === 'in-transit') return props.inTransitLabel
+  return null
+})
+
+/** Leading 16×16 icon paired with the resolved status label. */
+const statusIcon = computed(() => {
+  if (props.vehicleStatus === 'on-lot')     return storeSvg
+  if (props.vehicleStatus === 'in-transit') return tailRightSvg
+  return null
+})
 
 function prevImage(e: Event) {
   e.preventDefault()
@@ -81,6 +114,12 @@ function nextImage(e: Event) {
 function toggleFavorite(e: MouseEvent) {
   e.preventDefault()
   emit('update:favorited', !props.favorited)
+}
+
+function toggleCompared(e: MouseEvent) {
+  e.preventDefault()
+  e.stopPropagation()
+  emit('update:compared', !props.compared)
 }
 
 function openCalculator(e: Event) {
@@ -175,6 +214,14 @@ function openTestDrive(e: MouseEvent) {
         />
       </div>
 
+      <!-- Compare button — straddles image/content boundary, right-aligned -->
+      <div class="srpt__compare">
+        <CompareButton
+          :selected="compared"
+          @click="toggleCompared"
+        />
+      </div>
+
     </div><!-- /.srpt__image-area -->
 
 
@@ -262,9 +309,32 @@ function openTestDrive(e: MouseEvent) {
           </div>
         </div>
 
+        <!-- Status (takes precedence over delivery info) -->
+        <a
+          v-if="statusText && href"
+          :href="href"
+          class="srpt__delivery srpt__delivery--status srpt__vdp-link"
+          :class="`srpt__delivery--status-${vehicleStatus}`"
+        >
+          <span class="srpt__status-row">
+            <span class="srpt__status-icon" aria-hidden="true" v-html="statusIcon" />
+            <span class="srpt__delivery-label">{{ statusText }}</span>
+          </span>
+        </a>
+        <div
+          v-else-if="statusText"
+          class="srpt__delivery srpt__delivery--status"
+          :class="`srpt__delivery--status-${vehicleStatus}`"
+        >
+          <span class="srpt__status-row">
+            <span class="srpt__status-icon" aria-hidden="true" v-html="statusIcon" />
+            <span class="srpt__delivery-label">{{ statusText }}</span>
+          </span>
+        </div>
+
         <!-- Delivery info — ADA tab stop 9 -->
         <a
-          v-if="href && (deliveryLabel || deliveryStore)"
+          v-else-if="href && (deliveryLabel || deliveryStore)"
           :href="href"
           class="srpt__delivery srpt__vdp-link"
         >
@@ -447,6 +517,19 @@ function openTestDrive(e: MouseEvent) {
   z-index: 5;
 }
 
+/* ─── Compare button — straddles image/content boundary ─────
+ * 16px from the tile's right edge, vertically centered on the
+ * image/content divider (same line as the carousel dots).
+ * Per Figma node 13945:11306 in the SRP tile group.
+ * -------------------------------------------------------- */
+.srpt__compare {
+  position: absolute;
+  bottom: 0;
+  right: var(--spacing-xxxs);   /* 16px */
+  transform: translateY(50%);
+  z-index: 6;                    /* above dots (5) so expansion never gets clipped */
+}
+
 /* ─── Content section ──────────────────────────────────────── */
 .srpt__content {
   display: flex;
@@ -611,6 +694,42 @@ function openTestDrive(e: MouseEvent) {
   margin-left: 4px;
   font-size: var(--text-label-size);
   letter-spacing: var(--text-label-letter-spacing);
+}
+
+/* ─── Vehicle status row (replaces delivery block) ──────────
+ * The row flows right-aligned (via parent column) with a small
+ * leading 16×16 icon. Icon inherits Neutral0 via currentColor
+ * so it automatically tracks the text colour on hover / focus.
+ * -------------------------------------------------------- */
+.srpt__status-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-neutral-0);
+  white-space: nowrap;
+}
+
+.srpt__status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+}
+
+.srpt__status-icon :deep(svg) {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.srpt__status-icon :deep(path),
+.srpt__status-icon :deep(circle),
+.srpt__status-icon :deep(rect),
+.srpt__status-icon :deep(polygon) {
+  fill: currentColor;
 }
 
 /* ─── CTA row ──────────────────────────────────────────────── */

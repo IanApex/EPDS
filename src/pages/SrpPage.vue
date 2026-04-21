@@ -106,6 +106,7 @@ import type { FooterLinkColumn, SocialLink, LegalLink } from '@/components/Globa
 import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
 
 import SrpTile from '@/components/SrpTile/SrpTile.vue'
+import CompareTray from '@/components/CompareTray/CompareTray.vue'
 import Pagination from '@/components/Pagination/Pagination.vue'
 import SeoCarousel from '@/components/SeoCarousel/SeoCarousel.vue'
 import SrpFiltersPanel from '@/components/SrpFiltersPanel/SrpFiltersPanel.vue'
@@ -125,6 +126,8 @@ import SrpFilterColor from '@/components/SrpFilterColor/SrpFilterColor.vue'
 import type { ColorOption } from '@/components/SrpFilterColor/SrpFilterColor.vue'
 import SrpFilterCondition from '@/components/SrpFilterCondition/SrpFilterCondition.vue'
 import type { ConditionOption } from '@/components/SrpFilterCondition/SrpFilterCondition.vue'
+import SrpFilterVehicleStatus from '@/components/SrpFilterVehicleStatus/SrpFilterVehicleStatus.vue'
+import type { VehicleStatusOption } from '@/components/SrpFilterVehicleStatus/SrpFilterVehicleStatus.vue'
 
 import thirdRowSeatIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=3rd Row Seat.svg?raw'
 import backupCameraIcon  from '@icons/Icon Type=Vehicle Descriptors, Size=Large, Theme=Backup Camera.svg?raw'
@@ -225,6 +228,9 @@ watch(activeFilter, (newKey) => {
   if (newKey === 'condition') {
     onConditionOpen()
   }
+  if (newKey === 'vehicle-status') {
+    onVehicleStatusOpen()
+  }
 })
 
 /**
@@ -246,7 +252,13 @@ const baseCategories = computed(() => {
     { key: 'color',      label: 'Color',                     alwaysSelected: false, hideTitle: false },
   ]
   if (isSonic.value) {
-    items.splice(1, 0, { key: 'condition', label: 'Condition', alwaysSelected: false, hideTitle: false })
+    // Sonic-only: Vehicle status sits directly above Condition, right after Distance.
+    items.splice(
+      1,
+      0,
+      { key: 'vehicle-status', label: 'Vehicle status', alwaysSelected: false, hideTitle: false },
+      { key: 'condition',      label: 'Condition',      alwaysSelected: false, hideTitle: false },
+    )
   }
   return items
 })
@@ -265,8 +277,9 @@ const filterCategories = computed<FilterCategory[]>(() =>
       || (c.key === 'features'   && isFeaturesFiltered.value)
       || (c.key === 'mpg'        && isMpgEngineFiltered.value)
       || (c.key === 'drive'      && isDriveTransFiltered.value)
-      || (c.key === 'color'      && isColorFiltered.value)
-      || (c.key === 'condition'  && isConditionFiltered.value),
+      || (c.key === 'color'          && isColorFiltered.value)
+      || (c.key === 'condition'      && isConditionFiltered.value)
+      || (c.key === 'vehicle-status' && isVehicleStatusFiltered.value),
   })),
 )
 
@@ -758,6 +771,40 @@ function resetCondition() {
   committedCondition.value = []
 }
 
+// ─── Vehicle status filter state ──────────────────────────────────────────────
+
+const VEHICLE_STATUS_OPTIONS: VehicleStatusOption[] = [
+  { value: 'on-lot',     label: 'On the lot', count: 1845 },
+  { value: 'in-transit', label: 'In transit', count: 412  },
+]
+
+const selectedVehicleStatus  = ref<string[]>([])
+const committedVehicleStatus = ref<string[]>([])
+
+function onVehicleStatusOpen() {
+  committedVehicleStatus.value = [...selectedVehicleStatus.value]
+}
+
+const isVehicleStatusFiltered = computed(
+  () => selectedVehicleStatus.value.length > 0,
+)
+
+const vehicleStatusPills = computed(() =>
+  selectedVehicleStatus.value.map(v => ({
+    key:   v,
+    label: VEHICLE_STATUS_OPTIONS.find(o => o.value === v)?.label ?? v,
+  })),
+)
+
+function removeVehicleStatus(value: string) {
+  selectedVehicleStatus.value = selectedVehicleStatus.value.filter(v => v !== value)
+}
+
+function resetVehicleStatus() {
+  selectedVehicleStatus.value  = []
+  committedVehicleStatus.value = []
+}
+
 function resetFilters() {
   selectedMakes.value           = []
   selectedModels.value          = []
@@ -784,6 +831,7 @@ function resetFilters() {
   resetDriveTrans()
   resetColor()
   resetCondition()
+  resetVehicleStatus()
 }
 
 const bodyStylePills = computed(() =>
@@ -919,24 +967,55 @@ interface VehicleListing {
   deliveryDistance: string
   imageUrl: string
   favorited: boolean
+  compared: boolean
+  /**
+   * Inventory status for this listing. When set, the tile replaces the
+   * delivery block with the resolved status copy ("On the lot" / "In transit").
+   */
+  vehicleStatus?: 'on-lot' | 'in-transit'
 }
 
 const listings = ref<VehicleListing[]>(
-  Array.from({ length: 9 }, (_, i) => ({
-    id: i + 1,
-    year: '2020',
-    mileage: '126k mi',
-    stockNumber: 'PDW077969',
-    title: 'Lamborghini Aventador LP 750-4 Superveloce Roadster SE',
-    price: '30,499',
-    monthlyPayment: '$250—$1,450/mo',
-    deliveryLabel: 'Pick up today at',
-    deliveryStore: 'SW Houston store',
-    deliveryDistance: '125 mi',
-    imageUrl: DUMMY_CAR_IMAGE,
-    favorited: false,
-  }))
+  Array.from({ length: 9 }, (_, i) => {
+    // Seed a mix of statuses so the Vehicle-Status filter has something to do.
+    // Slots 2 & 6 → In transit; slots 3 & 7 → On the lot; rest → plain delivery info.
+    const statusFor = (idx: number): 'on-lot' | 'in-transit' | undefined => {
+      if (idx === 2 || idx === 6) return 'in-transit'
+      if (idx === 3 || idx === 7) return 'on-lot'
+      return undefined
+    }
+    return {
+      id: i + 1,
+      year: '2020',
+      mileage: '126k mi',
+      stockNumber: 'PDW077969',
+      title: 'Lamborghini Aventador LP 750-4 Superveloce Roadster SE',
+      price: '30,499',
+      monthlyPayment: '$250—$1,450/mo',
+      deliveryLabel: 'Pick up today at',
+      deliveryStore: 'SW Houston store',
+      deliveryDistance: '125 mi',
+      imageUrl: DUMMY_CAR_IMAGE,
+      favorited: false,
+      compared: false,
+      vehicleStatus: statusFor(i),
+    }
+  })
 )
+
+/**
+ * Listings visible after applying the Vehicle-Status filter.
+ * (Other filters are visual-only in this demo page and don't prune data.)
+ */
+const visibleListings = computed(() => {
+  if (!isVehicleStatusFiltered.value) return listings.value
+  const selected = selectedVehicleStatus.value
+  return listings.value.filter(car => {
+    // Treat listings without an explicit status as "on-lot" for filtering.
+    const effectiveStatus = car.vehicleStatus ?? 'on-lot'
+    return selected.includes(effectiveStatus)
+  })
+})
 
 const sortOption = ref('Distance: Nearest')
 const showSortDropdown = ref(false)
@@ -1007,8 +1086,26 @@ const seoByBody: SeoCarouselItem[] = [
   { label: 'Wagons', href: '#' },
 ]
 
-function toggleFavorite(index: number) {
-  listings.value[index].favorited = !listings.value[index].favorited
+/** Toggle by listing id so visibleListings (filtered) still updates the source. */
+function toggleFavorite(id: number) {
+  const car = listings.value.find(c => c.id === id)
+  if (car) car.favorited = !car.favorited
+}
+
+function toggleCompared(id: number) {
+  const car = listings.value.find(c => c.id === id)
+  if (car) car.compared = !car.compared
+}
+
+/** Number of vehicles currently flagged for comparison — drives the tray. */
+const comparedCount = computed(() =>
+  listings.value.reduce((n, car) => (car.compared ? n + 1 : n), 0),
+)
+
+function onCompareAction() {
+  // TODO: route to the dedicated compare page once it's built.
+  // eslint-disable-next-line no-console
+  console.log('[SrpPage] navigate to compare page — selected:', comparedCount.value)
 }
 
 </script>
@@ -1103,6 +1200,15 @@ function toggleFavorite(index: number) {
                   :options="CONDITION_OPTIONS"
                   v-model:selected="selectedCondition"
                   :committed="committedCondition"
+                />
+              </template>
+
+              <!-- Vehicle status (Sonic only) -->
+              <template v-else-if="activeFilter === 'vehicle-status' && isSonic">
+                <SrpFilterVehicleStatus
+                  :options="VEHICLE_STATUS_OPTIONS"
+                  v-model:selected="selectedVehicleStatus"
+                  :committed="committedVehicleStatus"
                 />
               </template>
 
@@ -1261,6 +1367,15 @@ function toggleFavorite(index: number) {
               @labelClick="openFilterFromPill('condition')"
               @dismiss="removeCondition(cp.key)"
             />
+            <!-- 1d. Vehicle status -->
+            <SrpFilterPill
+              v-for="vp in vehicleStatusPills"
+              :key="`vstatus-${vp.key}`"
+              variant="dismissible"
+              :label="vp.label"
+              @labelClick="openFilterFromPill('vehicle-status')"
+              @dismiss="removeVehicleStatus(vp.key)"
+            />
             <!-- 2. Make / Model / Trim — interleaved: make, then its models, then their trims -->
             <SrpFilterPill
               v-for="pill in mmtPills"
@@ -1372,7 +1487,7 @@ function toggleFavorite(index: number) {
           <!-- Results header -->
           <div class="srp-page__results-header">
             <div class="srp-page__results-count">
-              2,110 used cars at {{ brandName }}
+              2,110 vehicles at {{ brandName }}
             </div>
             <div class="srp-page__sort">
               <span class="srp-page__sort-label">Sort by</span>
@@ -1411,7 +1526,7 @@ function toggleFavorite(index: number) {
           <!-- Vehicle tile grid — column count per Figma SRP responsive spec -->
           <div class="srp-page__grid">
             <SrpTile
-              v-for="(car, index) in listings"
+              v-for="car in visibleListings"
               :key="car.id"
               :year="car.year"
               :mileage="car.mileage"
@@ -1422,11 +1537,14 @@ function toggleFavorite(index: number) {
               :deliveryLabel="car.deliveryLabel"
               :deliveryStore="car.deliveryStore"
               :deliveryDistance="car.deliveryDistance"
+              :vehicleStatus="isSonic ? car.vehicleStatus : undefined"
               :imageUrl="car.imageUrl"
               :favorited="car.favorited"
+              :compared="car.compared"
               :imageCount="5"
               href="#"
-              @update:favorited="toggleFavorite(index)"
+              @update:favorited="toggleFavorite(car.id)"
+              @update:compared="toggleCompared(car.id)"
             />
           </div>
 
@@ -1482,6 +1600,12 @@ function toggleFavorite(index: number) {
       :trustBadges="footerTrustBadges"
       :legalLinks="footerLegalLinks"
       :copyrightText="footerCopyrightText"
+    />
+
+    <!-- Compare tray — appears once the user flags a vehicle on any SRP tile -->
+    <CompareTray
+      :count="comparedCount"
+      @compare="onCompareAction"
     />
 
     <!-- ─── Mobile filter drawer (≤1239px) ──────────────────── -->
@@ -1547,6 +1671,15 @@ function toggleFavorite(index: number) {
                 :label="cp.label"
                 @labelClick="openFilterFromPill('condition')"
                 @dismiss="removeCondition(cp.key)"
+              />
+              <!-- Vehicle status -->
+              <SrpFilterPill
+                v-for="vp in vehicleStatusPills"
+                :key="`vstatus-${vp.key}`"
+                variant="dismissible"
+                :label="vp.label"
+                @labelClick="openFilterFromPill('vehicle-status')"
+                @dismiss="removeVehicleStatus(vp.key)"
               />
               <!-- Make / Model / Trim — interleaved -->
               <SrpFilterPill
@@ -1729,6 +1862,14 @@ function toggleFavorite(index: number) {
                   :options="CONDITION_OPTIONS"
                   v-model:selected="selectedCondition"
                   :committed="committedCondition"
+                />
+              </template>
+
+              <template v-else-if="mobileActiveFilter === 'vehicle-status' && isSonic">
+                <SrpFilterVehicleStatus
+                  :options="VEHICLE_STATUS_OPTIONS"
+                  v-model:selected="selectedVehicleStatus"
+                  :committed="committedVehicleStatus"
                 />
               </template>
               <template v-else-if="mobileActiveFilter === 'year'">

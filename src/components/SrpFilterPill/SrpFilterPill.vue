@@ -119,7 +119,7 @@ function onDismissLabelClick(e: MouseEvent) {
   height: 36px;
   padding: 4px 12px 4px 0;
   gap: var(--spacing-nano);
-  border-radius: 34px;
+  border-radius: var(--button-border-radius);
   border: var(--border-width-hairline) solid var(--color-action-accent);
   background: var(--color-action-accent);
   color: var(--color-neutral-100);
@@ -136,7 +136,7 @@ function onDismissLabelClick(e: MouseEvent) {
   height: 36px;
   padding: 0 var(--spacing-nano) 0 var(--spacing-micro);
   border: none;
-  border-radius: 32px;
+  border-radius: var(--button-border-radius);
   background: transparent;
   cursor: pointer;
   color: inherit;
@@ -224,9 +224,9 @@ function onDismissLabelClick(e: MouseEvent) {
   display: inline-flex;
   align-items: center;
   height: 36px;
-  padding: 4px 1px 4px 12px;
+  padding: 4px 0px 4px 12px;
   gap: var(--spacing-quarck);
-  border-radius: 32px;
+  border-radius: var(--button-border-radius);
   border: var(--border-width-hairline) solid var(--color-action-accent);
   background: var(--color-action-accent-subtle);
   color: var(--color-action-accent);
@@ -276,7 +276,7 @@ function onDismissLabelClick(e: MouseEvent) {
   margin: 0;
   padding: 0 6px;
   border: none;
-  border-radius: 24px;
+  border-radius: var(--button-border-radius);
   background: transparent;
   cursor: pointer;
   color: var(--color-action-accent);
