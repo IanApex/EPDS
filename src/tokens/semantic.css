@@ -76,4 +76,18 @@
    * ----------------------------------------------------------- */
   --color-feedback-info:         var(--color-action-accent);
   --color-feedback-info-surface: var(--color-action-accent-subtle);
+
+  /* ─── Button: Secondary (light theme) ─────────────────────────
+   * Surface / border / text for the `BaseButton` secondary variant
+   * on light backgrounds. EchoPark defaults to an outlined look
+   * (transparent fill, Neutral0 border + text). Brands may override
+   * these tokens in their primitives file to swap in a filled
+   * treatment — Sonic, for example, uses an Accent60 fill with
+   * white text and no visible border.
+   * ----------------------------------------------------------- */
+  --color-btn-secondary-surface:        transparent;
+  --color-btn-secondary-surface-hover:  transparent;
+  --color-btn-secondary-surface-press:  var(--color-neutral-95);
+  --color-btn-secondary-border:         var(--color-neutral-0);
+  --color-btn-secondary-text:           var(--color-neutral-0);
 }

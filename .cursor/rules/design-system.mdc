@@ -427,6 +427,18 @@ EPDS/
 - **Accessibility**: `ariaLabel` prop is always rendered as `aria-label` — mandatory since there is no visible label
 - **Stories**: Default, Hover, Active, Focus, Disabled, AsAnchor, AllStates, IconVariety
 
+### `OverlayIconButton` — `src/components/OverlayIconButton/`
+- **Figma**: VDP gallery overlays (nodes `13948:43357` photos, `13948:43358` favorite).
+- **Purpose**: 40 × 40 circular icon button for placement over a photo. Shared by `VdpGallery`'s photos + favorite buttons.
+- **Props**: `ariaLabel: string` (**required**), `selected?: boolean`, `ariaPressed?: boolean`, `disabled?: boolean`
+- **Slots**: `#icon` (SVG rendered at 20×20). Fills inherit `currentColor` via `:deep(path|circle|rect|polygon|polyline|ellipse)`, so a single SVG tracks hover and selected states.
+- **Emits**: `click: [event: MouseEvent]`
+- **Default**: white surface (`--color-neutral-100`) + accent icon (`--color-action-accent`); hover deepens the icon to `--color-action-accent-hover`.
+- **Selected**: surface flips to `--color-action-accent` with a white icon; hover deepens to `--color-action-accent-hover`. Wire `ariaPressed` to mirror `selected` for toggles.
+- **Focus**: 3 px `--color-focus-ring` outer box-shadow. **Disabled**: 50 % opacity.
+- **Stories**: `Default`, `Selected`, `Disabled`, `Interactive` (photos + favorite toggle on a real photo backdrop).
+- **Storybook `title`**: `Atoms/Buttons/OverlayIconButton`
+
 ### `TileCta` — `src/components/TileCta/`
 - **Figma**: "IconButtons/SrpTile"
 - **Props**: `label?: string`, `href?: string`, `target?: string`, `disabled?: boolean`
@@ -471,11 +483,13 @@ EPDS/
 - **Emits**: `click: [event: MouseEvent]`
 - **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text. All sizes work with all variants/themes.
 - **Primary states**: hover (darker bg + underline), active (bright green), focus-visible (accessibility blue ring), disabled (grey). Theme prop has no effect.
-- **Secondary light states**: hover (border thin→thick), active (thick border + neutral-95 fill), focus-visible (thick accessibility-blue border), disabled (grey bg)
-- **Secondary dark states**: same border behaviour but white border/text; active fills with neutral-0 (dark); used on dark backgrounds
+- **Secondary light states**: the *shape* is identical across brands (thin→thick inset box-shadow for hover, focus-visible = accessibility-blue ring, disabled = grey bg); *colours* are token-driven so brands can swap the outlined look for a filled one without touching this component:
+  - **EchoPark** (semantic defaults): transparent surface, `--color-neutral-0` border + text, `--color-neutral-95` active fill.
+  - **Sonic**: `--color-accent-60` (#425363) surface, `--color-neutral-100` text, transparent border, `--color-accent-55` hover / `--color-accent-40` press. Override lives in `src/tokens/primitives/sonic.css`.
+- **Secondary dark states**: same border behaviour but white border/text; active fills with neutral-0 (dark); used on dark backgrounds. Not token-driven — the dark theme targets a consistent scrim across brands.
 - **Stories**: full coverage of variant×size×theme×state + VariantComparison, SizeComparison, AllVariants. Dark stories use `backgrounds: { default: 'dark' }` parameter.
 - **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
-- **Key tokens used**: `--color-base-primary-*`, `--color-neutral-0/95/100`, `--color-accessibility-80`, `--border-radius-pill`, `--border-width-thin/thick`, `--font-*-btn*`
+- **Key tokens used**: `--color-base-primary-*`, `--color-btn-secondary-surface/-hover/-press`, `--color-btn-secondary-border`, `--color-btn-secondary-text`, `--color-neutral-0/95/100`, `--color-accessibility-80`, `--border-radius-pill`, `--border-width-thin/thick`, `--font-*-btn*`
 
 ### `Accordion` — `src/components/Accordion/`
 - **Figma**: "Components/Accordion" — expandable disclosure with animated expand/collapse (renamed from `BaseAccordion`)
@@ -704,6 +718,8 @@ Documented briefly here — see each folder’s `.vue` / `.stories.ts` for full 
 | `LocationTile` | `Molecules/LocationTile` | Store picker tile (radio group) |
 | `LocationTileVdp` | `Molecules/LocationTileVdp` | VDP-oriented location tile |
 | `SrpTile` | `Molecules/SRPTile` | SRP vehicle card; composes `SmallIconButton`, `ArrowCircleButton`, `MediumIconButton`, `TileCta`, `CarouselDots`, `CompareButton`. Supports `vehicleStatus?: 'on-lot' \| 'in-transit'` which replaces the delivery block with a single status row: 16×16 leading icon (`Style=Location, Detail=Store` for `on-lot`, `Style=Arrows, Detail=Tail, Icon=Right` for `in-transit`) + status label (`onLotLabel` / `inTransitLabel`). Icons inherit `currentColor` via `:deep(path) { fill: currentColor }`. Stories: `StatusOnLot`, `StatusInTransit`. |
+| `VdpGallery` | `Molecules/VdpGallery` | VDP above-the-fold hero image (864 × 455 desktop) with two `OverlayIconButton` atoms pinned top-right: **photos** icon + **favorite** heart (selected-state toggle). `v-model:favorited`, `@click:photos`. |
+| `VdpSummary` | `Molecules/VdpSummary` | VDP above-the-fold right column (year/make → model/trim → price row + See Store Price secondary → dealer location → primary CTA → VIN / Stock # meta). Composes `BaseButton` for both actions. Emits `@click:cta` and `@click:secondary`. |
 | `CarOfferInputCard` | `Molecules/CarOfferInputCard` | Car offer entry (Figma); composes `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` |
 | `GlobalHeader` | `Organisms/GlobalHeader` | Site header (brand-configurable via props — see full docs below) |
 | `GlobalFooter` | `Organisms/GlobalFooter` | Site footer (brand-configurable via props — see full docs below) |
@@ -738,6 +754,42 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Colours** adapt automatically via the semantic token / primitives swap (e.g. `--color-action-primary` becomes red for Sonic).
 - **Content** (logos, links, badges, phone numbers) is passed as structured props.
 - **Storybook** stories for each brand demonstrate the configuration; use the Brand toolbar toggle to preview colour theming.
+
+### `VdpPage` — `src/pages/VdpPage.vue`
+- **Role**: Vehicle Detail Page composition — not a published library component, used for Storybook page-level demos. First pass is **desktop + Sonic-only + above-the-fold only**; below-the-fold sections are flagged in-file with a `TODO` and will land in a follow-up.
+- **Props**: `brandName?: string` (default `'Sonic Automotive'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
+- **Composes**: `GlobalHeader`, `GlobalFooter`, `VdpGallery`, `VdpSummary`. Hero row is a flex container with `gap: 80px` (Figma spec) that shrinks to `--spacing-xxl` below 1280 px.
+- **Seed data**: Matches the Figma frame — 2026 BMW X5 M60i, `$50,000` MSRP, `BMW of Birmingham`, VIN `5UX33EU01T9307218`, Stock `T9307218`. `favorited` is a local `ref(false)` toggled via `@update:favorited` on `VdpGallery`. `onTestDrive`, `onSeeStorePrice`, and `onOpenPhotos` are stubbed to `console.log` — host apps will wire these to the real flows.
+- **Brand awareness**: Same white-label pattern as `SrpPage` (an internal `isSonic` computed drives `GlobalHeader` / `GlobalFooter` logo, nav, link columns, legal, social, copyright). Today only the Sonic brand variant is built.
+- **Stories** (`Pages/VDP`): `Sonic Automotive Brand` with `layout: 'fullscreen'`.
+- **Storybook `title`**: `Pages/VDP`
+
+### `VdpGallery` — `src/components/VdpGallery/`
+- **Figma**: node `13948:43354` (gallery frame), `13948:43357` (photos button), `13948:43358` (favorite button) — VDP above-the-fold hero.
+- **Props**: `imageUrl?: string`, `imageAlt?: string`, `title?: string` (used for fallback alt + gallery aria-label), `imageCount?: number` (reserved for a future count badge), `favorited?: boolean`
+- **Emits**: `update:favorited: [value: boolean]` (two-way with `v-model:favorited`), `click:photos: [event: MouseEvent]`
+- **Layout**: Outer `.vdpg` is `max-width: 864px`; inner `.vdpg__frame` pins the Figma `864 / 455` aspect ratio (`aspect-ratio` CSS) with `overflow: hidden` and a subtle `--color-neutral-95` placeholder. Photo fills via `object-fit: cover`. Overlay buttons sit at `top: 20px; right: 16px; gap: 8px; z-index: 2`.
+- **Overlay buttons**: Two `OverlayIconButton` atoms pinned to the frame — photos (opens gallery) + favorite (bound to `:selected="favorited"` so it flips to an accent fill with a white heart when saved). The atom owns the 40 × 40 circle, the white surface, and the `currentColor` icon plumbing; `VdpGallery` only supplies SVGs, aria labels, and handlers.
+- **Icons**: `Style=Media, Detail=Image` (photos) and `Style=Account, Detail=Heart-Filled` (favorite).
+- **Accessibility**: Each button renders a real `aria-label` (`"View all photos of <title>"` or generic `"View all photos"`; favorite flips between `"Save to favorites"` and `"Remove from favorites"` with `aria-pressed` tracking state).
+- **Responsive**: Desktop-first. Aspect ratio and overlay positioning hold as the container shrinks. Mobile-optimised treatment (full-bleed, different overlay scale) is out of scope for the first pass.
+- **Stories**: `Default`, `NoImage` (placeholder), `Favorited`, `Interactive` (ref-backed favorite + photos click logging)
+- **Storybook `title`**: `Molecules/VdpGallery`
+
+### `VdpSummary` — `src/components/VdpSummary/`
+- **Figma**: node `13948:43443` ("Group 1631") — VDP above-the-fold right column.
+- **Props**: `year?: number | string`, `make?: string`, `model: string` (**required**), `trim?: string`, `price?: number | string`, `priceLabel?: string` (default `'MSRP'`, hidden when empty), `secondaryLabel?: string` (default `'See Store Price'`, hidden when empty), `dealerName?: string`, `ctaLabel?: string` (default `'Test Drive'`, hidden when empty), `vin?: string`, `stockNumber?: string`
+- **Emits**: `click:cta: [event: MouseEvent]`, `click:secondary: [event: MouseEvent]`
+- **Layout**: `max-width: 416px` column. Title block (`year + make` 27 px regular → `model + trim` 40 px bold, `letter-spacing: -1px`, line-heights 1 / 1.1) sits 40 px above the body. Body stacks two groups with `gap: 40px` (`--spacing-sm`):
+  1. Price-group (`gap: 24px`) — price row + dealer location
+  2. CTA-group (`gap: 32px`) — full-width primary CTA + VIN meta row
+- **Price row**: Flex row with `justify-content: space-between; align-items: flex-end`. Price is an inline-flex baseline-aligned triplet: `$` (18 px) + value (40 px, `letter-spacing: -1px`) + `priceLabel` (14 px, `--color-neutral-40`). Numeric `price` values are auto-formatted via `toLocaleString('en-US')`. The right slot is a `BaseButton variant="secondary" size="sm"` — rendering is conditional on `secondaryLabel` being non-empty.
+- **Location row**: `Style=Location, Detail=Map-Location` 18 × 18 icon tinted `--color-action-accent`, followed by the dealer name (16 px, line-height 18 px, `--color-neutral-0`).
+- **Primary CTA**: `BaseButton variant="primary" size="sm"` stretched to full summary width via `max-width: none`. Brand color adapts automatically (EchoPark green / Sonic orange).
+- **Meta row**: `VIN: <vin>` · `|` · `Stock #: <stockNumber>` at 12 px / 16 px. Row renders only if either value is present. The `|` is `--color-neutral-90` (subtle). Meta text is `user-select: text` so associates can copy the stock # on a tablet.
+- **Brand awareness**: All color comes from semantic tokens (`--color-neutral-0` primary text, `--color-neutral-40` muted label, `--color-action-accent` for the map pin, `--color-action-primary` through `BaseButton`). Swapping brands re-themes everything with no component changes.
+- **Stories**: `Default`, `LongModelName`, `NoTrim`, `CustomCtaLabel`, `NoSecondary`
+- **Storybook `title`**: `Molecules/VdpSummary`
 
 ### `SrpPage` — `src/pages/SrpPage.vue`
 - **Role**: Full SRP (Search Results Page) composition — not a published library component, used for Storybook page-level demos
@@ -1002,13 +1054,13 @@ A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches
 - Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
 - a11y is set to `'error'` — failing stories must be fixed, not suppressed
 - **Top-level sidebar groups**: **`Atoms`**, **`Molecules`**, **`Organisms`**, **`Pages`**, **`Components`**. Set each story’s `title` on `Meta`; order is controlled in **`.storybook/preview.ts`** via the inline `storySort` comparator (`order` array — **must stay inline** for Storybook 10 static analysis; **no TypeScript types inside that function**).
-  - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `CompareButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
+  - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `OverlayIconButton`, `CompareButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
-  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/CompareTray'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`, `SrpFilterVehicleStatus`
+  - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/CompareTray'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, `'Molecules/VdpGallery'`, `'Molecules/VdpSummary'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`, `SrpFilterVehicleStatus`
   - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SRP Filters/FiltersPanel'`
-  - **Pages** (`src/pages/`): `'Pages/SRP'` — full-page compositions showing components in context; each page story has per-brand variants (EchoPark + Sonic)
+  - **Pages** (`src/pages/`): `'Pages/SRP'`, `'Pages/VDP'` — full-page compositions showing components in context; each page story has per-brand variants (EchoPark + Sonic)
   - **Components**: reserved for future standalone app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
 
 ## Figma MCP Workflow

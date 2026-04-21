@@ -137,19 +137,25 @@ defineEmits<{
   box-shadow: inset 0 0 0 3px var(--color-focus-ring);
 }
 
-/* ─── Secondary — light theme (dark border on light bg) ─ */
+/* ─── Secondary — light theme ──────────────────────────────
+ * Surface / border / text are driven by semantic tokens so a
+ * brand can swap the outlined look for a filled one (see
+ * Sonic's Accent60 surface) without touching this component.
+ * -------------------------------------------------------- */
 .base-button--secondary.base-button--light {
-  box-shadow: inset 0 0 0 2px var(--color-neutral-0);
-  color: var(--color-neutral-0);
+  box-shadow: inset 0 0 0 2px var(--color-btn-secondary-border);
+  background-color: var(--color-btn-secondary-surface);
+  color: var(--color-btn-secondary-text);
 }
 
 .base-button--secondary.base-button--light:hover:not(:disabled) {
-  box-shadow: inset 0 0 0 3px var(--color-neutral-0);
+  box-shadow: inset 0 0 0 3px var(--color-btn-secondary-border);
+  background-color: var(--color-btn-secondary-surface-hover);
 }
 
 .base-button--secondary.base-button--light:active:not(:disabled) {
-  box-shadow: inset 0 0 0 3px var(--color-neutral-0);
-  background-color: var(--color-neutral-95);
+  box-shadow: inset 0 0 0 3px var(--color-btn-secondary-border);
+  background-color: var(--color-btn-secondary-surface-press);
 }
 
 /* ─── Secondary — dark theme (white border on dark bg) ── */

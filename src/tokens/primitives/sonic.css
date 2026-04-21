@@ -109,4 +109,17 @@
    * defined in tokens.css.
    * ----------------------------------------------------------- */
   --button-border-radius: 6px;
+
+  /* ─── Button: Secondary (light theme) overrides ───────────────
+   * Sonic's secondary button is a *filled* steel-blue surface
+   * with white text — not the EchoPark outlined treatment.
+   * Maps to Accent60 (#425363) with darker Accent55 / Accent40
+   * hover / press states. Border collapses to transparent so the
+   * inset box-shadow in BaseButton renders nothing.
+   * ----------------------------------------------------------- */
+  --color-btn-secondary-surface:        var(--color-accent-60);
+  --color-btn-secondary-surface-hover:  var(--color-accent-55);
+  --color-btn-secondary-surface-press:  var(--color-accent-40);
+  --color-btn-secondary-border:         transparent;
+  --color-btn-secondary-text:           var(--color-neutral-100);
 }
