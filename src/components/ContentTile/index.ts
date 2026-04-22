@@ -1,1 +1,1 @@
-export { default } from './ContentTile.vue'
+﻿export { default, default as ContentTile } from './ContentTile.vue'

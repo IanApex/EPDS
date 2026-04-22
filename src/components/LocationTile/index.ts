@@ -1,1 +1,1 @@
-export { default } from './LocationTile.vue'
+﻿export { default, default as LocationTile } from './LocationTile.vue'

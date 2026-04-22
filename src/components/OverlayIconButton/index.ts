@@ -1,1 +1,1 @@
-export { default } from './OverlayIconButton.vue'
+﻿export { default, default as OverlayIconButton } from './OverlayIconButton.vue'

@@ -1,1 +1,1 @@
-export { default } from './FaqBlogTab.vue'
+﻿export { default, default as FaqBlogTab } from './FaqBlogTab.vue'

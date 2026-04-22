@@ -1,1 +1,1 @@
-export { default as ProtectionPlansGraphic } from './ProtectionPlansGraphic.vue'
+﻿export { default, default as ProtectionPlansGraphic } from './ProtectionPlansGraphic.vue'

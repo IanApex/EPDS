@@ -1,1 +1,1 @@
-export { default } from './CompareTray.vue'
+﻿export { default, default as CompareTray } from './CompareTray.vue'

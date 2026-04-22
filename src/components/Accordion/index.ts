@@ -1,1 +1,1 @@
-export { default } from './Accordion.vue'
+﻿export { default, default as Accordion } from './Accordion.vue'

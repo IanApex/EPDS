@@ -1,1 +1,1 @@
-export { default } from './SmallIconButton.vue'
+﻿export { default, default as SmallIconButton } from './SmallIconButton.vue'

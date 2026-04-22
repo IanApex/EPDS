@@ -1,1 +1,1 @@
-export { default } from './VdpGallery.vue'
+﻿export { default, default as VdpGallery } from './VdpGallery.vue'

@@ -1,1 +1,1 @@
-export { default as SrpFilterYear } from './SrpFilterYear.vue'
+﻿export { default, default as SrpFilterYear } from './SrpFilterYear.vue'

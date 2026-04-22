@@ -1,1 +1,1 @@
-export { default } from './ArrowCircleButton.vue'
+﻿export { default, default as ArrowCircleButton } from './ArrowCircleButton.vue'

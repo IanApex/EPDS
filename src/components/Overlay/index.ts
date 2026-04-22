@@ -1,1 +1,1 @@
-export { default as Overlay } from './Overlay.vue'
+﻿export { default, default as Overlay } from './Overlay.vue'

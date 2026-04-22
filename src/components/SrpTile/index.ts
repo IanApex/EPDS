@@ -1,1 +1,1 @@
-export { default } from './SrpTile.vue'
+﻿export { default, default as SrpTile } from './SrpTile.vue'

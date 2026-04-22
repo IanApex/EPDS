@@ -1,1 +1,1 @@
-export { default } from './Alert.vue'
+﻿export { default, default as Alert } from './Alert.vue'

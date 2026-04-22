@@ -1,1 +1,1 @@
-export { default as GapGraphic } from './GapGraphic.vue'
+﻿export { default, default as GapGraphic } from './GapGraphic.vue'

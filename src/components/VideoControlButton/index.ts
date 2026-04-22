@@ -1,1 +1,1 @@
-export { default } from './VideoControlButton.vue'
+﻿export { default, default as VideoControlButton } from './VideoControlButton.vue'

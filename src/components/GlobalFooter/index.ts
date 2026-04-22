@@ -1,4 +1,4 @@
-export { default } from './GlobalFooter.vue'
+﻿export { default, default as GlobalFooter } from './GlobalFooter.vue'
 export type {
   FooterLinkColumn,
   SocialLink,

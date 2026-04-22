@@ -1,1 +1,1 @@
-export { default as TextBoxLG } from './TextBoxLG.vue'
+﻿export { default, default as TextBoxLG } from './TextBoxLG.vue'

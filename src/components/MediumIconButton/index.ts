@@ -1,1 +1,1 @@
-export { default } from './MediumIconButton.vue'
+﻿export { default, default as MediumIconButton } from './MediumIconButton.vue'

@@ -1,1 +1,1 @@
-export { default as LinkCta } from './LinkCta.vue'
+export { default, default as LinkCta } from './LinkCta.vue'

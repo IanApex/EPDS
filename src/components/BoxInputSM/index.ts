@@ -1,1 +1,1 @@
-export { default } from './BoxInputSM.vue'
+﻿export { default, default as BoxInputSM } from './BoxInputSM.vue'

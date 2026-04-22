@@ -1,1 +1,1 @@
-export { default } from './CompareButton.vue'
+﻿export { default, default as CompareButton } from './CompareButton.vue'

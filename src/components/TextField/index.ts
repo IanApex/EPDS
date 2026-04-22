@@ -1,1 +1,1 @@
-export { default as TextField } from './TextField.vue'
+﻿export { default, default as TextField } from './TextField.vue'

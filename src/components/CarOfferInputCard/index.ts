@@ -1,1 +1,1 @@
-export { default } from './CarOfferInputCard.vue'
+﻿export { default, default as CarOfferInputCard } from './CarOfferInputCard.vue'

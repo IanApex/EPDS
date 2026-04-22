@@ -1,1 +1,1 @@
-export { default } from './SrpFilterChild.vue'
+﻿export { default, default as SrpFilterChild } from './SrpFilterChild.vue'

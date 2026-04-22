@@ -1,1 +1,1 @@
-export { default } from './LocationTileVdp.vue'
+﻿export { default, default as LocationTileVdp } from './LocationTileVdp.vue'

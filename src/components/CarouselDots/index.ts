@@ -1,1 +1,1 @@
-export { default } from './CarouselDots.vue'
+﻿export { default, default as CarouselDots } from './CarouselDots.vue'

@@ -1,1 +1,1 @@
-export { default as JourneySelector } from './JourneySelector.vue'
+﻿export { default, default as JourneySelector } from './JourneySelector.vue'

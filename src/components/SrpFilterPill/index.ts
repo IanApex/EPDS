@@ -1,1 +1,1 @@
-export { default } from './SrpFilterPill.vue'
+﻿export { default, default as SrpFilterPill } from './SrpFilterPill.vue'
