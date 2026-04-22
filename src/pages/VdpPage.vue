@@ -9,6 +9,13 @@ import type { FooterLinkColumn, SocialLink, LegalLink } from '@/components/Globa
 import VdpGallery from '@/components/VdpGallery/VdpGallery.vue'
 import VdpSummary from '@/components/VdpSummary/VdpSummary.vue'
 import VdpPackagesOptions, { type PackageItem } from '@/components/VdpPackagesOptions'
+import VdpExteriorInterior, { type AttributeItem } from '@/components/VdpExteriorInterior'
+import VdpStandoutFeatures, { type StandoutFeature } from '@/components/VdpStandoutFeatures'
+
+import headsUpDisplayIcon     from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Heads Up Display.svg?raw'
+import massagingSeatIcon      from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Massaging Seat.svg?raw'
+import powerMoonroofIcon      from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Power Moonroof.svg?raw'
+import remoteKeylessEntryIcon from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Remote Keyless Entry.svg?raw'
 
 import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
 
@@ -153,6 +160,54 @@ const packages: PackageItem[] = [
   },
 ]
 
+/* ─── Exterior & Interior seed data ──────────────────────
+ * Mirrors the Figma Exterior & Interior frame — two rows of
+ * four attributes on desktop, reflowing to 3 / 2 columns on
+ * tablet / mobile via the component's own CSS grid. */
+const exteriorInteriorAttributes: AttributeItem[] = [
+  {
+    label:        'Color',
+    value:        'Arctic Race Blue metallic',
+    swatchType:   'color',
+    swatchColor:  '#1F3A5F',
+  },
+  {
+    label:        'Upholstery',
+    value:        'Ivory white',
+    swatchType:   'color',
+    swatchColor:  '#F6F1E7',
+  },
+  { label: 'Wheels',        value: '22" M Aero Black 1027M Wheels' },
+  { label: 'Interior Trim', value: 'M Dark Silver Interior' },
+  { label: 'Body Style',    value: 'SUV' },
+  { label: 'Seats',         value: '5 seats' },
+]
+
+/* ─── Standout Features seed data ────────────────────────
+ * Three-image mosaic (hero + two thumbs) paired with four
+ * icon-labeled highlight chips. First chip renders emphasized
+ * (bold) per the Figma treatment. */
+const standoutImages = [
+  { src: vehicle.imageUrl, alt: `${vehicle.year} ${vehicle.make} ${vehicle.model} interior` },
+  {
+    src:
+      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=450&fit=crop',
+    alt: 'Ivory white leather rear seats',
+  },
+  {
+    src:
+      'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=450&fit=crop',
+    alt: 'Exterior front angle',
+  },
+]
+
+const standoutFeatures: StandoutFeature[] = [
+  { label: 'Heads up display',             iconSvg: headsUpDisplayIcon, emphasized: true },
+  { label: 'Ventilated Massage Seats',     iconSvg: massagingSeatIcon },
+  { label: 'Panoramic Moonroof',           iconSvg: powerMoonroofIcon },
+  { label: 'Comfort Access Keyless Entry', iconSvg: remoteKeylessEntryIcon },
+]
+
 /* Stubs — host app will wire these to real flows / gallery modals. */
 function onTestDrive() {
   console.log('[VdpPage] test drive requested', vehicle.stockNumber)
@@ -217,6 +272,23 @@ function onSeeAllPackages() {
         @click:see-all="onSeeAllPackages"
       />
 
+      <!-- ── Exterior & Interior ───────────────────────── -->
+      <VdpExteriorInterior
+        class="vdp-page__exterior-interior"
+        :attributes="exteriorInteriorAttributes"
+      />
+
+      <!-- ── Standout Features ─────────────────────────────
+           Full-bleed within the page's max-width container: the
+           gray feature band reaches the page edges on desktop /
+           mobile via negative horizontal margins that cancel the
+           page gutter (tablet already has zero page padding). -->
+      <VdpStandoutFeatures
+        class="vdp-page__standout-features"
+        :images="standoutImages"
+        :features="standoutFeatures"
+      />
+
       <!--
         TODO: Below-the-fold VDP sections (specs, features, CTA tile,
         protection plans, FAQ, SEO carousel, etc.) land in a follow-up.
@@ -272,12 +344,26 @@ function onSeeAllPackages() {
   flex: 0 0 416px;
 }
 
-/* ─── Packages & Options ──────────────────────────────────
- * Sits 80 px below the hero row per Figma. Margin-top on
- * the component itself keeps the hero row self-contained
- * and makes future sections easy to chain below. */
-.vdp-page__packages {
-  margin-top: 80px;
+/* ─── Below-the-fold sections ─────────────────────────────
+ * Each sub-section sits 80 px below the previous block per
+ * Figma. Applying `margin-top` per-section (rather than a
+ * shared flex/grid gap) keeps the hero row self-contained
+ * and makes it easy to reorder or insert new sections later. */
+.vdp-page__packages,
+.vdp-page__exterior-interior,
+.vdp-page__standout-features {
+  margin-top: var(--spacing-xxl); /* 80px */
+}
+
+/* Standout Features breaks out of the page's 32 px desktop
+ * gutter so its gray feature band can reach the edges of the
+ * 1440 max-width container (matching Figma frame 13951:55390).
+ * The component's own internal 80 px padding re-inset its
+ * content so it still reads at the same horizontal rhythm as
+ * the rest of the page. */
+.vdp-page__standout-features {
+  margin-left:  calc(-1 * var(--spacing-xs)); /* -32px */
+  margin-right: calc(-1 * var(--spacing-xs));
 }
 
 /* Between xlg and lg (1024–1279) we let the gallery shrink gracefully
@@ -292,8 +378,19 @@ function onSeeAllPackages() {
  * Stack the hero vertically: gallery spans the full content
  * width, summary sits below with an 80 px internal horizontal
  * inset per Figma (tablet frame 864 wide, summary body at
- * x=80, width=704). */
+ * x=80, width=704).
+ *
+ * Page-level horizontal padding is zeroed here so the gallery
+ * can go edge-to-edge full-bleed. Every below-the-fold section
+ * (VdpSummary, VdpPackagesOptions, VdpExteriorInterior) already
+ * owns an 80 px side inset at this breakpoint, so gutters stay
+ * consistent without the page container double-padding them. */
 @media (max-width: 1023.98px) {
+  .vdp-page__main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .vdp-page__hero {
     flex-direction: column;
     align-items: center;
@@ -328,6 +425,25 @@ function onSeeAllPackages() {
 
   .vdp-page__summary {
     padding: 0;
+  }
+
+  /* Mobile uses a 24 px page gutter; re-balance the Standout
+   * Features break-out so the band still reaches the page
+   * container edges. */
+  .vdp-page__standout-features {
+    margin-left:  calc(-1 * var(--spacing-xxs)); /* -24px */
+    margin-right: calc(-1 * var(--spacing-xxs));
+  }
+}
+
+/* Tablet already zeros the page gutter (see `.vdp-page__main`
+ * rule above), so the Standout Features section needs no
+ * horizontal break-out there — cancel the desktop negative
+ * margin so the component sits flush with the page edges. */
+@media (max-width: 1023.98px) {
+  .vdp-page__standout-features {
+    margin-left:  0;
+    margin-right: 0;
   }
 }
 </style>
