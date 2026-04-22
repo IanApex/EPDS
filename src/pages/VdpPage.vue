@@ -8,6 +8,7 @@ import type { FooterLinkColumn, SocialLink, LegalLink } from '@/components/Globa
 
 import VdpGallery from '@/components/VdpGallery/VdpGallery.vue'
 import VdpSummary from '@/components/VdpSummary/VdpSummary.vue'
+import VdpPackagesOptions, { type PackageItem } from '@/components/VdpPackagesOptions'
 
 import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
 
@@ -124,6 +125,34 @@ const vehicle = {
 
 const favorited = ref(false)
 
+/* ─── Packages & Options seed data ───────────────────────
+ * Representative BMW X5 M60i option list; mirrors the
+ * VdpPackagesOptions Storybook sample so the page reads
+ * naturally against the vehicle above. */
+const packages: PackageItem[] = [
+  {
+    title: 'Premium Package',
+    body:
+      'Adds heated front seats, a heated steering wheel, a Harman Kardon ' +
+      'surround-sound system, soft-close automatic doors, and a wireless ' +
+      'device charging tray in the front console.',
+  },
+  {
+    title: 'M Sport Package',
+    body:
+      'Includes the M Sport aerodynamic kit, 21-inch M wheels with ' +
+      'performance tires, M Sport brakes with blue calipers, an ' +
+      'M leather steering wheel, and a dark-headliner interior trim.',
+  },
+  {
+    title: 'Executive Package',
+    body:
+      'Includes heated and ventilated front seats with massage, rear-seat ' +
+      'heating, a panoramic Sky Lounge LED roof, four-zone automatic ' +
+      'climate control, and acoustic side-window glass.',
+  },
+]
+
 /* Stubs — host app will wire these to real flows / gallery modals. */
 function onTestDrive() {
   console.log('[VdpPage] test drive requested', vehicle.stockNumber)
@@ -133,6 +162,9 @@ function onSeeStorePrice() {
 }
 function onOpenPhotos() {
   console.log('[VdpPage] open photo gallery', vehicle.stockNumber)
+}
+function onSeeAllPackages() {
+  console.log('[VdpPage] see all packages & options', vehicle.stockNumber)
 }
 </script>
 
@@ -176,6 +208,14 @@ function onOpenPhotos() {
           @click:secondary="onSeeStorePrice"
         />
       </section>
+
+      <!-- ── Installed Packages & Options ──────────────── -->
+      <VdpPackagesOptions
+        class="vdp-page__packages"
+        :packages="packages"
+        see-all-href="#"
+        @click:see-all="onSeeAllPackages"
+      />
 
       <!--
         TODO: Below-the-fold VDP sections (specs, features, CTA tile,
@@ -232,12 +272,62 @@ function onOpenPhotos() {
   flex: 0 0 416px;
 }
 
-/* Below the xlg breakpoint (<1440) we let the gallery shrink gracefully
- * while keeping the summary fixed; mobile treatment is out of scope for
- * the first pass and is covered by the TODO in the plan. */
+/* ─── Packages & Options ──────────────────────────────────
+ * Sits 80 px below the hero row per Figma. Margin-top on
+ * the component itself keeps the hero row self-contained
+ * and makes future sections easy to chain below. */
+.vdp-page__packages {
+  margin-top: 80px;
+}
+
+/* Between xlg and lg (1024–1279) we let the gallery shrink gracefully
+ * while keeping the summary at its fixed 416 px column width. */
 @media (max-width: 1279.98px) {
   .vdp-page__hero {
     gap: var(--spacing-xxl, 40px);
+  }
+}
+
+/* ─── Tablet (<1024) ──────────────────────────────────────
+ * Stack the hero vertically: gallery spans the full content
+ * width, summary sits below with an 80 px internal horizontal
+ * inset per Figma (tablet frame 864 wide, summary body at
+ * x=80, width=704). */
+@media (max-width: 1023.98px) {
+  .vdp-page__hero {
+    flex-direction: column;
+    align-items: center;
+    gap: 80px;
+  }
+
+  .vdp-page__gallery {
+    flex: 1 1 auto;
+  }
+
+  .vdp-page__summary {
+    flex: 1 1 auto;
+    padding: 0 80px;
+  }
+}
+
+/* ─── Mobile (<600) ───────────────────────────────────────
+ * Per Figma mobile frame 3069 (419 wide): gallery spans edge
+ * to edge of the content area, summary sits flush below it
+ * with the page gutter dropping to 24 px (matching the 24 px
+ * internal inset shown inside the 419 px frame). The 80 px
+ * summary inset used on tablet is removed — page padding
+ * alone handles horizontal rhythm at this size. */
+@media (max-width: 599.98px) {
+  .vdp-page__main {
+    padding: var(--spacing-xs, 32px) 24px var(--spacing-xl, 40px);
+  }
+
+  .vdp-page__hero {
+    gap: var(--spacing-xxs, 24px);
+  }
+
+  .vdp-page__summary {
+    padding: 0;
   }
 }
 </style>
