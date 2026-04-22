@@ -149,6 +149,41 @@ function onSecondaryClick(event: MouseEvent) {
   color: var(--color-neutral-0);
 }
 
+/* ─── Tablet (<1024) ──────────────────────────────────────
+ * On tablet the summary stacks beneath the full-width gallery
+ * and expands to fill the content area. The existing internal
+ * structure (right-aligned secondary price button, full-width
+ * CTA, centered VIN/Stock meta) already matches the Figma
+ * tablet frame — only the desktop 416 px cap needs to lift. */
+@media (max-width: 1023.98px) {
+  .vdps {
+    max-width: none;
+  }
+}
+
+/* ─── Mobile (<600) ───────────────────────────────────────
+ * Figma mobile frame 3069: the "2026 BMW" make line scales
+ * down (27 → 16 px), the big model headline stays at 40 px,
+ * the title → body rhythm tightens to ~12 px, and the gap
+ * between the price group and the CTA group collapses from
+ * 40 → 24 px. The horizontal layout of every row (price +
+ * right-aligned secondary button, full-width CTA, centered
+ * VIN/Stock meta) is identical to tablet and needs no change. */
+@media (max-width: 599.98px) {
+  .vdps__titles {
+    margin-bottom: var(--spacing-nano, 12px);
+  }
+
+  .vdps__make {
+    font-size: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .vdps__body {
+    gap: var(--spacing-xxs, 24px);
+  }
+}
+
 /* ─── Titles ───────────────────────────────────────────── */
 .vdps__titles {
   display: flex;

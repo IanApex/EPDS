@@ -37,6 +37,14 @@ const preview: Preview = {
         el?.remove()
       }
 
+      /* Surface the active brand on the root element so components can
+       * apply brand-specific *structural* overrides via CSS selectors
+       * (e.g. `[data-brand="sonic"] .my-component`). Token-only brand
+       * differences still flow through sonic.css above — this hook is
+       * only for shape / layout changes that can't be expressed as
+       * custom-property swaps. */
+      document.documentElement.setAttribute('data-brand', brand)
+
       return story()
     },
   ],

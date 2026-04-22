@@ -20,11 +20,13 @@
   ],
   "scripts": {
     "dev": "vite",
+    "dev:clean": "node -e \"require('node:fs').rmSync('node_modules/.vite',{recursive:true,force:true})\" && vite",
     "build": "vue-tsc -p tsconfig.lib.json --noEmit && vite build --config vite.lib.config.ts",
     "build:app": "vue-tsc -b && vite build",
     "typecheck": "vue-tsc -b",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
+    "storybook:clean": "node -e \"require('node:fs').rmSync('node_modules/.vite',{recursive:true,force:true});require('node:fs').rmSync('node_modules/.cache/storybook',{recursive:true,force:true})\" && storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "peerDependencies": {

@@ -128,4 +128,19 @@ function onFavoriteClick() {
   gap: var(--spacing-nano);
   z-index: 2;
 }
+
+/* ─── Mobile (<600) ───────────────────────────────────────
+ * Figma mobile frame 3069: hero photo is shorter/stubbier
+ * (419 × 271 ≈ 1.55 aspect) vs the 864 × 455 tablet crop,
+ * and the overlay cluster shifts up to a 16 px top inset
+ * (right inset stays at 16 px). */
+@media (max-width: 599.98px) {
+  .vdpg__frame {
+    aspect-ratio: 419 / 271;
+  }
+
+  .vdpg__overlays {
+    top: 16px;
+  }
+}
 </style>
