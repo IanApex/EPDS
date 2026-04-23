@@ -32,12 +32,6 @@ export interface StandoutFeature {
   label: string
   /** Raw SVG markup, typically imported via `@icons/...svg?raw`. */
   iconSvg?: string
-  /**
-   * When true (default for the first item), renders the label in bold
-   * to highlight the headline feature. Matches the Figma treatment
-   * where "Heads up display" is emphasized relative to the other rows.
-   */
-  emphasized?: boolean
 }
 
 withDefaults(defineProps<{
@@ -102,13 +96,7 @@ withDefaults(defineProps<{
               aria-hidden="true"
               v-html="feature.iconSvg"
             />
-            <span
-              class="vdp-sf__feature-label"
-              :class="{
-                'vdp-sf__feature-label--emphasized':
-                  feature.emphasized ?? i === 0,
-              }"
-            >
+            <span class="vdp-sf__feature-label">
               {{ feature.label }}
             </span>
           </li>
@@ -238,13 +226,7 @@ withDefaults(defineProps<{
   line-height: var(--text-subhead-line-height);
   letter-spacing: var(--text-subhead-letter-spacing);
   color: var(--color-neutral-20);
-  /* Default weight matches "regular" chips; emphasized modifier
-   * below bumps it to bold for the headline feature. */
   font-weight: var(--font-weight-regular);
-}
-
-.vdp-sf__feature-label--emphasized {
-  font-weight: var(--text-subhead-weight); /* bold */
 }
 
 /* ─── Tablet (< lg) ──────────────────────────────────────

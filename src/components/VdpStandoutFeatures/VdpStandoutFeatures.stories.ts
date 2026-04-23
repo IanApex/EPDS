@@ -65,9 +65,9 @@ const SAMPLE_IMAGES = [
 ]
 
 const SAMPLE_FEATURES: StandoutFeature[] = [
-  { label: 'Heads up display',        iconSvg: headsUpDisplayIcon,     emphasized: true },
-  { label: 'Ventilated Massage Seats', iconSvg: massagingSeatIcon },
-  { label: 'Panoramic Moonroof',       iconSvg: powerMoonroofIcon },
+  { label: 'Heads up display',             iconSvg: headsUpDisplayIcon },
+  { label: 'Ventilated Massage Seats',     iconSvg: massagingSeatIcon },
+  { label: 'Panoramic Moonroof',           iconSvg: powerMoonroofIcon },
   { label: 'Comfort Access Keyless Entry', iconSvg: remoteKeylessEntryIcon },
 ]
 
@@ -156,7 +156,7 @@ export const TextOnlyChips: Story = {
   name: 'Chips without icons',
   args: {
     ...DEFAULT_ARGS,
-    features: SAMPLE_FEATURES.map(({ label, emphasized }) => ({ label, emphasized })),
+    features: SAMPLE_FEATURES.map(({ label }) => ({ label })),
   },
   render: RENDER,
 }

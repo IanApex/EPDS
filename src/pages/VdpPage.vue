@@ -11,11 +11,20 @@ import VdpSummary from '@/components/VdpSummary/VdpSummary.vue'
 import VdpPackagesOptions, { type PackageItem } from '@/components/VdpPackagesOptions'
 import VdpExteriorInterior, { type AttributeItem } from '@/components/VdpExteriorInterior'
 import VdpStandoutFeatures, { type StandoutFeature } from '@/components/VdpStandoutFeatures'
+import VdpYourTerms, { type YourTermsOption } from '@/components/VdpYourTerms'
 
 import headsUpDisplayIcon     from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Heads Up Display.svg?raw'
 import massagingSeatIcon      from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Massaging Seat.svg?raw'
 import powerMoonroofIcon      from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Power Moonroof.svg?raw'
 import remoteKeylessEntryIcon from '@icons/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Remote Keyless Entry.svg?raw'
+
+import financeIcon from '@icons/Icon=Illustrative, Name=Finance.svg?raw'
+import payCashIcon from '@icons/Icon=Illustrative, Name=Pay-Cash.svg?raw'
+import preQualIcon from '@icons/Icon=Illustrative, Name=Pre-Qual.svg?raw'
+
+import sonicBankIcon      from '@icons/Style=Finance-Sonic, Detail=Payment, Icon=Bank-Outline.svg?raw'
+import sonicCashIcon      from '@icons/Style=Finance-Sonic, Detail=Payment, Icon=Cash.svg?raw'
+import sonicFastTrackIcon from '@icons/Style=Finance-Sonic, Detail=Payment, Icon=Fast-Track.svg?raw'
 
 import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
 
@@ -185,8 +194,8 @@ const exteriorInteriorAttributes: AttributeItem[] = [
 
 /* ─── Standout Features seed data ────────────────────────
  * Three-image mosaic (hero + two thumbs) paired with four
- * icon-labeled highlight chips. First chip renders emphasized
- * (bold) per the Figma treatment. */
+ * icon-labeled highlight chips, all rendered with the same
+ * visual weight. */
 const standoutImages = [
   { src: vehicle.imageUrl, alt: `${vehicle.year} ${vehicle.make} ${vehicle.model} interior` },
   {
@@ -202,11 +211,49 @@ const standoutImages = [
 ]
 
 const standoutFeatures: StandoutFeature[] = [
-  { label: 'Heads up display',             iconSvg: headsUpDisplayIcon, emphasized: true },
+  { label: 'Heads up display',             iconSvg: headsUpDisplayIcon },
   { label: 'Ventilated Massage Seats',     iconSvg: massagingSeatIcon },
   { label: 'Panoramic Moonroof',           iconSvg: powerMoonroofIcon },
   { label: 'Comfort Access Keyless Entry', iconSvg: remoteKeylessEntryIcon },
 ]
+
+/* ─── Your Vehicle. Your Terms. seed data ───────────────
+ * Three financing options with brand-aware iconography:
+ *  - EchoPark: multi-colour illustrative icons (Finance /
+ *    Pay-Cash / Pre-Qual) from the EPDS icon set.
+ *  - Sonic: the orange `currentColor`-fill outline icons that
+ *    match the Sonic Figma treatment; tinted via the Sonic
+ *    data-brand override baked into `VdpYourTerms`. */
+const yourTermsOptions = computed<YourTermsOption[]>(() => [
+  {
+    title:       'Finance',
+    description:
+      'Build equity with every payment, own your vehicle outright at ' +
+      'payoff, and drive without mileage restrictions.',
+    iconSvg:     isSonic.value ? sonicBankIcon : financeIcon,
+    linkLabel:   'Apply for Financing',
+    linkHref:    '#',
+  },
+  {
+    title:       'Lease',
+    description:
+      'Enjoy payments tailored to you and always drive the latest ' +
+      'model. Upgrade every 2–3 years—no trade-in negotiations, no hassle.',
+    iconSvg:     isSonic.value ? sonicCashIcon : payCashIcon,
+    linkLabel:   'Lease This Car',
+    linkHref:    '#',
+  },
+  {
+    title:       'Fast Track',
+    description:
+      'Get ahead before you arrive. Estimate your trade-in value, ' +
+      'explore current offers, and start your credit application—all ' +
+      'from home.',
+    iconSvg:     isSonic.value ? sonicFastTrackIcon : preQualIcon,
+    linkLabel:   'Get Started',
+    linkHref:    '#',
+  },
+])
 
 /* Stubs — host app will wire these to real flows / gallery modals. */
 function onTestDrive() {
@@ -220,6 +267,9 @@ function onOpenPhotos() {
 }
 function onSeeAllPackages() {
   console.log('[VdpPage] see all packages & options', vehicle.stockNumber)
+}
+function onYourTermsClick(payload: { option: YourTermsOption, index: number }) {
+  console.log('[VdpPage] your-terms option clicked', payload.option.title, vehicle.stockNumber)
 }
 </script>
 
@@ -289,6 +339,16 @@ function onSeeAllPackages() {
         :features="standoutFeatures"
       />
 
+      <!-- ── Your Vehicle. Your Terms. ─────────────────────
+           Three-tile finance-options row (Finance / Lease /
+           Fast Track). Spaced 80 px below the Standout
+           Features band per Figma 13953:10389. -->
+      <VdpYourTerms
+        class="vdp-page__your-terms"
+        :options="yourTermsOptions"
+        @click:option="onYourTermsClick"
+      />
+
       <!--
         TODO: Below-the-fold VDP sections (specs, features, CTA tile,
         protection plans, FAQ, SEO carousel, etc.) land in a follow-up.
@@ -351,7 +411,8 @@ function onSeeAllPackages() {
  * and makes it easy to reorder or insert new sections later. */
 .vdp-page__packages,
 .vdp-page__exterior-interior,
-.vdp-page__standout-features {
+.vdp-page__standout-features,
+.vdp-page__your-terms {
   margin-top: var(--spacing-xxl); /* 80px */
 }
 
