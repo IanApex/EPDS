@@ -283,3 +283,96 @@ export const AllVariants: Story = {
     docs: { description: { story: 'Full 2×2 matrix of variant × size.' } },
   },
 }
+
+// ─── Sonic Brand: Full Figma matrix ──────────────────────
+// Use the Brand toolbar dropdown (top-right) to switch to "Sonic
+// Automotive" — the matrix below mirrors the Figma "Buttons" frame
+// (3 variants × 2 sizes × 3 states). State-specific styling is
+// rendered live via storybook-addon-pseudo-states classes
+// (`pseudo-hover`, `pseudo-active`) applied per-cell.
+//
+// Sonic Figma names map to the BaseButton `theme` prop as follows:
+//   Sonic "Primary"          → variant="primary"
+//   Sonic "Secondary / Dark" → variant="secondary" theme="light"
+//                              (dark border + dark text on light bg)
+//   Sonic "Secondary / Light"→ variant="secondary" theme="dark"
+//                              (white border + white text on dark bg)
+//
+// The labels below use Sonic's naming for parity with Figma.
+
+export const SonicAllStates: Story = {
+  name: 'Sonic — All States',
+  render: () => ({
+    components: { BaseButton },
+    template: `
+      <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; row-gap: 24px; column-gap: 24px; align-items: center;">
+        <div></div>
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70;">Default</div>
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70;">Hover</div>
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70;">Pressed</div>
+
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70; white-space: nowrap;">Primary / Large</div>
+        <BaseButton label="Shop all rides" variant="primary" size="md" />
+        <BaseButton label="Shop all rides" variant="primary" size="md" class="pseudo-hover" />
+        <BaseButton label="Shop all rides" variant="primary" size="md" class="pseudo-active" />
+
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70; white-space: nowrap;">Primary / Small</div>
+        <BaseButton label="Shop all rides" variant="primary" size="sm" />
+        <BaseButton label="Shop all rides" variant="primary" size="sm" class="pseudo-hover" />
+        <BaseButton label="Shop all rides" variant="primary" size="sm" class="pseudo-active" />
+
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70; white-space: nowrap;">Secondary Dark / Large</div>
+        <BaseButton label="Shop all rides" variant="secondary" theme="light" size="md" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="light" size="md" class="pseudo-hover" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="light" size="md" class="pseudo-active" />
+
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #666b70; white-space: nowrap;">Secondary Dark / Small</div>
+        <BaseButton label="Shop all rides" variant="secondary" theme="light" size="sm" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="light" size="sm" class="pseudo-hover" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="light" size="sm" class="pseudo-active" />
+      </div>
+    `,
+  }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Sonic "Primary" + "Secondary / Dark" rows from the Figma "Buttons" frame. Switch the Brand toolbar to "Sonic Automotive" to render with Sonic tokens.',
+      },
+    },
+  },
+}
+
+export const SonicAllStatesLight: Story = {
+  name: 'Sonic — Secondary / Light (on dark bg)',
+  render: () => ({
+    components: { BaseButton },
+    template: `
+      <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; row-gap: 24px; column-gap: 24px; align-items: center;">
+        <div></div>
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #ffffff;">Default</div>
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #ffffff;">Hover</div>
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #ffffff;">Pressed</div>
+
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #ffffff; white-space: nowrap;">Secondary Light / Large</div>
+        <BaseButton label="Shop all rides" variant="secondary" theme="dark" size="md" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="dark" size="md" class="pseudo-hover" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="dark" size="md" class="pseudo-active" />
+
+        <div style="font-family: Roboto, sans-serif; font-size: 12px; color: #ffffff; white-space: nowrap;">Secondary Light / Small</div>
+        <BaseButton label="Shop all rides" variant="secondary" theme="dark" size="sm" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="dark" size="sm" class="pseudo-hover" />
+        <BaseButton label="Shop all rides" variant="secondary" theme="dark" size="sm" class="pseudo-active" />
+      </div>
+    `,
+  }),
+  parameters: {
+    backgrounds: { default: 'dark' },
+    docs: {
+      description: {
+        story:
+          'Sonic "Secondary / Light" — white border + white text used on dark backgrounds (BaseButton `theme="dark"`). Switch the Brand toolbar to "Sonic Automotive" to render with Sonic tokens.',
+      },
+    },
+  },
+}

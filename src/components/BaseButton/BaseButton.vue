@@ -7,9 +7,10 @@ defineProps<{
    */
   variant?: 'primary' | 'secondary'
   /**
-   * Visual size of the button.
-   * - `md` — 56px height, 16px text
-   * - `sm` — 40px height, 14px text
+   * Visual size of the button. Exact dimensions are brand-driven via
+   * the `--btn-md-*` / `--btn-sm-*` and `--font-*-btn` tokens.
+   * - `md` — EchoPark 56px / Sonic 48px ("Large")
+   * - `sm` — 40px both brands ("Small")
    */
   size?: 'md' | 'sm'
   /**
@@ -70,17 +71,19 @@ defineEmits<{
 
 /* ─── Sizes ────────────────────────────────────────────── */
 .base-button--md {
-  height: 56px;
-  padding: 13px 40px;
+  height: var(--btn-md-height);
+  padding: var(--btn-md-padding);
   font-size: var(--font-size-btn);
+  font-weight: var(--font-weight-btn);
   line-height: var(--line-height-btn);
   letter-spacing: var(--letter-spacing-btn);
 }
 
 .base-button--sm {
-  height: 40px;
-  padding: 13px 24px;
+  height: var(--btn-sm-height);
+  padding: var(--btn-sm-padding);
   font-size: var(--font-size-btn-sm);
+  font-weight: var(--font-weight-btn-sm);
   line-height: var(--line-height-btn-sm);
   letter-spacing: var(--letter-spacing-btn-sm);
 }
@@ -88,17 +91,17 @@ defineEmits<{
 /* ─── Primary variant ──────────────────────────────────── */
 .base-button--primary {
   border: var(--border-width-thick) solid transparent;
-  background-color: var(--color-action-primary);
-  color: var(--color-neutral-100);
+  background-color: var(--color-btn-primary-surface);
+  color: var(--color-btn-primary-text);
 }
 
 .base-button--primary:hover:not(:disabled) {
-  background-color: var(--color-action-primary-hover);
+  background-color: var(--color-btn-primary-surface-hover);
   text-decoration: underline;
 }
 
 .base-button--primary:active:not(:disabled) {
-  background-color: var(--color-action-primary-press);
+  background-color: var(--color-btn-primary-surface-press);
   text-decoration: none;
 }
 
@@ -115,12 +118,17 @@ defineEmits<{
 }
 
 /* ─── Secondary variant — shared ──────────────────────────
- * Border is always 3px transparent so outer dimensions never
- * shift. The visible border is rendered via inset box-shadow,
- * which draws inside the button and affects no surrounding layout.
+ * No real border — the visible frame is rendered as an
+ * `inset box-shadow`, which paints at the outer edge of the
+ * button and does NOT consume layout space. This keeps the
+ * secondary's visible footprint identical to the primary's
+ * filled bg footprint (both reach the full button height/width
+ * defined by `--btn-*-height` / `--btn-*-padding`). Border-width
+ * transitions on hover/press change the shadow size only and
+ * therefore never shift inner content.
  * -------------------------------------------------------- */
 .base-button--secondary {
-  border: 3px solid transparent;
+  border: none;
   background-color: transparent;
 }
 
@@ -139,8 +147,8 @@ defineEmits<{
 
 /* ─── Secondary — light theme ──────────────────────────────
  * Surface / border / text are driven by semantic tokens so a
- * brand can swap the outlined look for a filled one (see
- * Sonic's Accent60 surface) without touching this component.
+ * brand can swap the outlined look for a filled one without
+ * touching this component.
  * -------------------------------------------------------- */
 .base-button--secondary.base-button--light {
   box-shadow: inset 0 0 0 2px var(--color-btn-secondary-border);
@@ -154,7 +162,7 @@ defineEmits<{
 }
 
 .base-button--secondary.base-button--light:active:not(:disabled) {
-  box-shadow: inset 0 0 0 3px var(--color-btn-secondary-border);
+  box-shadow: inset 0 0 0 var(--btn-secondary-press-border-width) var(--color-btn-secondary-border);
   background-color: var(--color-btn-secondary-surface-press);
 }
 
@@ -169,8 +177,18 @@ defineEmits<{
 }
 
 .base-button--secondary.base-button--dark:active:not(:disabled) {
-  box-shadow: inset 0 0 0 3px var(--color-neutral-100);
-  background-color: var(--color-neutral-0);
+  box-shadow: inset 0 0 0 var(--btn-secondary-press-border-width) var(--color-neutral-100);
+  background-color: var(--color-btn-secondary-surface-press-dark);
+}
+
+/* ─── Sonic-only structural override ───────────────────────
+ * Per Sonic Figma "Buttons" frame, secondary variants underline
+ * the label on hover. EchoPark's secondaries do not. The
+ * [data-brand] hook on <html> is the documented escape hatch for
+ * brand differences that cannot be expressed via token swaps.
+ * -------------------------------------------------------- */
+[data-brand="sonic"] .base-button--secondary:hover:not(:disabled) {
+  text-decoration: underline;
 }
 
 /* ─── Label ────────────────────────────────────────────── */

@@ -105,4 +105,28 @@
   --color-accessibility-80: #4095BF;
   /* Light cyan focus indicator on blue / accent pills (Figma system blue 80) */
   --color-accessibility-90: #6FCFFF;
+
+  /* ─── Navigation tokens ───────────────────────────────────────
+   * Global navigation colours pulled from the Figma "Navigation"
+   * frames (no-dropdown 7639:20395, with-dropdown 7639:20405).
+   * Used by `NavItem` and future nav atoms in the global header.
+   *
+   * These values describe the SA-derived global nav styling and
+   * are mirrored verbatim in `primitives/sonic.css` — both brands
+   * share the same nav appearance for now. A future brand can
+   * redefine any of them in its own primitives file.
+   * ----------------------------------------------------------- */
+  --color-nav-text:        #292B2E;
+  --color-nav-text-hover:  #445366;
+  --color-nav-text-active: #292B2E;
+  --color-nav-text-focus:  #566F8F;
+  --color-nav-focus-ring:  var(--color-accessibility-90);
+
+  /* ─── Navigation: active indicator border ─────────────────────
+   * Top border of the open mega-menu panel and mobile drawer —
+   * the brand-coloured "this is the live nav surface" cue.
+   * EchoPark uses brand green; Sonic redefines this to the
+   * dark-red press surface in `primitives/sonic.css`.
+   * ----------------------------------------------------------- */
+  --color-nav-active-indicator: var(--color-base-primary-50);
 }

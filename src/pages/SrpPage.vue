@@ -11,21 +11,6 @@ const props = withDefaults(
 
 const isSonic = computed(() => props.brandName.toLowerCase().includes('sonic'))
 
-const headerLogoUrl = computed(() =>
-  isSonic.value ? saLogoDefaultUrl : undefined
-)
-
-const headerNavLinks = computed<NavLink[] | undefined>(() =>
-  isSonic.value
-    ? [
-        { label: 'New cars' },
-        { label: 'Used cars' },
-        { label: 'Sell your car' },
-        { label: 'More', dropdown: true },
-      ]
-    : undefined
-)
-
 const footerLogoUrl = computed(() =>
   isSonic.value ? saLogoDefaultUrl : undefined
 )
@@ -99,9 +84,10 @@ const footerCopyrightText = computed(() =>
 )
 
 import GlobalHeader from '@/components/GlobalHeader/GlobalHeader.vue'
-import type { NavLink } from '@/components/GlobalHeader/GlobalHeader.vue'
 import GlobalFooter from '@/components/GlobalFooter/GlobalFooter.vue'
 import type { FooterLinkColumn, SocialLink, LegalLink } from '@/components/GlobalFooter/GlobalFooter.vue'
+import SonicNavBar from '@/components/SonicNavBar/SonicNavBar.vue'
+import { sonicNavItems } from '@/pages/sonicNavItems'
 
 import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
 
@@ -1111,15 +1097,23 @@ function onCompareAction() {
 </script>
 
 <template>
-  <div class="srp-page">
-    <!-- Header -->
+  <div class="srp-page" :class="{ 'srp-page--sonic-sticky': isSonic }">
+    <!-- Header — Sonic uses the new `SonicNavBar` organism, sticky-pinned
+         to the viewport top so the mega-menu always sits flush with it.
+         The page root gets `srp-page--sonic-sticky` so the sidebar /
+         chips bar / filter-sort bar slot in beneath the nav (see CSS
+         below). EchoPark continues to use the legacy `GlobalHeader`. -->
+    <SonicNavBar
+      v-if="isSonic"
+      :nav-items="sonicNavItems"
+      :brand-name="brandName"
+    />
     <GlobalHeader
+      v-else
       variant="global-search"
       zipCode="75214"
       :phoneNumber="phoneNumber"
       :brandName="brandName"
-      :logoUrl="headerLogoUrl"
-      :navLinks="headerNavLinks"
     />
 
     <!-- Main content -->
@@ -2034,6 +2028,61 @@ function onCompareAction() {
   padding: 20px 24px;
   border-bottom: 1px solid var(--color-neutral-90);
   background: var(--color-neutral-100);
+}
+
+/* ─── Sticky stacking (Sonic only) ────────────────────────
+ * Page-root modifier `srp-page--sonic-sticky` is applied
+ * whenever the brand resolves to Sonic. The `SonicNavBar`
+ * already pins itself at `top: 0` via its default
+ * `:sticky="true"` prop; this block makes the chips bar and
+ * (on collapsed layouts) the filter/sort bar stick directly
+ * beneath the nav so the active-filter rail and primary
+ * filter affordances stay visible while the user scrolls
+ * through results.
+ *
+ * Stack heights:
+ *   - Desktop nav:          72px
+ *   - Mobile nav (<1024):   64px
+ *   - Filter/sort bar:      50px (only visible ≤1239px)
+ *
+ * Sidebar already uses `position: sticky; top: 0`; bumping
+ * `top` to `72px` lets it slot in below the nav cleanly. */
+.srp-page--sonic-sticky .srp-page__sidebar-sticky {
+  top: 72px;
+  max-height: calc(100vh - 72px);
+}
+
+.srp-page--sonic-sticky .srp-page__chips-bar {
+  position: sticky;
+  top: 72px;
+  /* Sit below the navbar's `z-index: 100` so the mega-menu
+   * panel can overlay the chips on hover/click. */
+  z-index: 50;
+}
+
+.srp-page--sonic-sticky .srp-page__filter-sort-bar {
+  position: sticky;
+  top: 72px;
+  z-index: 50;
+}
+
+/* Tablet + smaller (filter/sort bar shown, sidebar hidden):
+ * chips bar stacks below the filter/sort bar. */
+@media (max-width: 1239px) {
+  .srp-page--sonic-sticky .srp-page__chips-bar {
+    top: 122px; /* 72 desktop nav + 50 filter-sort-bar */
+  }
+}
+
+/* Mobile: SonicNavBar collapses to 64px tall, so all sticky
+ * offsets drop by 8px to match. */
+@media (max-width: 1023.98px) {
+  .srp-page--sonic-sticky .srp-page__filter-sort-bar {
+    top: 64px;
+  }
+  .srp-page--sonic-sticky .srp-page__chips-bar {
+    top: 114px; /* 64 mobile nav + 50 filter-sort-bar */
+  }
 }
 
 .srp-page__chips {

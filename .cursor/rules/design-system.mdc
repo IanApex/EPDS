@@ -16,7 +16,7 @@ alwaysApply: true
 - **Styling**: Three-layer CSS custom property system (primitives → semantic → scales); scoped `<style>` blocks in SFCs
 - **Token TS wrapper**: `src/tokens/tokens.ts`
 - **Breakpoints**: `src/tokens/breakpoints.ts` (JS constants — CSS vars can't be used in `@media`)
-- **Font**: Roboto via Google Fonts (weights 300/400/500/700) — loaded in `index.html` and `.storybook/preview-head.html`
+- **Font**: Roboto via Google Fonts (weights 300/400/500/700/900) — loaded in `index.html` and `.storybook/preview-head.html`. Weight 900 (Black) is used by `NavItem` Active state per the Sonic spec.
 - **Path aliases**: `@/` → `src/`, `@icons/` → `icon/`, `@logos/` → `Logos/`, `@illustrations/` → `Illustrations/`
 
 ## Project Structure
@@ -452,6 +452,94 @@ EPDS/
 - **Icon colour**: `.tile-cta__icon :deep(path/circle/rect/polygon) { fill: currentColor }` — inherits all state colour changes automatically
 - **Stories**: Default, Hover, Active, Focus, Disabled, AsAnchor, NoIcon, AllStates
 
+### `NavItem` — `src/components/NavItem/`
+- **Figma**: Single component covering both Figma variants — "Navigation / no dropdown" (node `7639:20395`) and "Navigation / with dropdown" (node `7639:20405`). First atoms of the global header / nav organism.
+- **Props**: `label?: string` (alternatively use the default slot), `active?: boolean` (default `false` — current page on no-dropdown, open menu on dropdown — supports `v-model:active`), `dropdown?: boolean` (default `false` — show trailing 24×24 chevron), `href?: string` (renders as `<a>` when set), `target?: string`, `ariaLabel?: string`
+- **Emits**: `update:active: [value: boolean]`, `click: [event: MouseEvent]`
+- **Click semantics**: The component toggles `active` itself (via `update:active`) **only for the dropdown variant** — clicking a dropdown trigger emits the next active value so it works as `v-model:active` out of the box (open / close menu). **Plain nav links never toggle on click** — they navigate, and the parent app sets `active` from the current route. Both variants always emit `click` for analytics / `preventDefault` interception.
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided. No-dropdown active anchors get `aria-current="page"`; no-dropdown active buttons get `aria-pressed="true"`. Dropdown variants always wire `aria-haspopup="true"` and surface `aria-expanded` from `active`.
+- **Anatomy**: 8 px-gap inline-flex of `[label]` + optional `[chevron]`. Chevron is the bundled `Style=Arrows, Detail=No-Tail, Icon=Down.svg` rendered at 24 × 24 via `?raw` + `v-html`; it rotates 180 ° when `active` is true (re-uses the single Down asset rather than shipping an Up duplicate). `:deep(path) { fill: currentColor }` lets the chevron track the same colour as the label across all states.
+- **States** (Figma):
+ - **Default** — Roboto Regular 16 px, line-height 1, letter-spacing -0.032 px, `--color-nav-text` (`#292B2E`); chevron points Down
+ - **Hover** (only when not active) — `--color-nav-text-hover` (`#445366`) + underline on the label only (`text-underline-offset: 2px`, `text-decoration-skip-ink: none`); chevron stays Down
+ - **Active** (current page / open menu) — Roboto **Black 900**, `--color-nav-text-active` (`#292B2E`); no underline; chevron flipped Up; hover styling is suppressed while active
+ - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring` (Accessibility90 `#6FCFFF`) + `--color-nav-text-focus` (`#566F8F`); active items keep their bold weight + Up chevron while showing the focus border
+- **Layout-stable focus ring**: `border: 3px solid transparent` + `padding: 0 4px` are reserved at all times so toggling `:focus-visible` never shifts the surrounding nav bar.
+- **Brand awareness**: All colour comes from `--color-nav-*` tokens defined in **both** `primitives/echopark.css` and `primitives/sonic.css` with **identical Figma values** for now (the SA-derived design is the global default — both brand modes render the same nav appearance until a brand explicitly redefines them). The component still ships `var()` fallbacks (`--color-neutral-0`, `--color-action-accent`, `--color-action-accent-muted`, `--color-focus-ring`) for any future brand that doesn't declare nav tokens. Font follows `--font-family-brand`.
+- **Roboto Black (900)**: Loaded in `index.html` and `.storybook/preview-head.html` (`...family=Roboto:wght@300;400;500;700;900...`) — required for the Active state. Falls back to `bold` (700) if the weight isn't loaded.
+- **Stories**: `Default`, `Hover`, `Active`, `FocusSelected`, `DropdownDefault`, `DropdownHover`, `DropdownActive`, `DropdownFocus`, `AsAnchor`, `ActiveAnchor`, `AllStates`, `AllStatesDropdown`, `DropdownInteractive` (click-to-toggle demo), `NavBarPreview` (single-open dropdown bar).
+- **Storybook `title`**: `Atoms/Navigation/NavItem`
+
+### `NavItemMobile` — `src/components/NavItemMobile/`
+- **Figma**: "Navigation / hidden menu" (node `7639:20419`) — full-width drill-in row used inside the mobile menu drawer. Distinct from the desktop `NavItem` dropdown variant: clicking navigates the user into a sub-menu / sub-page rather than toggling an inline panel, **so the trailing chevron always points right and never rotates**.
+- **Props**: `label?: string` (alternatively use the default slot), `active?: boolean` (default `false` — persistent "pressed" visual; typical use: mark the currently-drilled-in branch in breadcrumb-style mobile nav), `href?: string` (renders as `<a>` when set), `target?: string`, `ariaLabel?: string`
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided. Click never toggles internally — parent app handles drill-in navigation.
+- **Anatomy**: `display: flex; width: 100%; justify-content: space-between; gap: 8px` so the label sits flush left and the 24×24 Right chevron pins to the right edge of whatever container the row lives in (typically a 100%-width drawer). Chevron uses the bundled `Style=Arrows, Detail=No-Tail, Icon=Right.svg` rendered via `?raw` + `v-html`; `:deep(path) { fill: currentColor }` lets the icon track the same colour as the label across all states.
+- **Typography**: 18 px / line-height 1 / letter-spacing -0.036 px (vs 16 px / -0.032 px on desktop `NavItem`).
+- **States** (Figma):
+ - **Default** — Roboto Regular, `--color-nav-text` (`#292B2E`)
+ - **Hover** (only when not active) — `--color-nav-text-hover` (`#445366`) + label underline
+ - **Pressed** — Roboto Black 900, `--color-nav-text-active` (`#292B2E`); fired transiently via `:active` (touch / mouse press feedback) **and** persistently via the `active` prop
+ - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring` (Accessibility90 `#6FCFFF`) + `--color-nav-text-focus` (`#566F8F`); active rows keep their bold weight while showing the focus border
+- **Layout-stable focus ring**: `border: 3px solid transparent` + `padding: 0 4px` reserved at all times so toggling `:focus-visible` never reflows the surrounding rows.
+- **Brand awareness**: Uses the same global `--color-nav-*` tokens as `NavItem` (defined identically in both primitive files) and `--font-family-brand`.
+- **Stories**: `Default`, `Hover`, `Pressed`, `FocusSelected`, `AsAnchor`, `AllStates`, `MobileMenuPreview` (drawer composition), `VariableLabels` (proves the chevron stays pinned right regardless of label length).
+- **Storybook `title`**: `Atoms/Navigation/NavItemMobile`
+
+### `NavItemSubmenu` — `src/components/NavItemSubmenu/`
+- **Figma**: "Submenu" (node `7639:20454`) — leaf-level link inside a drilled-in mobile sub-menu (the level **below** `NavItemMobile`). No chevron — clicking simply navigates.
+- **Props**: `label?: string` (alternatively use the default slot), `active?: boolean` (default `false` — persistent "pressed" / current-page visual), `href?: string` (renders as `<a>` when set), `target?: string`, `ariaLabel?: string`
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided. Active anchors get `aria-current="page"`; active buttons get `aria-pressed="true"`. Click never toggles internally.
+- **Anatomy**: Single content-sized `inline-flex` link (no chevron, no icon). The parent menu container controls stacking, gaps, and any full-width tap targets.
+- **Typography (differs from parent rows)**: 16 px / **line-height 1.5** / **letter-spacing -0.352 px** (vs `NavItemMobile`'s 18 px / 1 / -0.036 px and `NavItem`'s 16 px / 1 / -0.032 px). The tighter tracking + taller leading produce the body-text feel Figma applies to sub-menu lists.
+- **States** (Figma):
+ - **Default** — Roboto Regular, `--color-nav-text` (`#292B2E`)
+ - **Hover** (only when not active) — `--color-nav-text-hover` (`#445366`) + underline
+ - **Pressed** — Roboto Black 900, `--color-nav-text-active` (`#292B2E`); fired transiently via `:active` (touch / mouse press) **and** persistently via the `active` prop
+ - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring` (Accessibility90 `#6FCFFF`) + `--color-nav-text-focus` (`#566F8F`); active rows keep their bold weight while showing the focus border
+- **Layout-stable focus ring**: `border: 3px solid transparent` + `padding: 0 4px` reserved at all times so toggling `:focus-visible` never reflows the surrounding rows.
+- **Brand awareness**: Uses the same global `--color-nav-*` tokens as `NavItem` / `NavItemMobile` and `--font-family-brand`.
+- **Stories**: `Default`, `Hover`, `Pressed`, `FocusSelected`, `AsAnchor`, `AllStates`, `SubmenuList` (compositional sub-menu container with five links + one current page).
+- **Storybook `title`**: `Atoms/Navigation/NavItemSubmenu`
+
+### `MenuToggle` — `src/components/MenuToggle/`
+- **Figma**: "Hamburger menu / closed" (node `7639:20490` — closed/hamburger icon states) and the open/X states immediately below (node `7639:20520`).
+- **Role**: Mobile menu hamburger / close toggle. Renders the hamburger icon when the drawer is closed and the X (close) icon when it's open. Click toggles `open` automatically — works as `v-model:open` out of the box, matching the same pattern as `NavItem` (dropdown variant) and `CompareButton`.
+- **Props**: `open?: boolean` (default `false` — `true` shows X, `false` shows hamburger), `ariaLabel?: string` (override; defaults to `'Open menu'` / `'Close menu'`), `disabled?: boolean`
+- **Emits**: `update:open: [value: boolean]`, `click: [event: MouseEvent]`
+- **Renders as**: `<button type="button">` only — never an anchor. `aria-expanded` and `aria-pressed` both reflect `open`.
+- **Icons**: Bundled from `icon/Style=Display, Detail=Menu, Icon=Menu.svg` (hamburger) and `icon/Style=Display, Detail=Default, Icon=Close.svg` (X), imported with `?raw` and rendered via `v-html`. Both inherit `currentColor` via `:deep(path) { fill: currentColor }` so all four state colours flow through the icon automatically.
+- **Layout**: `display: inline-flex; width: 30px; height: 30px; box-sizing: border-box; border: 3px solid transparent`. Inner icon area is always `24 × 24`. The 3 px transparent border reserves focus-ring space at all times — toggling `:focus-visible` never shifts the surrounding header layout.
+- **States** (Figma):
+ - **Default** — `--color-nav-text` (`#292B2E`)
+ - **Hover** — `--color-nav-text-hover` (`#445366`)
+ - **Pressed** — `--color-nav-text-focus` (`#566F8F`); fired transiently via `:active` (touch / mouse press)
+ - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring` (Accessibility90 `#6FCFFF`); icon colour stays at the default
+ - **Disabled** — `opacity: var(--opacity-level-medium)` + `cursor: not-allowed`
+- **Brand awareness**: Uses the global `--color-nav-*` tokens (defined identically in `primitives/echopark.css` and `primitives/sonic.css`) so behaviour matches `NavItem` / `NavItemMobile` / `NavItemSubmenu` across brands with no component changes.
+- **Stories**: `ClosedDefault`, `ClosedHover`, `ClosedPressed`, `ClosedFocus`, `OpenDefault`, `OpenHover`, `OpenPressed`, `OpenFocus`, `Disabled`, `AllStates` (8-cell grid: closed × open × four states), `Interactive` (ref-backed `v-model:open` demo).
+- **Storybook `title`**: `Atoms/Navigation/MenuToggle`
+
+### `NavIconButton` — `src/components/NavIconButton/`
+- **Figma**: Favorites heart (node `7639:21078` — Figma calls the frame "Hamburger menu" but it's the heart icon) and Profile avatar (node `7639:21038`). Same four-state machine drives both, so they share one primitive.
+- **Role**: Generic 24 × 24 nav-area icon button. Used by the global header for the Favorites heart, Profile avatar, and any future single-icon nav action (Cart, Notifications, etc.). Pure shape primitive — the consumer passes the SVG via the `#icon` slot and decides where the click goes.
+- **Props**: `ariaLabel: string` (**required**, no visible text), `selected?: boolean` (default `false` — persistent "current page" state), `href?: string` (renders as `<a>` when set), `target?: string`, `disabled?: boolean`
+- **Slots**: `#icon` — 24 × 24 SVG. Import the SVG with `?raw` and wrap in `<span v-html="..." />`. The icon inherits `currentColor` via `:deep(path|circle|rect|polygon|polyline|ellipse) { fill: currentColor }`, so all four state colours flow through automatically without per-state SVG assets.
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button type="button">` by default; `<a>` when `href` is provided. Selected anchors get `aria-current="page"`; selected buttons get `aria-pressed="true"`. Disabled anchors get `aria-disabled="true"` + `pointer-events: none`.
+- **States** (Figma):
+ - **Default** — `--color-nav-text` (`#292B2E`)
+ - **Hover** — `--color-nav-text-hover` (`#445366`)
+ - **Pressed** (`:active`) **and Selected** — `--color-nav-text-focus` (`#566F8F`); `selected` is the persistent "current page" indicator (icon equivalent of the bold active state on `NavItem` — icons can't bold, so the design uses colour instead)
+ - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring` (Accessibility90 `#6FCFFF`); icon colour stays at the underlying state colour
+ - **Disabled** — `opacity: var(--opacity-level-medium)` + `pointer-events: none`
+- **Layout-stable focus ring**: `width: 30px; height: 30px; box-sizing: border-box; border: 3px solid transparent`. Inner icon area is always 24 × 24. Mirrors `MenuToggle` exactly.
+- **Brand awareness**: Uses the global `--color-nav-*` tokens (defined identically in `primitives/echopark.css` and `primitives/sonic.css`) so behaviour matches the rest of the nav family across brands with no component changes.
+- **Stories** (favorites + profile, plus shared variants): `FavoritesDefault`, `FavoritesHover`, `FavoritesPressed`, `FavoritesSelected` (current page), `FavoritesFocus`, `ProfileDefault`, `ProfileHover`, `ProfilePressed`, `ProfileSelected`, `ProfileFocus`, `AsAnchor`, `AllStates` (8-cell grid: heart × profile × four visible states), `HeaderRowPreview` (both icons composed side-by-side with click-to-toggle `selected` demo).
+- **Storybook `title`**: `Atoms/Navigation/NavIconButton`
+
 ### `IconButton` — `src/components/IconButton/`
 - **Figma**: "IconButtons/SignIn"
 - **Props**: `label?: string`, `disabled?: boolean`
@@ -478,18 +566,25 @@ EPDS/
 - **Key tokens**: `--color-accent-30/40/80/90`, `--color-accessibility-80`, `--opacity-level-medium`, `--font-*-btn`
 
 ### `BaseButton` — `src/components/BaseButton/`
-- **Figma**: "Buttons/Primary" (primary md), "Buttons/Tertiary" (primary sm), "Buttons/Secondary" (secondary light md), "Buttons/TertiaryOutlined" (secondary light sm), "Buttons/SecondaryDark" (secondary dark md), "Buttons/TertiaryDark" (secondary dark sm)
+- **Figma**: "Buttons/Primary" (primary md), "Buttons/Tertiary" (primary sm), "Buttons/Secondary" (secondary light md), "Buttons/TertiaryOutlined" (secondary light sm), "Buttons/SecondaryDark" (secondary dark md), "Buttons/TertiaryDark" (secondary dark sm). Sonic equivalent: "Buttons" frame (`Primary` / `Secondary Dark` / `Secondary Light` × `Large` / `Small` × `Default` / `Hover` / `Pressed`).
 - **Props**: `variant?: 'primary' | 'secondary'`, `size?: 'md' | 'sm'`, `theme?: 'light' | 'dark'`, `label?: string`, `disabled?: boolean`
 - **Emits**: `click: [event: MouseEvent]`
-- **Sizes**: `md` = 56px h, 16px text; `sm` = 40px h, 14px text. All sizes work with all variants/themes.
-- **Primary states**: hover (darker bg + underline), active (bright green), focus-visible (accessibility blue ring), disabled (grey). Theme prop has no effect.
-- **Secondary light states**: the *shape* is identical across brands (thin→thick inset box-shadow for hover, focus-visible = accessibility-blue ring, disabled = grey bg); *colours* are token-driven so brands can swap the outlined look for a filled one without touching this component:
-  - **EchoPark** (semantic defaults): transparent surface, `--color-neutral-0` border + text, `--color-neutral-95` active fill.
-  - **Sonic**: `--color-accent-60` (#425363) surface, `--color-neutral-100` text, transparent border, `--color-accent-55` hover / `--color-accent-40` press. Override lives in `src/tokens/primitives/sonic.css`.
-- **Secondary dark states**: same border behaviour but white border/text; active fills with neutral-0 (dark); used on dark backgrounds. Not token-driven — the dark theme targets a consistent scrim across brands.
-- **Stories**: full coverage of variant×size×theme×state + VariantComparison, SizeComparison, AllVariants. Dark stories use `backgrounds: { default: 'dark' }` parameter.
-- **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in preview.ts
-- **Key tokens used**: `--color-base-primary-*`, `--color-btn-secondary-surface/-hover/-press`, `--color-btn-secondary-border`, `--color-btn-secondary-text`, `--color-neutral-0/95/100`, `--color-accessibility-80`, `--border-radius-pill`, `--border-width-thin/thick`, `--font-*-btn*`
+- **Sizes** (brand-driven via `--btn-md-*` / `--btn-sm-*` tokens):
+ - `md` — EchoPark **56px h, 13px / 40px padding, 16px / 500 / 0.4px text**; Sonic **48px h, 12px / 24px padding, 18px / 700 / -0.198px / lh 1.3 text** (Sonic Figma "Large").
+ - `sm` — EchoPark **40px h, 13px / 24px padding, 14px / 500 / 0 text**; Sonic **40px h, 12px / 16px padding, 14px / 700 / -0.154px / lh 1.3 text** (Sonic Figma "Small").
+- **Border-radius**: EchoPark = pill (`--border-radius-pill`); Sonic = **2px** (`--button-border-radius` overridden in `primitives/sonic.css`).
+- **Primary states**: hover (darker bg + underline), active (deepest bg, no underline), focus-visible (accessibility-blue ring via `border-color`), disabled (grey). Theme prop has no effect. Surface colours flow through `--color-btn-primary-surface[-hover|-press]` so brands can supply button-specific values that diverge from the broader `--color-action-primary` chain. **Sonic** overrides them to `#F24922 / #D9320D / #9A2409` (Figma button frame, slightly more orange than the rest of the Sonic primary palette).
+- **Secondary states**: shape is identical across brands (2px → 3px inset box-shadow on hover, focus-visible = accessibility-blue ring, disabled = grey bg). Colours and press treatment are token-driven:
+ - **EchoPark — light theme**: transparent surface, `--color-neutral-0` border + text, hover thickens to 3px (no fill change), press = 3px border + `--color-neutral-95` fill.
+ - **EchoPark — dark theme**: white border + text on dark, hover thickens to 3px (no fill change), press = 3px border + `--color-neutral-0` fill.
+ - **Sonic — light theme** ("Secondary Dark" in Figma): same outlined defaults as EchoPark, but **press keeps the border at 2px** and adds a `rgba(242, 242, 242, 0.10)` overlay fill (controlled via `--btn-secondary-press-border-width` and `--color-btn-secondary-surface-press`). Hover also adds an underline (Sonic-only structural override scoped via `[data-brand="sonic"]`).
+ - **Sonic — dark theme** ("Secondary Light" in Figma): same white border / white text as EchoPark, but **press keeps the border at 2px** and uses `rgba(242, 242, 242, 0.10)` overlay (`--color-btn-secondary-surface-press-dark`). Same Sonic-only hover underline.
+- **Brand override mechanics**:
+ - Token swaps in `primitives/sonic.css` cover: border-radius, button typography (`--font-size-btn`, `--font-weight-btn`, `--line-height-btn`, `--letter-spacing-btn` and their `-sm` siblings), button dimensions (`--btn-md-height`, `--btn-md-padding`, `--btn-sm-*`), primary surface colours, secondary surface / border / text + press border-width.
+ - `[data-brand="sonic"]` selector inside `BaseButton.vue` adds the secondary-hover underline that cannot be expressed as a token swap.
+- **Stories**: full coverage of variant×size×theme×state + VariantComparison, SizeComparison, AllVariants. Plus **`Sonic — All States`** and **`Sonic — Secondary / Light (on dark bg)`** stories that mirror the Figma "Buttons" frame layout (3 variants × 2 sizes × 3 states) — switch the Storybook **Brand** toolbar to *Sonic Automotive* to see the Sonic styling. Dark-background stories use `backgrounds: { default: 'dark' }`.
+- **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in `preview.ts`.
+- **Key tokens used**: `--color-btn-primary-surface/-hover/-press`, `--color-btn-primary-text`, `--color-btn-secondary-surface/-hover/-press`, `--color-btn-secondary-surface-press-dark`, `--color-btn-secondary-border`, `--color-btn-secondary-text`, `--btn-secondary-press-border-width`, `--btn-md-height/-padding`, `--btn-sm-height/-padding`, `--button-border-radius`, `--font-*-btn*`, `--color-neutral-0/95/100`, `--color-focus-ring`.
 
 ### `Accordion` — `src/components/Accordion/`
 - **Figma**: "Components/Accordion" — expandable disclosure with animated expand/collapse (renamed from `BaseAccordion`)
@@ -755,12 +850,39 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Content** (logos, links, badges, phone numbers) is passed as structured props.
 - **Storybook** stories for each brand demonstrate the configuration; use the Brand toolbar toggle to preview colour theming.
 
+### `SonicNavBar` — `src/components/SonicNavBar/`
+- **Figma**: "Frame 2492" (node `7639:20938`) — single nav frame with five Property 1 variants. **Default** (desktop bar, 1440×72), **Variant 2** (mobile bar, 375×64), **Variant 3** (desktop with mega-menu open, 1440×412), **Variant 4** (mobile drawer with parent list, 375×552), **Variant 5** (mobile drawer drilled into a parent submenu, 375×952).
+- **Role**: Sonic-style global navigation organism. Composes every nav atom in the system: `NavItem` (desktop primary nav + dropdown triggers), `NavItemMobile` (mobile drawer parent rows), `NavItemSubmenu` (drilled submenu leaf links), `MenuToggle` (hamburger / close), `NavIconButton` (favourites + profile), `BaseButton` (primary CTA), `Divider` (mobile drilled-submenu separator).
+- **Props**: `navItems: NavBarItem[]` (**required**), `logoUrl?: string` (default Sonic SA-FullColor logo), `logoHref?: string` (default `'/'`), `brandName?: string` (default `'Sonic Automotive'`, used for alt + aria labels), `ctaLabel?: string` (default `'Join the Sonic Circuit'`), `ctaHref?: string`, `favoritesHref?: string` (default `'/favorites'`), `profileHref?: string` (default `'/account'`), `favoritesSelected?: boolean`, `profileSelected?: boolean`, `forceMobile?: boolean` (Storybook escape hatch — applies the mobile layout regardless of the viewport media query so narrow canvas frames render correctly), `sticky?: boolean` (default `true`) — pin the bar to the viewport top with `position: sticky`. Pages with their own top-of-viewport sticky elements (e.g. `SrpPage`'s filter sidebar at `top: 0`) should pass `:sticky="false"` so the bar scrolls away normally and the page-level sticky takes over.
+- **Type exports**:
+ - `NavBarLink` — `{ label: string, href?: string }`
+ - `NavBarSection` — `{ heading: string, links: NavBarLink[] }`
+ - `NavBarItem` — `{ key: string, label: string, href?: string, dropdown?: NavBarSection[] }`. When `dropdown` is omitted the item is a direct link (e.g. "Sell/Trade"). When supplied, the item becomes a desktop dropdown trigger and a drilled-mobile parent row.
+- **Emits**: `cta-click`, `favorites-click`, `profile-click`, `submenu-link-click: [{ item, link, event }]`, `nav-item-click: [{ item, event }]`.
+- **Layout** (toolbar):
+ - **Desktop** (≥ 1024 px): 72 px height, 80 px horizontal padding. Logo (104 × 41 px) + horizontal nav (49 px gap between items) + favourites/profile + primary CTA (`BaseButton variant="primary" size="sm"`).
+ - **Mobile** (< 1024 px or `forceMobile`): 64 px height, 24 px horizontal padding. Logo (94 × 37 px) + favourites/profile + `MenuToggle`. Desktop nav and CTA are hidden via media query.
+- **Mega-menu** (Variant 3 — desktop only):
+ - Opens flush below the toolbar with `border-top: 1px solid var(--color-nav-active-indicator)` (Sonic dark red `#D9320D`, EchoPark green) — the "this is the live nav surface" cue.
+ - 80 px / 40 px padding. Section columns laid out with **`gap: 119px`** to match Figma. The second section auto-wraps into a 2-column grid via `grid-template-columns: repeat(2, …)` so long type lists ("ATVs / UTVs / Motorcycles / Watercraft") flow into a second column.
+ - Section heading: 18 px Bold; links: 16 px Regular `--color-nav-text`, hover → `--color-nav-text-hover` + underline; focus ring: 3 px `--color-nav-focus-ring` outline.
+ - Only one dropdown is open at a time. Click another to swap; click the active trigger again — or click outside / press `Escape` — to close.
+- **Mobile drawer** (Variant 4 + 5):
+ - Slides in below the 64 px bar with the same brand-coloured `border-top`. Body scroll locks while open (mirrors `Overlay`).
+ - **Parent list (Variant 4)**: vertical stack of `NavItemMobile` rows (40 px gap). Items with `dropdown` chevron-right and drill in on click; items without `dropdown` route via their `href` and emit `nav-item-click`. CTA button pinned to the bottom (`margin-top: auto`) at full width.
+ - **Drilled submenu (Variant 5)**: back-arrow header (`Style=Arrows, Detail=No-Tail, Icon=Left.svg` + 20 px Black 900 parent label) on top, then each section as a labelled block (`Section heading` 18 px Bold + `NavItemSubmenu` list with 32 px gap), separated by `Divider color="light"` between sections. Same drill-in / drill-out pattern as the SRP filter panel — tap back or press `Escape` to return to the parent list.
+- **Keyboard**: `Escape` collapses one level at a time — drilled submenu → parent drawer → desktop dropdown.
+- **Brand awareness**: Component itself is brand-agnostic. CTA themes red on Sonic / green on EchoPark via `BaseButton variant="primary"`. Mega-menu / drawer top border reads from `--color-nav-active-indicator` (Sonic `#D9320D`, EchoPark `var(--color-base-primary-50)`). All nav text colours come from the global `--color-nav-*` family already shared across `NavItem` / `NavItemMobile` / `NavItemSubmenu` / `MenuToggle` / `NavIconButton`. The "Sonic" name reflects the Figma source frame; the underlying organism is fully white-labellable via the brand toolbar.
+- **Stories** (`Organisms/SonicNavBar`): `Default` (desktop bar with placeholder body), `Variant 2 — mobile bar` (375 px frame), `Variant 3 — desktop mega-menu open` (auto-clicks "Shop rides" on mount so the mega-menu is visible without interaction), `Variant 4 — mobile drawer parent list` (auto-opens the drawer), `Variant 5 — mobile drilled submenu` (auto-opens drawer → drills into "Shop rides"), `Interactive` (fully interactive sandbox with a tall placeholder body and `layout: 'fullscreen'`).
+- **Token additions**: `--color-nav-active-indicator` added to **both** `primitives/echopark.css` and `primitives/sonic.css`. EchoPark maps it to `var(--color-base-primary-50)` (brand green); Sonic maps it to `var(--color-btn-primary-surface-hover)` (`#D9320D`, the dark-red press surface).
+- **Storybook `title`**: `Organisms/SonicNavBar`
+
 ### `VdpPage` — `src/pages/VdpPage.vue`
 - **Role**: Vehicle Detail Page composition — not a published library component, used for Storybook page-level demos. First pass is **desktop + Sonic-only + above-the-fold only**; below-the-fold sections are flagged in-file with a `TODO` and will land in a follow-up.
 - **Props**: `brandName?: string` (default `'Sonic Automotive'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
-- **Composes**: `GlobalHeader`, `GlobalFooter`, `VdpGallery`, `VdpSummary`. Hero row is a flex container with `gap: 80px` (Figma spec) that shrinks to `--spacing-xxl` below 1280 px.
+- **Composes**: `SonicNavBar` (Sonic) **or** `GlobalHeader` (EchoPark), `GlobalFooter`, `VdpGallery`, `VdpSummary`. Hero row is a flex container with `gap: 80px` (Figma spec) that shrinks to `--spacing-xxl` below 1280 px.
 - **Seed data**: Matches the Figma frame — 2026 BMW X5 M60i, `$50,000` MSRP, `BMW of Birmingham`, VIN `5UX33EU01T9307218`, Stock `T9307218`. `favorited` is a local `ref(false)` toggled via `@update:favorited` on `VdpGallery`. `onTestDrive`, `onSeeStorePrice`, and `onOpenPhotos` are stubbed to `console.log` — host apps will wire these to the real flows.
-- **Brand awareness**: Same white-label pattern as `SrpPage` (an internal `isSonic` computed drives `GlobalHeader` / `GlobalFooter` logo, nav, link columns, legal, social, copyright). Today only the Sonic brand variant is built.
+- **Brand awareness**: Same white-label pattern as `SrpPage`: `isSonic` swaps the header (`SonicNavBar` for Sonic, sticky enabled here because the VDP doesn't have its own top-of-viewport sticky element; `GlobalHeader` for EchoPark) and overrides the footer logo / link columns / legal / social / copyright. Sonic primary-nav structure imported from the shared `src/pages/sonicNavItems.ts`. Today only the Sonic brand variant is published as a Storybook page demo.
 - **Stories** (`Pages/VDP`): `Sonic Automotive Brand` with `layout: 'fullscreen'`.
 - **Storybook `title`**: `Pages/VDP`
 
@@ -794,8 +916,8 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 ### `SrpPage` — `src/pages/SrpPage.vue`
 - **Role**: Full SRP (Search Results Page) composition — not a published library component, used for Storybook page-level demos
 - **Props**: `brandName?: string` (default `'EchoPark'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
-- **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalHeader` (logo, nav links) and `GlobalFooter` (logo, link columns, social links, trust badges, legal links, copyright). When not Sonic, all overrides return `undefined` so the components fall back to their EchoPark defaults.
-- **Composes**: `GlobalHeader`, `GlobalFooter`, `SrpTile`, `CompareTray`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Vehicle status + Condition are both Sonic-only; EchoPark shows 10, Sonic shows 12 with Vehicle status directly above Condition at the top of the list after Distance), `SrpFilterPill`, `BaseButton`
+- **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalFooter` (logo, link columns, social links, trust badges, legal links, copyright) and **swaps the entire header**: Sonic renders the new `SonicNavBar` organism (mega-menu + mobile drawer, `:sticky="false"` so it doesn't fight the SRP's own sticky filter sidebar) while EchoPark continues to use the legacy `GlobalHeader` (`variant="global-search"` with zip / phone). The Sonic primary-nav structure is sourced from the shared `src/pages/sonicNavItems.ts` so `SrpPage` and `VdpPage` stay in lock-step (and mirror the seed used by the `SonicNavBar` Storybook stories).
+- **Composes**: `SonicNavBar` (Sonic) **or** `GlobalHeader` (EchoPark), `GlobalFooter`, `SrpTile`, `CompareTray`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Vehicle status + Condition are both Sonic-only; EchoPark shows 10, Sonic shows 12 with Vehicle status directly above Condition at the top of the list after Distance), `SrpFilterPill`, `BaseButton`
 - **Vehicle-status filtering**: `SrpPage` seeds each listing with an optional `vehicleStatus` and derives `visibleListings = listings.filter(...)` that honours the Vehicle-status filter selections. Tiles in the grid iterate over `visibleListings`, and `toggleFavorite` / `toggleCompared` now key off `car.id` (not array index) so filtered views still write back to the right listing. The `vehicleStatus` prop is only passed to tiles when `isSonic` — EchoPark tiles always render the delivery block, even if seeded data has a status.
 - **Stories** (`Pages/SRP`): `EchoPark Brand` (default brand + globals) and `Sonic Automotive Brand` (passes `brandName: 'Sonic Automotive'` + Sonic globals for primitives toggle)
 - **Storybook `title`**: `Pages/SRP`
@@ -1028,6 +1150,7 @@ A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches
 - `--color-feedback-warning[-surface]` — caution states
 - `--color-feedback-success[-surface]` — success/confirmation states
 - `--color-feedback-info[-surface]` — informational/notification states
+- `--color-nav-text[-hover|-active|-focus]`, `--color-nav-focus-ring` — global navigation colours; defined identically in both `primitives/echopark.css` and `primitives/sonic.css` (SA-derived nav design is the global default for now). Used by `NavItem` and future nav atoms.
 
 ### Font family chain
 `--font-family-brand` (primitives) → `--font-family-base` (tokens.css) → `--font-family-btn` (tokens.css)
@@ -1057,9 +1180,10 @@ A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches
   - **Atoms — Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `OverlayIconButton`, `CompareButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
   - **Atoms — Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
   - **Atoms — Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
+ - **Atoms — Navigation**: `'Atoms/Navigation/NavItem'`, `'Atoms/Navigation/NavItemMobile'`, `'Atoms/Navigation/NavItemSubmenu'`, `'Atoms/Navigation/MenuToggle'`, `'Atoms/Navigation/NavIconButton'` — atoms for the global header / nav organism
   - **Atoms — asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'` — **no** `Foundations/` parent
   - **Molecules** (flat `Molecules/Name` or sub-folder): `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/CompareTray'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, `'Molecules/VdpGallery'`, `'Molecules/VdpSummary'`, plus **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`, `SrpFilterVehicleStatus`
-  - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SRP Filters/FiltersPanel'`
+  - **Organisms** (flat): `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SonicNavBar'`, `'Organisms/SRP Filters/FiltersPanel'`
   - **Pages** (`src/pages/`): `'Pages/SRP'`, `'Pages/VDP'` — full-page compositions showing components in context; each page story has per-brand variants (EchoPark + Sonic)
   - **Components**: reserved for future standalone app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later)
 

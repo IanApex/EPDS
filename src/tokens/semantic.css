@@ -77,17 +77,38 @@
   --color-feedback-info:         var(--color-action-accent);
   --color-feedback-info-surface: var(--color-action-accent-subtle);
 
+  /* ─── Button: Primary (filled) ────────────────────────────────
+   * Surface / text for the `BaseButton` primary variant. Defaults
+   * to the brand's action-primary chain so EchoPark inherits its
+   * green fill automatically. Brands may override these tokens in
+   * their primitives file when the button uses a colour that diverges
+   * from the rest of the action-primary palette (e.g. Sonic's
+   * orange-red button reds, which differ slightly from the broader
+   * primary palette used by checkboxes, sliders, etc.).
+   * ----------------------------------------------------------- */
+  --color-btn-primary-surface:        var(--color-action-primary);
+  --color-btn-primary-surface-hover:  var(--color-action-primary-hover);
+  --color-btn-primary-surface-press:  var(--color-action-primary-press);
+  --color-btn-primary-text:           var(--color-neutral-100);
+
   /* ─── Button: Secondary (light theme) ─────────────────────────
    * Surface / border / text for the `BaseButton` secondary variant
    * on light backgrounds. EchoPark defaults to an outlined look
    * (transparent fill, Neutral0 border + text). Brands may override
    * these tokens in their primitives file to swap in a filled
-   * treatment — Sonic, for example, uses an Accent60 fill with
-   * white text and no visible border.
+   * treatment, change the press fill, etc.
    * ----------------------------------------------------------- */
   --color-btn-secondary-surface:        transparent;
   --color-btn-secondary-surface-hover:  transparent;
   --color-btn-secondary-surface-press:  var(--color-neutral-95);
   --color-btn-secondary-border:         var(--color-neutral-0);
   --color-btn-secondary-text:           var(--color-neutral-0);
+
+  /* ─── Button: Secondary (dark theme) ──────────────────────────
+   * Press fill for secondary buttons placed on dark backgrounds.
+   * EchoPark fills with Neutral0 (full-bleed dark on dark). Sonic
+   * uses a 10% white-ish overlay so the button reads as "pressed"
+   * without flooding the surface.
+   * ----------------------------------------------------------- */
+  --color-btn-secondary-surface-press-dark: var(--color-neutral-0);
 }

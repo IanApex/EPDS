@@ -117,6 +117,21 @@
    * ------------------------------------------------------------ */
   --button-border-radius: var(--border-radius-pill);
 
+  /* ─── Button: Dimensions ──────────────────────────────────────
+   * Per-size height / padding. EchoPark defaults; Sonic overrides
+   * these to the smaller "Large=48px" / "Small=40px" frame.
+   * ------------------------------------------------------------ */
+  --btn-md-height:  56px;
+  --btn-md-padding: 13px 40px;
+  --btn-sm-height:  40px;
+  --btn-sm-padding: 13px 24px;
+
+  /* ─── Button: Secondary press border-width ────────────────────
+   * EchoPark thickens the inset border to 3px on press. Sonic keeps
+   * it at 2px and adds a transparent overlay fill instead.
+   * ------------------------------------------------------------ */
+  --btn-secondary-press-border-width: 3px;
+
   /* ─── Border Width ────────────────────────────────────────────  */
   --border-width-none:     0px;
   --border-width-hairline: 1px;

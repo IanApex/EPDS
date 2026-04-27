@@ -2,9 +2,10 @@
 import { computed, ref } from 'vue'
 
 import GlobalHeader from '@/components/GlobalHeader/GlobalHeader.vue'
-import type { NavLink } from '@/components/GlobalHeader/GlobalHeader.vue'
 import GlobalFooter from '@/components/GlobalFooter/GlobalFooter.vue'
 import type { FooterLinkColumn, SocialLink, LegalLink } from '@/components/GlobalFooter/GlobalFooter.vue'
+import SonicNavBar from '@/components/SonicNavBar/SonicNavBar.vue'
+import { sonicNavItems } from '@/pages/sonicNavItems'
 
 import VdpGallery from '@/components/VdpGallery/VdpGallery.vue'
 import VdpSummary from '@/components/VdpSummary/VdpSummary.vue'
@@ -39,21 +40,10 @@ const props = withDefaults(
 const isSonic = computed(() => props.brandName.toLowerCase().includes('sonic'))
 
 /* ─── Header / footer brand config ───────────────────────
- * Mirrors the white-label pattern established by SrpPage.
+ * Mirrors the white-label pattern established by SrpPage:
+ * Sonic swaps in the new `SonicNavBar` organism (mega-menu
+ * + mobile drawer); EchoPark continues to use `GlobalHeader`.
  * -------------------------------------------------------- */
-const headerLogoUrl = computed(() => (isSonic.value ? saLogoDefaultUrl : undefined))
-
-const headerNavLinks = computed<NavLink[] | undefined>(() =>
-  isSonic.value
-    ? [
-        { label: 'New cars' },
-        { label: 'Used cars' },
-        { label: 'Sell your car' },
-        { label: 'More', dropdown: true },
-      ]
-    : undefined,
-)
-
 const footerLogoUrl = computed(() => (isSonic.value ? saLogoDefaultUrl : undefined))
 
 const footerLinkColumns = computed<FooterLinkColumn[] | undefined>(() =>
@@ -275,13 +265,20 @@ function onYourTermsClick(payload: { option: YourTermsOption, index: number }) {
 
 <template>
   <div class="vdp-page">
+    <!-- Header — Sonic renders the new `SonicNavBar` organism
+         (sticky desktop bar + mobile drawer); EchoPark falls back
+         to the legacy `GlobalHeader`. -->
+    <SonicNavBar
+      v-if="isSonic"
+      :nav-items="sonicNavItems"
+      :brand-name="brandName"
+    />
     <GlobalHeader
+      v-else
       variant="global-search"
       zipCode="35223"
       :phoneNumber="phoneNumber"
       :brandName="brandName"
-      :logoUrl="headerLogoUrl"
-      :navLinks="headerNavLinks"
     />
 
     <main class="vdp-page__main">
