@@ -723,6 +723,54 @@ watch(mobileOpen, (open) => {
 }
 
 /* ─────────────────────── Responsive ─────────────────────── */
+/* Mid-range desktop (1280–1439): the Figma spec is tuned to a
+ * 1440 viewport with 80 px gutters + 49 px nav gap. Below 1440
+ * the primary nav items collide with the utility cluster. We
+ * reclaim horizontal real estate progressively — first by
+ * dropping the 80 px page gutter to 32 px, then by tightening
+ * the nav-item gap and the cluster spacing — so the desktop
+ * layout keeps working all the way down to the 1024 mobile
+ * breakpoint without dropping any nav links or CTAs. */
+@media (max-width: 1439.98px) and (min-width: 1024px) {
+  .snb__bar {
+    padding-left: 32px;
+    padding-right: 32px;
+    gap: 24px;
+  }
+  .snb__nav {
+    gap: 32px;
+  }
+  .snb__megamenu {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+/* Tighter still between 1024 and 1280: drop the nav gap and the
+ * utility cluster's internal gaps so the long Sonic primary-nav
+ * labels ("Service, parts & gear", "Our Company") don't run into
+ * the icons + CTA. */
+@media (max-width: 1279.98px) and (min-width: 1024px) {
+  .snb__nav {
+    gap: 24px;
+  }
+  .snb__utility,
+  .snb__icons {
+    gap: 16px;
+  }
+}
+
+/* Below 1200 the long Sonic primary-nav labels still overlap the
+ * utility cluster even at the tightest gap. Drop the desktop CTA
+ * ("Join the Sonic Circuit") so the icons can sit flush next to
+ * the nav. The CTA still appears in the mobile drawer (<1024) and
+ * at 1200+ desktop. */
+@media (max-width: 1199.98px) and (min-width: 1024px) {
+  .snb__cta-desktop {
+    display: none;
+  }
+}
+
 /* Mobile <1024px: collapse the desktop nav + CTA, surface the
  * hamburger, swap in the drawer below the bar. The `forceMobile`
  * prop applies the same rules unconditionally for Storybook

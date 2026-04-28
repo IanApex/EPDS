@@ -53,7 +53,7 @@ const navItems: NavBarItem[] = [
   },
   {
     key: 'service',
-    label: 'Service, parts & gear',
+    label: 'Service & parts',
     dropdown: [
       {
         heading: 'Service',

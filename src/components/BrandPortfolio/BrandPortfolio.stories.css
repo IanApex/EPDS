@@ -1,0 +1,32 @@
+/* Story scaffolding for BrandPortfolio.stories.ts.
+ * Lives in a real CSS file (not template-string `<style>`
+ * blocks) so the rules actually load as a stylesheet. */
+
+.bp-stories__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 1334px;
+  margin: 0 auto;
+  font-family: var(--font-family-base);
+  box-sizing: border-box;
+}
+
+.bp-stories__label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-neutral-40, #666);
+}
+
+/* EchoPark dual-CTA row inside the expanded card. The
+ * BrandPortfolio forwards `cta-{key}` slots into the
+ * molecule's #cta override slot, so we drop the buttons
+ * here in the same flex row. The `.bsc__cta-area` parent
+ * already provides 16 px gap + centred layout. */
+.bp-stories__epark-cta {
+  display: contents;
+}

@@ -779,6 +779,66 @@ EPDS/
 - **Stories**: Default, WithPhone, AccountPage, SRPWithPhone, ManyItems (wrapping), AllVariants
 - **Storybook `title`**: `Molecules/Breadcrumbs`
 
+### `BrandShowcaseCard` — `src/components/BrandShowcaseCard/`
+- **Figma**: "Card" — default node `7669:6028`, hover `7669:6031`, selected `7669:6034`. Designed for the Sonic Group **brand-portfolio organism** (one card per sub-brand: Sonic Automotive, EchoPark, Tactical Fleet, Powersports). Exactly one card in the group is selected/expanded at a time; the parent organism owns "exactly-one" group state.
+- **Role**: Selectable photo card with three visual states. Brand-agnostic — every visual detail that varies per brand (background photo, white logo, colour logo, scrim colours, CTA fill) is a prop, so the same molecule renders any sub-brand without overrides. Brand-specific expanded-state body content (OEM grid, stat block, etc.) is provided via the `#selected-content` slot so each card can carry its own marketing payload.
+- **Dimensions**: `width: 322px` collapsed → `width: 384px` selected, `height: 455px` constant. Width transitions via `transition: width 0.3s ease` so the parent grid animates the expand/collapse handoff smoothly.
+- **Props** (all visual specifics defaulted to the Sonic Automotive Figma frame, so a Sonic-only consumer only needs `name` + `imageUrl` + the two logo URLs):
+  - `name: string` (**required** — used for the accessible label and image alt fallback)
+  - `imageUrl: string` (**required** — full-bleed background photo)
+  - `tagline?: string` — one-line marketing tag rendered below the white logo in the collapsed state (hidden when selected)
+  - `logoLight: string` (**required**) + `logoLightHeight?: number` (default `83`) — white-knockout logo for the collapsed state
+  - `logoColor?: string` + `logoColorHeight?: number` (default `57`) — full-colour logo shown at the top of the expanded state
+  - `description?: string` — body copy shown below the colour logo in the expanded state (14 / 22 / -0.5 px Roboto Regular)
+  - `hoverScrimColor?: string` (default `'rgba(242, 73, 34, 0.7)'`) — collapsed-state hover overlay
+  - `defaultScrimColor?: string` (default `'rgba(37, 45, 55, 0.7)'`) — collapsed-state resting overlay
+  - `selectedScrimColor?: string` (default `'rgba(255, 255, 255, 0.9)'`) — expanded-state white wash that lets the photo whisper through
+  - `ctaLabel?: string` — text for the bottom CTA (rendered as `BaseButton size="sm" variant="primary"`). The card emits `cta-click`; the parent owns navigation. Brand-specific CTA colour comes from the global `--color-btn-primary-*` tokens (red on Sonic, green on EchoPark) — wrap each card in a `data-brand` ancestor to render multiple sub-brand cards on the same page.
+  - `selected?: boolean` (v-model) — `false` = collapsed, `true` = expanded
+  - `ariaLabel?: string` — override the auto-generated card aria label
+- **Slots**:
+  - `#selected-content` — brand-specific markup rendered between the description and the CTA in the expanded state. Sonic Automotive uses this for a 4 × 6 grid of OEM logos (rendered via the colocated `SonicOemGrid` helper component — see below); EchoPark uses it for a 3-column city list (`EchoParkLocationsGrid`); Powersports uses it for a 3-logo dealership row (`PowersportsLogoRow`); Tactical Fleet leaves it empty so the description fills the body.
+  - `#cta` (scope: `{ onCtaClick: (event: MouseEvent) => void }`) — optional override slot for the entire CTA area. Consumers can use this to render multiple buttons (e.g. EchoPark's primary + secondary pair) or any custom CTA markup. The `onCtaClick` handler from the card is passed for convenience so clicks still fire the `cta-click` emit from the card root (useful for analytics). When this slot is present **and** `ctaLabel` is also set, the slot wins and `ctaLabel` is ignored. The CTA area is a `flex; gap: 16px; justify-content: center` row so multiple buttons sit side-by-side without extra wrapper styling.
+- **Width CSS vars**: `--bsc-width-collapsed` (default `322px`) and `--bsc-width-selected` (default `384px`) drive the card's two widths. The parent `BrandPortfolio` organism overrides them to `100%` so each card fills its flex slot — that lets the row reflow smoothly when selection changes.
+- **Emits**:
+  - `update:selected: [boolean]` — fires `true` when a collapsed card is clicked. The molecule **never emits `false`** — collapsing is the parent's job (it switches selection to a different card or sets the state to null).
+  - `select: [event: Event]` — fires alongside `update:selected: true`. Convenience hook for analytics.
+  - `cta-click: [event: MouseEvent]` — fires when the user clicks the inner CTA. The card root's click handler is suppressed on this path via `event.stopPropagation()`.
+- **Visual states** (all driven via CSS variables on the root + `:hover` / `&--selected` modifiers — single render path, no template branching beyond the collapsed-vs-expanded content):
+  - **Default** — full-bleed photo + dark-navy scrim (`rgba(37, 45, 55, 0.7)`); white logo (208 × 83 in Figma) centred with the tagline 8 px below it.
+  - **Hover** (collapsed only) — scrim swaps to the brand colour at 70 % alpha (`rgba(242, 73, 34, 0.7)` for Sonic). 0.2 s `background` transition on the scrim makes the colour shift feel intentional rather than abrupt.
+  - **Selected** — scrim swaps to white at 90 % alpha; collapsed content unmounts; the expanded content (colour logo + description + slot + `BaseButton sm primary` CTA) renders with `padding: 24px` and a centred `flex-direction: column; gap: 32px`. The CTA is the small variant per Figma intent — note this is 5 px taller than the original Figma custom-CTA mock (40 vs 35 px) but shares the same brand-themed primary fill, so layout is reused from the design system instead of a one-off button.
+- **Click semantics**: Collapsed-state card root is `<div role="button" tabindex="0" aria-pressed="false">`; selected-state root drops `role`, `tabindex`, and `aria-pressed` so the inner BaseButton is the only interactive element on the card. Click + `Enter` + `Space` all call `selectCard`, which emits only when collapsed. When selected, the cursor changes from `pointer` → `default` and the focus ring on the root never fires (no role).
+- **Accessibility**: Full keyboard support (Enter / Space activate the collapsed card). `aria-pressed` is set in the collapsed state and removed when selected so AT doesn't announce a "pressed button" containing another button. `aria-label` defaults to "Show details for {name}" / "{name} — currently selected" depending on state; can be overridden via `ariaLabel`. The inner `BaseButton` exposes its own focus ring (`--color-focus-ring`) so it's independently navigable.
+- **Co-located helpers** (all live alongside `BrandShowcaseCard.vue`, story-only — not exported from `src/index.ts`):
+  - `SonicOemGrid.vue` — Sonic-specific 4 × 6 OEM logo grid (23 marks: Audi, BMW, Cadillac, Chevrolet, Chrysler, Dodge, Jeep, Honda, Hyundai, GMC, Jaguar, Ford, Land Rover, Lexus, Mercedes, Mini, Nissan, Porsche, Ram, Subaru, Toyota, Volkswagen, Volvo) in the order baked into the Figma frame. Per-mark dimensions live in **scoped CSS** as `[data-mark]` attribute selectors.
+  - `EchoParkLocationsGrid.vue` — EchoPark 3-column / 6-row city list (16 EchoPark locations: Birmingham, Centennial, Charlotte, Colorado Springs, Grand Prairie, Houston North, Houston SW, Las Vegas, Nashville, New Braunfels, Phoenix, Raleigh, Sacramento, San Antonio, St Louis, Thornton). 14 / 22 / -0.5 px Roboto Light. Default list is overridable via the `locations` prop.
+  - `PowersportsLogoRow.vue` — Sonic Powersports 3-logo dealership row (Team Mancuso Powersports, Motorcycles Charlotte, Harley-Davidson) at the per-logo Figma sizes (73 × 57 / 64 × 63 / 77 × 59) using `[data-mark]` selectors.
+  - Tactical Fleet does **not** ship a helper — its expanded state is description-only. The card's empty-slot path renders the description filling the body and pins the CTA at the bottom.
+- **Stories**: `Default`, `Hover` (uses `pseudo` addon), `Selected` (mounts `SonicOemGrid` in `#selected-content`), `AllStates` (default / hover / selected side-by-side using identical Sonic seed data; story scaffolding lives in `BrandShowcaseCard.stories.css`), `Interactive` (two-card sandbox with a shared `ref<string|null>` selection that flips between cards). All stories ship with the Sonic Automotive Figma seed (`Photos/Sonic Automotive/bwsonic.png`, `Logos/Color=White.svg`, `Logos/Color=SA-FullColor.svg`, `Logos/OEMs/*.svg`).
+- **Storybook `title`**: `Molecules/BrandShowcaseCard`
+
+### `BrandPortfolio` — `src/components/BrandPortfolio/`
+- **Figma**: "Brand Portfolio" frame — first sub-frame shows all four cards in default state; the next four sub-frames show one of Sonic Automotive / EchoPark / Tactical Fleet / Powersports expanded. Designed for the Sonic Group's "explore our brands" homepage section.
+- **Role**: Organism that composes 4 (configurable to N) `BrandShowcaseCard` molecules into a horizontal row with **exactly-one** selection state. Clicking a collapsed card animates the row so the new card grows to 384 px while the other three flex equally to fill the remaining width. The molecule itself only emits `update:selected: true`; the organism owns the "switch selection / never collapse to zero" UX.
+- **Props**:
+  - `brands: BrandShowcaseEntry[]` (**required**) — array of card configs; each entry mirrors `BrandShowcaseCard`'s prop surface plus a stable `key` (used for selection state, list keys, and the per-brand slot names) and an optional `ctaLabel` (set to `undefined` to suppress the molecule's default single-CTA when a `#cta-<key>` slot is provided instead).
+  - `modelValue?: string | null` (v-model) — currently selected card's `key`. Pass `null` to render the "all collapsed" Figma frame.
+  - `selectFirstByDefault?: boolean` (default `true`) — when `modelValue` is `undefined` at mount, initialise selection to `brands[0].key`. Set to `false` (and pass `:modelValue="null"`) for the "Default" / "all collapsed" story.
+- **Emits**:
+  - `update:modelValue: [string | null]`
+  - `select: [key: string]`
+  - `cta-click: [{ key: string, event: MouseEvent }]` — fires when any card's CTA is clicked; `key` identifies which brand.
+- **Slots** (per-brand, dynamic by `brand.key`):
+  - `#content-<key>` — replaces `BrandShowcaseCard`'s `#selected-content` slot for the specified brand. Hosts pass `<SonicOemGrid />` for `sonic`, `<EchoParkLocationsGrid />` for `echopark`, `<PowersportsLogoRow />` for `powersports`, and nothing for `tactical` (description-only body).
+  - `#cta-<key>` (scope: `{ onCtaClick: (event: MouseEvent) => void }`) — replaces `BrandShowcaseCard`'s `#cta` override slot for the specified brand. EchoPark uses this to render a primary + secondary `BaseButton` pair side-by-side. The molecule's `onCtaClick` is forwarded so analytics still flow through `cta-click` on the organism.
+- **Layout**:
+  - **Desktop (≥ 600 px)**: row capped at `max-width: 1286px`, `margin: 0 auto`, no gap between cards (Figma butts the photos against each other for a continuous strip; the molecule's `overflow: hidden` keeps each scrim from bleeding into a neighbour). Selected slot is `flex: 0 0 384px`; collapsed slots are `flex: 1 1 0; max-width: 322px` so they cap at the molecule's collapsed width and split the remaining space evenly. The molecule's `--bsc-width-collapsed` / `--bsc-width-selected` CSS vars are overridden to `100%` so each card fills its flex slot.
+  - **Mobile (≤ 599 px)**: row stacks vertically (Figma did not yet redesign the multi-card row for mobile); cards keep their 322 / 384 px widths and centre horizontally. Tap-to-expand still works the same as desktop — only the layout direction changes.
+- **Animation**: the row's flex-basis transitions sync with the molecule's `width` transition (both `0.3s ease`) so reflow reads as one smooth motion rather than two competing animations.
+- **Stories** (`Organisms/BrandPortfolio`): `Default` (all collapsed), `SonicSelected`, `EchoParkSelected` (demonstrates the `#cta-echopark` slot for primary + secondary CTAs), `TacticalFleetSelected` (description-only body), `PowersportsSelected`, `Interactive` (`v-model`-bound sandbox with all per-brand slots wired up).
+- **Storybook `title`**: `Organisms/BrandPortfolio`
+
 ### `BlogArticleCard` — `src/components/BlogArticleCard/`
 - **Figma**: "Blog Articles" — teaser card with two states: "Article photo" and "Article Branded"
 - **Props**: `variant?: 'photo' | 'branded'` (default `'photo'`), `meta: string` (**required** — date + category), `title: string` (**required** — headline), `imageUrl?: string` (photo variant only), `href?: string`, `target?: string`
@@ -860,7 +920,11 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
  - `NavBarItem` — `{ key: string, label: string, href?: string, dropdown?: NavBarSection[] }`. When `dropdown` is omitted the item is a direct link (e.g. "Sell/Trade"). When supplied, the item becomes a desktop dropdown trigger and a drilled-mobile parent row.
 - **Emits**: `cta-click`, `favorites-click`, `profile-click`, `submenu-link-click: [{ item, link, event }]`, `nav-item-click: [{ item, event }]`.
 - **Layout** (toolbar):
- - **Desktop** (≥ 1024 px): 72 px height, 80 px horizontal padding. Logo (104 × 41 px) + horizontal nav (49 px gap between items) + favourites/profile + primary CTA (`BaseButton variant="primary" size="sm"`).
+ - **Desktop** (≥ 1440 px / full Figma spec): 72 px height, 80 px horizontal padding. Logo (104 × 41 px) + horizontal nav (49 px gap between items) + favourites/profile + primary CTA (`BaseButton variant="primary" size="sm"`).
+ - **Mid-range desktop progressive tightening** (1024–1439 px): the Figma 1440 spec doesn't fit at narrower desktop viewports — the long Sonic primary-nav labels ("Service, parts & gear", "Our Company") collide with the utility cluster. The component tightens spacing in three steps so the full desktop layout keeps working down to the mobile breakpoint:
+   - **1280–1439 px**: page gutter 80 → 32 px, nav gap 49 → 32 px, bar inter-cluster gap 32 → 24 px (mega-menu padding follows the bar to stay aligned).
+   - **1024–1279 px**: nav gap 32 → 24 px, utility cluster + icons gap 24 → 16 px.
+   - **1024–1199 px**: hide the desktop CTA (`.snb__cta-desktop` — "Join the Sonic Circuit") so the icons sit flush against the nav. The CTA still renders inside the mobile drawer at <1024.
  - **Mobile** (< 1024 px or `forceMobile`): 64 px height, 24 px horizontal padding. Logo (94 × 37 px) + favourites/profile + `MenuToggle`. Desktop nav and CTA are hidden via media query.
 - **Mega-menu** (Variant 3 — desktop only):
  - Opens flush below the toolbar with `border-top: 1px solid var(--color-nav-active-indicator)` (Sonic dark red `#D9320D`, EchoPark green) — the "this is the live nav surface" cue.
@@ -876,6 +940,37 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Stories** (`Organisms/SonicNavBar`): `Default` (desktop bar with placeholder body), `Variant 2 — mobile bar` (375 px frame), `Variant 3 — desktop mega-menu open` (auto-clicks "Shop rides" on mount so the mega-menu is visible without interaction), `Variant 4 — mobile drawer parent list` (auto-opens the drawer), `Variant 5 — mobile drilled submenu` (auto-opens drawer → drills into "Shop rides"), `Interactive` (fully interactive sandbox with a tall placeholder body and `layout: 'fullscreen'`).
 - **Token additions**: `--color-nav-active-indicator` added to **both** `primitives/echopark.css` and `primitives/sonic.css`. EchoPark maps it to `var(--color-base-primary-50)` (brand green); Sonic maps it to `var(--color-btn-primary-surface-hover)` (`#D9320D`, the dark-red press surface).
 - **Storybook `title`**: `Organisms/SonicNavBar`
+
+### `SonicCircuitBenefit` — `src/components/SonicCircuitBenefit/`
+- **Figma**: derived from the per-tile pattern inside "The Sonic Circuit" frame (desktop node `7680:16688`, mobile `7680:16721`).
+- **Role**: Atomic icon-on-circle + caption tile. Building block for the `SonicCircuit` organism — not used standalone on the page. Renders as a `<li>` so the parent `<ul role="list">` carries proper benefits-list semantics.
+- **Props**: `caption: string` (**required** — body text rendered below the disk), `iconSvg: string` (**required** — raw SVG markup for the icon; import the source SVG with `?raw`).
+- **No slots**: The icon is a prop, not a slot, so `v-html` runs **inside** the atom on `.scb__icon` itself. This keeps the SVG as a *direct child* of the 78 × 78 sized wrapper — the previous slot-based API forced consumers to wrap the SVG in their own `<span v-html="…">`, which became an inline element between `.scb__icon` and the `<svg>` and broke the wrapper-driven sizing.
+- **Icon tint**: The atom rewrites every `path / circle / rect / polygon / polyline / ellipse` fill to `currentColor` and sets `.scb__icon { color: #D0D4D9 }` — a single SVG asset always renders in the same warm-light-grey against the disk regardless of its source `fill` attribute. The hex is intentionally a component-local literal (no other component in the system uses this value yet); promote to a token once a second surface adopts it.
+- **Layout**: `flex-direction: column; align-items: center; gap: 16px; width: 284px` on desktop; `width: 100%` on mobile so the caption fills the column when the parent organism stacks tiles vertically below 600 px.
+- **Disk**: 102 × 102 px (desktop) / 64 × 64 px (mobile) circle with `background: rgba(255, 255, 255, 0.15)` — mirrors the Figma `imgEllipse61` semi-transparent white disc that pre-multiplies onto the section's navy surface.
+- **Inner art**: `width: 78 / 49 px` on desktop / mobile (matches Figma `78 px` and `48.941 px ≈ 49 px`). The wrapper is `display: inline-flex; align-items: center; justify-content: center` and the v-html-rendered `:deep(svg)` is sized to `100% / 100%` so any source SVG (24 / 32 / 80 px) renders consistently.
+- **Caption**: 16 / 22 / -0.5 px Roboto Regular, white, centered. Width is controlled by the parent `.scb` column (284 px desktop / 100 % mobile).
+- **Stories**: `MapPin`, `Coin`, `Steering`, `Medal`, `Mobile` — each story renders the atom on a Sonic-navy background (`#25303D`) using the standard prop API (`:caption` + `:iconSvg`).
+- **Storybook `title`**: `Atoms/SonicCircuitBenefit`
+
+### `SonicCircuit` — `src/components/SonicCircuit/`
+- **Figma**: "The Sonic Circuit" — desktop node `7680:16688`, mobile node `7680:16721`. Full-bleed dark-navy panel pitching the Sonic Circuit rewards membership.
+- **Role**: Reusable "membership benefits" organism. Composes a stack of `SonicCircuitBenefit` atoms between a centered title block and a primary `BaseButton` CTA. Layout flips from a 4-up row on desktop to a vertical stack on mobile. Every label and the benefit list is prop-driven — the same organism can host any "benefits row" pitch on any brand (the section happens to be named after Sonic's program, but no brand-specific logic lives in the component).
+- **Props**: `title?: string` (default `'The Sonic Circuit'`), `subtitle?: string` (default `'One membership across every Sonic brand nationwide.'`), `benefits: SonicCircuitBenefitItem[]` (**required** — designed for 3–4 items per Figma), `ctaLabel?: string` (default `'Join the Circuit'`), `ctaHref?: string` (passed through to the parent click handler — the component never navigates), `ariaLabel?: string` (override the section landmark name; falls back to `title`).
+- **Type export**: `SonicCircuitBenefitItem` — `{ id: string; iconSvg: string; caption: string }`. `iconSvg` is the raw SVG markup (import with `?raw`) — passed straight through to the atom's `iconSvg` prop.
+- **Emits**: `cta-click: [event: MouseEvent]` — fires when the user clicks the primary CTA. Parent decides where the click goes (router push, `window.location`, etc.).
+- **Composes**: `SonicCircuitBenefit` (one per item in `benefits`) + `BaseButton variant="primary" size="md"` for the CTA.
+- **Layout**: Full-bleed `<section>` with a fixed `#25303d` navy background. Inner content rail is `max-width: 1440px` with `padding: 80px` so the content sits inside the Figma's 1280 px content area (1440 − 2 × 80). Outer flex column with `gap: 68px` between heading / benefits / CTA. Heading is a 564 px centered column (title 42 / 54 / -1.2; subtitle 24 / 1.3 / -0.264). Benefits row is a `<ul role="list">` flex row with `gap: 47px` and `justify-content: center`. CTA is wrapped in a centered flex container and pinned to a `width: 175px` (Figma spec) via `min-width / flex` overrides on the BaseButton — keeps the button matched-set tidy regardless of label length.
+- **Brand awareness**: The CTA uses `BaseButton variant="primary"` so the fill colour automatically themes (Sonic red on Sonic, EchoPark green on EchoPark). The `#25303d` navy is intentionally a section-local literal (no other component in the system uses this exact value yet — closest neighbour is `--color-neutral-0` `#242C33`, which is not the same) and should be promoted to a token once a second surface adopts it.
+- **Responsive**:
+  - **Desktop (≥1024)** — 80 px section padding, 4-up benefits row, 68 px gap.
+  - **Tablet (≤1023)** — Section padding shrinks to `64px 32px`; outer gap drops to 56 px; benefits row gets `flex-wrap: wrap` with `gap: 47px 32px` so 4 × 284 px tiles + gaps don't overflow narrower viewports.
+  - **Mobile (<600)** — Section padding `40px 24px`; outer gap 40 px; title scales to 32 px (line-height 54), subtitle to 18 px / -0.198; benefits stack vertically (`flex-direction: column; flex-wrap: nowrap`) with 47 px gap; tiles fill the column width.
+- **Accessibility**: `<section aria-label="…">` landmark (overridable via `ariaLabel` prop, defaults to `title`). The benefits row is a `<ul role="list">` so assistive tech reads the items as a list of features. The decorative disks are `aria-hidden="true"`.
+- **HomePage integration**: `HomePage.vue` mounts the section directly below `ShopByCategories` with `margin-top: 80px` (desktop) / `40px` (mobile). The four Figma-spec benefits are seeded in the page using existing system icons reused via `?raw` imports — `Style=Location, Detail=Map-Location`, `Style=Finance, Detail=Payment, Icon=Coin`, `Icon Type=Vehicle Descriptors, Size=Medium, Theme=Steering`, `Icon Type=Vehicle Descriptors, Size=Small, Theme=Medal`. Each tints white via the atom's `currentColor` plumbing.
+- **Stories**: `Default` (Figma copy + 4 Sonic Circuit benefits), `Mobile` (375 px viewport — proves the vertical stack), `ThreeBenefits`, `TwoBenefits` (proves tiles re-center for any count), `CustomCopy` (overrides `title` / `subtitle` / `ctaLabel` to demonstrate the section is reusable beyond the Sonic-branded context).
+- **Storybook `title`**: `Organisms/SonicCircuit`
 
 ### `VdpPage` — `src/pages/VdpPage.vue`
 - **Role**: Vehicle Detail Page composition — not a published library component, used for Storybook page-level demos. First pass is **desktop + Sonic-only + above-the-fold only**; below-the-fold sections are flagged in-file with a `TODO` and will land in a follow-up.
