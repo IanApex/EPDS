@@ -273,7 +273,7 @@ function onCtaClick(event: MouseEvent) {
   position: relative;
   flex-shrink: 0;
   width: var(--bsc-width-collapsed, 322px);
-  height: 455px;
+  height: var(--bsc-height, 455px);
   overflow: hidden;
   cursor: pointer;
   user-select: none;

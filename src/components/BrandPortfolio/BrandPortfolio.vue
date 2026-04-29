@@ -240,7 +240,7 @@ function onCtaClick(key: string, event: MouseEvent) {
   min-width: 0;
   max-width: 322px;
   align-items: stretch;
-  transition: flex-basis 0.3s ease, max-width 0.3s ease;
+  transition: flex-basis 0.3s ease, max-width 0.3s ease, flex-grow 0.3s ease;
 }
 
 .bp__slot--selected {
@@ -259,43 +259,37 @@ function onCtaClick(key: string, event: MouseEvent) {
 }
 
 /* ─── Mobile (≤ 599 px) ─────────────────────────────────────
- * Figma did not yet ship a mobile redesign for the multi-
- * card row, so we preserve the desktop card spec and stack
- * the cards vertically. Selected card stays 384 px wide
- * (centred); collapsed cards stay 322 px wide (centred).
- * The wrapper still drives selection state, so
- * tap-to-expand works the same as desktop. */
+ * Figma mobile spec: full-width cards stacked vertically
+ * with no gap, each 248 px tall in the collapsed state.
+ * Photos read as a continuous strip identical to desktop.
+ * Tapping a card still expands it (455 px, full-width) so
+ * the selected-state content (logo, description, CTA) has
+ * enough room — no mobile-specific expanded layout was
+ * provided in the Figma spec. */
 @media (max-width: 599.98px) {
   .bp__row {
     flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    align-items: stretch;
+    gap: 0;
     max-width: 100%;
   }
 
   .bp__slot,
   .bp__slot--selected {
     flex: 0 0 auto;
-    width: 322px;
-    max-width: 322px;
+    width: 100%;
+    max-width: 100%;
   }
 
-  .bp__slot--selected {
-    width: 384px;
-    max-width: 384px;
-  }
-
-  /* Reset the collapsed/selected width vars so the molecule
-   * uses its own defaults (322 / 384 px) on mobile rather
-   * than 100 % of the centred slot. */
   .bp__slot :deep(.bsc) {
-    --bsc-width-collapsed: 322px;
-    --bsc-width-selected: 384px;
-    width: var(--bsc-width-collapsed);
+    --bsc-width-collapsed: 100%;
+    --bsc-width-selected: 100%;
+    --bsc-height: 248px;
+    width: 100%;
   }
 
   .bp__slot--selected :deep(.bsc) {
-    width: var(--bsc-width-selected);
+    --bsc-height: 455px;
   }
 }
 </style>
