@@ -9,6 +9,8 @@ import ShopByCategories from '@/components/ShopByCategories/ShopByCategories.vue
 import type { ShopByCategory } from '@/components/ShopByCategories/ShopByCategories.vue'
 import SonicCircuit from '@/components/SonicCircuit/SonicCircuit.vue'
 import type { SonicCircuitBenefitItem } from '@/components/SonicCircuit/SonicCircuit.vue'
+import StackingCardSection from '@/components/StackingCardSection/StackingCardSection.vue'
+import type { StackingCardEntry } from '@/components/StackingCardSection/StackingCardSection.vue'
 import BrandPortfolio from '@/components/BrandPortfolio/BrandPortfolio.vue'
 import type { BrandShowcaseEntry } from '@/components/BrandPortfolio/BrandPortfolio.vue'
 import SonicOemGrid from '@/components/BrandShowcaseCard/SonicOemGrid.vue'
@@ -55,6 +57,8 @@ import circuitMapPinSvg   from '../../icon/Style=Location, Detail=Map-Location, 
 import circuitCoinSvg     from '../../icon/Style=Finance, Detail=Payment, Icon=Coin.svg?raw'
 import circuitSteeringSvg from '../../icon/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Steering.svg?raw'
 import circuitMedalSvg    from '../../icon/Icon Type=Vehicle Descriptors, Size=Small, Theme=Medal.svg?raw'
+import priceTagIconSvg    from '../../icon/Style=Finance, Detail=Payment, Icon=Price-Tag.svg?raw'
+import engineIconSvg      from '../../icon/Icon Type=Vehicle Descriptors, Size=Medium, Theme=Engine.svg?raw'
 
 /* ─── ShopByCategories imagery ─────────────────────────────
  * Real photos from `Photos/`, mapped to each tab's tile set.
@@ -176,6 +180,50 @@ function onFindALocation() {
 function onJoinCircuit() {
   console.log('[HomePage] Sonic Circuit CTA: Join the Circuit')
 }
+
+function onOwnershipCtaClick(payload: { index: number; event: MouseEvent }) {
+  payload.event.preventDefault()
+  console.log('[HomePage] Ownership card CTA:', payload.index)
+}
+
+/* ─── Car ownership stacking cards ─────────────────────────
+ * Drive / Sell / Service cards reuse icons + photos already
+ * imported for the circuit section and hero respectively. */
+const ownershipCards: StackingCardEntry[] = [
+  {
+    imageUrl: reliableImg,
+    iconSvg: circuitSteeringSvg,
+    heading: 'Drive',
+    body:
+      'Shop thousands of new and pre-owned vehicles from the comfort ' +
+      'of your home or visit one of our conveniently located dealerships nationwide.',
+    ctaLabel: 'Shop vehicles',
+    imagePosition: 'left',
+    imageProportion: 'large',
+  },
+  {
+    imageUrl: heroMobileUrl,
+    iconSvg: priceTagIconSvg,
+    heading: 'Sell',
+    body:
+      'Get a competitive offer for your current vehicle in minutes. ' +
+      'Trade it in or sell it outright — the choice is yours.',
+    ctaLabel: 'Get an offer',
+    imagePosition: 'right',
+    imageProportion: 'large',
+  },
+  {
+    imageUrl: heroDesktopUrl,
+    iconSvg: engineIconSvg,
+    heading: 'Service',
+    body:
+      'From routine maintenance to collision repair, our service and ' +
+      'parts centers are spread across the country to help you whenever you need us.',
+    ctaLabel: 'Find service & parts centers',
+    imagePosition: 'left',
+    imageProportion: 'large',
+  },
+]
 
 /* ─── Brand portfolio CTA handler ───────────────────────────
  * BrandPortfolio emits a single `cta-click` carrying the brand
@@ -423,6 +471,18 @@ const brands: BrandShowcaseEntry[] = [
         @cta-click="onJoinCircuit"
       />
 
+      <!-- ── Car ownership made easy ─────────────────────────
+           Scroll-driven stacking card section (Drive / Sell / Service).
+           Sits between the Sonic Circuit panel and the brand portfolio. -->
+      <StackingCardSection
+        class="home-page__ownership"
+        title="Car ownership made easy"
+        subtitle="Everything you need, all in one place."
+        :cards="ownershipCards"
+        :sticky-offset="72"
+        @cta-click="onOwnershipCtaClick"
+      />
+
       <!-- ── Meet the Sonic brand ──────────────────────────
            Brand portfolio organism — 4 selectable cards (Sonic,
            EchoPark, Powersports, Tactical Fleet). Section title
@@ -509,12 +569,14 @@ const brands: BrandShowcaseEntry[] = [
  * screens without leaving a large dead-air gap above the tab strip. */
 .home-page__shop-categories,
 .home-page__sonic-circuit,
+.home-page__ownership,
 .home-brand-portfolio {
   margin-top: 80px;
 }
 @media (max-width: 599.98px) {
   .home-page__shop-categories,
   .home-page__sonic-circuit,
+  .home-page__ownership,
   .home-brand-portfolio {
     margin-top: 40px;
   }
@@ -538,7 +600,7 @@ const brands: BrandShowcaseEntry[] = [
   display: flex;
   flex-direction: column;
   gap: 38px;
-  padding: 0 80px;
+  padding: 0 80px 80px;
   background: var(--color-neutral-100);
 }
 
@@ -573,12 +635,13 @@ const brands: BrandShowcaseEntry[] = [
 @media (max-width: 599.98px) {
   .home-brand-portfolio {
     gap: 24px;
-    padding: 0 24px;
+    padding: 0 0 0;
   }
   .home-brand-portfolio__title {
-    font-size: 24px;
-    line-height: 32px;
-    letter-spacing: -0.5px;
+    padding: 0 24px;
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: -0.8px;
   }
 }
 
