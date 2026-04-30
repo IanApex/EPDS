@@ -323,9 +323,6 @@ const shopCategories: ShopByCategory[] = [
  * Selected-state copy + CTA labels reuse the marketing strings
  * established in `BrandPortfolio.stories.ts` so a sub-brand
  * card renders identically on the page and in Storybook. */
-const ECHOPARK_HOVER_SCRIM = 'rgba(63, 137, 0, 0.7)'
-const TACTICAL_HOVER_SCRIM = 'rgba(36, 56, 95, 0.7)'
-
 const brands: BrandShowcaseEntry[] = [
   {
     key: 'sonic',
@@ -351,7 +348,6 @@ const brands: BrandShowcaseEntry[] = [
     description:
       'Premium nearly-new used cars at unbeatable prices, ' +
       'available across 16 EchoPark locations:',
-    hoverScrimColor: ECHOPARK_HOVER_SCRIM,
     /* `ctaLabel: undefined` suppresses the molecule's default
      * single-button render so the `#cta-echopark` slot below
      * can supply EchoPark's primary + secondary pair. */
@@ -388,7 +384,6 @@ const brands: BrandShowcaseEntry[] = [
       'transparent pricing and unparalleled expertise. Since 2018,' +
       'we\'ve redefined the high-performance car buying ' +
       'experience for collectors and enthusiasts nationwide.',
-    hoverScrimColor: TACTICAL_HOVER_SCRIM,
     ctaLabel: 'Shop luxury exotics',
   },
 ]
