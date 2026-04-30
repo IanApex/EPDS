@@ -36,9 +36,19 @@ const emit = defineEmits<{
 const sectionRef     = ref<HTMLElement | null>(null)
 const scrollProgress = ref(0)
 const shouldAnimate  = ref(false)
+const isMobile       = ref(false)
+
+function checkMobile() {
+  isMobile.value = window.innerWidth <= 599
+}
+
+// On mobile: nav is shorter (35px) and each card steps 450px instead of the
+// desktop-derived CARD_H+GAP-PEEK_H (401px).
+const effectiveStickyOffset = computed(() => isMobile.value ? 35 : props.stickyOffset)
+const stepSize = computed(() => isMobile.value ? 450 : CARD_H + GAP - PEEK_H)
 
 const totalScroll = computed(() =>
-  (props.cards.length - 1) * (CARD_H + GAP - PEEK_H),
+  (props.cards.length - 1) * stepSize.value,
 )
 
 const naturalCardsHeight = computed(() =>
@@ -49,7 +59,7 @@ function updateProgress() {
   if (!sectionRef.value || !shouldAnimate.value) return
   const top = sectionRef.value.getBoundingClientRect().top
   // Progress starts when section.top reaches stickyOffset, not viewport top.
-  scrollProgress.value = Math.max(0, Math.min(1, (props.stickyOffset - top) / totalScroll.value))
+  scrollProgress.value = Math.max(0, Math.min(1, (effectiveStickyOffset.value - top) / totalScroll.value))
 }
 
 let rafId: number | null = null
@@ -62,12 +72,15 @@ function onScroll() {
 }
 
 onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile, { passive: true })
   shouldAnimate.value = true
   window.addEventListener('scroll', onScroll, { passive: true })
   updateProgress()
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
   window.removeEventListener('scroll', onScroll)
   if (rafId !== null) cancelAnimationFrame(rafId)
 })
@@ -76,7 +89,7 @@ const sectionStyle = computed(() =>
   shouldAnimate.value
     ? {
         '--scss-total-scroll': `${totalScroll.value}px`,
-        '--scss-sticky-top':   `${props.stickyOffset}px`,
+        '--scss-sticky-top':   `${effectiveStickyOffset.value}px`,
       }
     : {},
 )
@@ -99,7 +112,7 @@ const cardWrapStyles = computed(() => {
       const p = Math.max(0, Math.min(1,
         (scrollProgress.value - segStart) / (segEnd - segStart),
       ))
-      translateY -= (CARD_H + GAP - PEEK_H) * p
+      translateY -= stepSize.value * p
     }
 
     let scale = 1
@@ -235,7 +248,7 @@ function onCtaClick(index: number, event: MouseEvent) {
 @media (max-width: 599.98px) {
   /* Mobile stacked content ≈ pad-top(40) + header(~72) + gap(40) + stacked-cards(607) = 759px */
   .scss--animated {
-    --scss-sticky-cap: 770px;
+    --scss-sticky-cap: 660px;
   }
 
   .scss__sticky {

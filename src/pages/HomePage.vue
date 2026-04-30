@@ -643,6 +643,7 @@ const brands: BrandShowcaseEntry[] = [
     font-size: 32px;
     line-height: 40px;
     letter-spacing: -0.8px;
+    text-align: center;
   }
 }
 
