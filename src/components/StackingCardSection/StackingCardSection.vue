@@ -187,6 +187,9 @@ function onCtaClick(index: number, event: MouseEvent) {
   display: flex;
   flex-direction: column;
   gap: 88px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   padding: 60px 80px 0;
   box-sizing: border-box;
 }

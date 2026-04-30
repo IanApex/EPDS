@@ -596,7 +596,11 @@ const brands: BrandShowcaseEntry[] = [
   display: flex;
   flex-direction: column;
   gap: 38px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   padding: 80px 80px 80px;
+  box-sizing: border-box;
   background: var(--color-neutral-100);
 }
 
