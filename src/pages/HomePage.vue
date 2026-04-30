@@ -68,6 +68,9 @@ import safetyImg from '../../Photos/Sonic Automotive/buckle kid.png'
 import lowMaintImg from '../../Photos/Sonic Automotive/Sun chick.png'
 import budgetImg from '../../Photos/Sonic Automotive/paper people.png'
 import reliableImg from '../../Photos/Sonic Automotive/yellow car.png'
+import driveladyImg   from '../../Photos/Sonic Automotive/drivelady.png'
+import sellladyImg    from '../../Photos/Sonic Automotive/selllady.png'
+import serviceguyImg  from '../../Photos/Sonic Automotive/serviceguy.png'
 
 import familyImg from '../../Photos/People/Group 248.png'
 import cargoImg from '../../Photos/Car only/image 2.png'
@@ -191,18 +194,18 @@ function onOwnershipCtaClick(payload: { index: number; event: MouseEvent }) {
  * imported for the circuit section and hero respectively. */
 const ownershipCards: StackingCardEntry[] = [
   {
-    imageUrl: reliableImg,
+    imageUrl: driveladyImg,
     iconSvg: circuitSteeringSvg,
     heading: 'Drive',
     body:
-      'Shop thousands of new and pre-owned vehicles from the comfort ' +
-      'of your home or visit one of our conveniently located dealerships nationwide.',
-    ctaLabel: 'Shop vehicles',
+      'From used & new cars to powersports toys & luxury exotics, find the perfect ' +
+      'ride at one of our sonic stores nationwide.',
+    ctaLabel: 'Shop all rides',
     imagePosition: 'left',
     imageProportion: 'large',
   },
   {
-    imageUrl: heroMobileUrl,
+    imageUrl: sellladyImg,
     iconSvg: priceTagIconSvg,
     heading: 'Sell',
     body:
@@ -213,7 +216,7 @@ const ownershipCards: StackingCardEntry[] = [
     imageProportion: 'large',
   },
   {
-    imageUrl: heroDesktopUrl,
+    imageUrl: serviceguyImg,
     iconSvg: engineIconSvg,
     heading: 'Service',
     body:
@@ -569,15 +572,13 @@ const brands: BrandShowcaseEntry[] = [
  * screens without leaving a large dead-air gap above the tab strip. */
 .home-page__shop-categories,
 .home-page__sonic-circuit,
-.home-page__ownership,
-.home-brand-portfolio {
+.home-page__ownership {
   margin-top: 80px;
 }
 @media (max-width: 599.98px) {
   .home-page__shop-categories,
   .home-page__sonic-circuit,
-  .home-page__ownership,
-  .home-brand-portfolio {
+  .home-page__ownership {
     margin-top: 40px;
   }
 }
@@ -600,7 +601,7 @@ const brands: BrandShowcaseEntry[] = [
   display: flex;
   flex-direction: column;
   gap: 38px;
-  padding: 0 80px 80px;
+  padding: 80px 80px 80px;
   background: var(--color-neutral-100);
 }
 
@@ -623,7 +624,7 @@ const brands: BrandShowcaseEntry[] = [
 
 @media (max-width: 1023.98px) {
   .home-brand-portfolio {
-    padding: 0 32px;
+    padding: 80px 32px 80px;
   }
   .home-brand-portfolio__title {
     font-size: 32px;
@@ -635,7 +636,7 @@ const brands: BrandShowcaseEntry[] = [
 @media (max-width: 599.98px) {
   .home-brand-portfolio {
     gap: 24px;
-    padding: 0 0 0;
+    padding: 40px 0 0;
   }
   .home-brand-portfolio__title {
     padding: 0 24px;

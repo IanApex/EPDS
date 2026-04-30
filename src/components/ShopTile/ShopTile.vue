@@ -62,6 +62,7 @@ const linkRel = computed(() =>
     />
     <span class="shop-tile__scrim" aria-hidden="true" />
     <span class="shop-tile__label">{{ label }}</span>
+    <span class="shop-tile__cta" aria-hidden="true">Shop these rides</span>
   </component>
 </template>
 
@@ -88,7 +89,12 @@ const linkRel = computed(() =>
   /* Reserve focus-ring space without layout shift. */
   outline: 3px solid transparent;
   outline-offset: 0;
-  transition: outline-color 120ms ease;
+  transition: outline-color 120ms ease, transform 200ms ease;
+}
+
+.shop-tile:hover {
+  transform: scale(1.05);
+  z-index: 1;
 }
 
 .shop-tile:focus-visible {
@@ -133,13 +139,32 @@ const linkRel = computed(() =>
   color: var(--color-neutral-100);
 }
 
-/* Hover affordance: subtle underline on the label so the tile reads
- * unambiguously as a click target. */
-.shop-tile:hover .shop-tile__label,
-.shop-tile:focus-visible .shop-tile__label {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 2px;
+.shop-tile__cta {
+  position: absolute;
+  z-index: 2;
+  bottom: 24px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 4px;
+  background: var(--color-btn-primary-bg, var(--color-action-primary));
+  color: var(--color-btn-primary-text, var(--color-neutral-100));
+  font-family: var(--font-family-brand, var(--font-family-base));
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.shop-tile:hover .shop-tile__cta {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ─── Mobile (<600) ───────────────────────────────────────

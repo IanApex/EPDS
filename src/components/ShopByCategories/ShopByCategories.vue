@@ -298,9 +298,12 @@ function onTileClick(
   line-height: 16px;
 }
 
-.sbc__tab:hover:not(.sbc__tab--active) .sbc__tab-label {
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.sbc__tab:hover:not(.sbc__tab--active) .sbc__tab-bar {
+  height: 1px;
+}
+
+.sbc__tab--active:hover .sbc__tab-bar {
+  height: 3px;
 }
 
 /* Active indicator. Default to 0 height so inactive tabs reserve
@@ -425,6 +428,10 @@ function onTileClick(
   .sbc__tile {
     flex: 0 0 auto;
     width: 100%;
+  }
+
+  .sbc__tile:nth-child(n+4) {
+    display: none;
   }
 }
 </style>
