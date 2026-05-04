@@ -1,0 +1,30 @@
+# Verifies the publishable Vue library artifact (dist/) — vue-tsc + vite.lib.config.ts.
+# Storybook deploy is separate; this gate catches broken typings or lib build regressions.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-lib:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Produces dist/epds.js, dist/epds.css, dist/index.d.ts (matches npm "build").
+      - run: npm run build

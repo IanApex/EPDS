@@ -20,6 +20,23 @@ npm run build:app     # optional SPA shell → dist-app/ (does not overwrite dis
 npm run typecheck     # full project (includes stories): vue-tsc -b
 ```
 
+## CI & deployments (GitHub Actions)
+
+Two workflows run on this repo:
+
+| Workflow | Trigger | What it does |
+|----------|---------|----------------|
+| **CI** (`.github/workflows/ci.yml`) | Push + pull requests targeting `main` | `npm ci` then **`npm run build`** — proves the publishable library (`dist/epds.js`, `dist/epds.css`, `dist/index.d.ts`) typechecks and bundles on a clean runner. |
+| **Deploy Storybook** (`.github/workflows/deploy-storybook.yml`) | Push to `main` (+ manual dispatch) | `npm ci` then **`npm run build-storybook`**; publishes the static Storybook site to **GitHub Pages** (`STORYBOOK_BASE` is set for the `/EPDS/` path). |
+
+These jobs do **not** publish to npm; they verify the build and host the docs. Ensure **Pages** is configured to deploy from GitHub Actions in the repo settings.
+
+## Recent tooling notes (maintainers)
+
+- **`src/vite-env.d.ts`** — declares `declare module '*?url'` so TypeScript resolves deep imports such as `@logos/OEMs/Audi.svg?url` (Vite’s default `*.svg?url` pattern only matched single path segments).
+- **`tsconfig.app.json`** — extends the Vue DOM base via `./node_modules/@vue/tsconfig/tsconfig.dom.json` so editors reliably resolve the shared preset (bare `@vue/tsconfig/...` can fail in some environments without a full `npm install`).
+- **`BrandShowcaseCard` Sonic OEM grid** — split into `SonicOemLogoCell.vue`, `SonicOemLogoCells.vue`, and `SonicOemGrid.vue` for clearer typings and Storybook previews.
+
 ## Using EPDS in another app
 
 1. Build this repo (`npm run build`) or depend on a published package that ships `dist/`.
@@ -61,4 +78,4 @@ Full token map, component specs, Storybook conventions, and Figma workflow live 
 
 ## Committing
 
-Commits are made manually on demand — run `git log --oneline` to see history.
+Commit and push as usual; after a push to `main`, check the **Actions** tab for green **CI** and **Deploy Storybook** runs. Run `git log --oneline` for history.

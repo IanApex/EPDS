@@ -15,10 +15,6 @@ withDefaults(defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
-
-function close() {
-  emit('update:modelValue', false)
-}
 </script>
 
 <template>
