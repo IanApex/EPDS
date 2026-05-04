@@ -70,12 +70,15 @@ EPDS/
 │   ├── stories/                      ← Foundation/asset gallery stories
 │   │   ├── Icons.stories.ts
 │   │   └── Logos.stories.ts
-│   ├── vite-env.d.ts                 ← SVG import type declarations
+│   ├── vite-env.d.ts                 ← Vite client ref + `*?url` (deep `@logos/...?url`) module typings
 │   ├── App.vue
 │   ├── main.ts                       ← imports `./epds.css` (local dev shell)
 │   └── style.css                     ← global resets only (pulled in via epds.css)
 ├── vite.lib.config.ts                ← `npm run build` — ESM lib + `dist/epds.css` + `dist/index.d.ts`
 ├── tsconfig.lib.json                 ← Typecheck scope for the library (excludes stories)
+├── .github/workflows/
+│   ├── ci.yml                        ← on push / PR → `main`: `npm ci` + `npm run build` (lib artifact gate)
+│   └── deploy-storybook.yml           ← on push → `main`: Storybook static build → GitHub Pages
 ├── .storybook/
 │   ├── main.ts
 │   ├── preview.ts                    ← imports `../src/epds.css`
@@ -95,6 +98,19 @@ EPDS/
   The package entry side-imports `epds.css`; bundlers should emit/load `dist/epds.css` automatically. Load **Roboto** (300/400/500/700) in the host app the same way as `index.html` / Storybook preview-head.
 - **App shell vs library**: `npm run build` writes **`dist/`** (publish this for npm). `npm run build:app` writes **`dist-app/`** so it never overwrites the library output; use `vite preview` after `build:app` if you need to check the shell. Storybook is unchanged (`npm run storybook` / `build-storybook`).
 - **New components**: add a barrel under `src/components/Name/` and register the export in `src/index.ts` (plus any public types already exported from the component `index.ts`).
+
+## CI & GitHub Pages
+
+- **`npm run build`** runs **`vue-tsc -p tsconfig.lib.json --noEmit`** then **`vite build --config vite.lib.config.ts`** — verifies typings and emits **`dist/epds.js`**, **`dist/epds.css`**, **`dist/index.d.ts`**. Dependencies must exist locally (`npm ci` / `npm install`).
+- **`.github/workflows/ci.yml`** — on every **push** and **pull request** targeting **`main`**: `npm ci` → **`npm run build`**. Confirms the **library** stays buildable on clean CI (orthogonal to docs).
+- **`.github/workflows/deploy-storybook.yml`** — on **push** to **`main`** (plus **workflow_dispatch**): `npm ci` → **`npm run build-storybook`** → uploads **`storybook-static`** → **GitHub Pages** (`STORYBOOK_BASE=/EPDS/` for the `/EPDS/` site path).
+- **npm publish** / registry releases are **not** automated here; workflows **verify** the lib build and **host** Storybook only.
+
+## TypeScript & tooling notes
+
+- **`tsconfig.app.json`** extends **`./node_modules/@vue/tsconfig/tsconfig.dom.json`** (relative path so editors resolve the Vue baseline even when package-style `@vue/tsconfig/...` `extends` is flaky).
+- **`src/vite-env.d.ts`**: keep **`/// <reference types="vite/client" />`**. Declare **`declare module '*?url' { … }`** so multi-segment URL imports typecheck (**e.g.** `@logos/OEMs/Audi.svg?url`) — Vite’s default **`*.svg?url`** patterns only match a single path segment.
+- **Strict unused locals**: `vue-tsc` honours **`noUnusedLocals`** from the TS config chain — remove unused script symbols (stub helpers that are never wired to the template) or the lib build fails.
 
 ## Components Built
 
@@ -811,7 +827,7 @@ EPDS/
 - **Click semantics**: Collapsed-state card root is `<div role="button" tabindex="0" aria-pressed="false">`; selected-state root drops `role`, `tabindex`, and `aria-pressed` so the inner BaseButton is the only interactive element on the card. Click + `Enter` + `Space` all call `selectCard`, which emits only when collapsed. When selected, the cursor changes from `pointer` → `default` and the focus ring on the root never fires (no role).
 - **Accessibility**: Full keyboard support (Enter / Space activate the collapsed card). `aria-pressed` is set in the collapsed state and removed when selected so AT doesn't announce a "pressed button" containing another button. `aria-label` defaults to "Show details for {name}" / "{name} — currently selected" depending on state; can be overridden via `ariaLabel`. The inner `BaseButton` exposes its own focus ring (`--color-focus-ring`) so it's independently navigable.
 - **Co-located helpers** (all live alongside `BrandShowcaseCard.vue`, story-only — not exported from `src/index.ts`):
-  - `SonicOemGrid.vue` — Sonic-specific 4 × 6 OEM logo grid (23 marks: Audi, BMW, Cadillac, Chevrolet, Chrysler, Dodge, Jeep, Honda, Hyundai, GMC, Jaguar, Ford, Land Rover, Lexus, Mercedes, Mini, Nissan, Porsche, Ram, Subaru, Toyota, Volkswagen, Volvo) in the order baked into the Figma frame. Per-mark dimensions live in **scoped CSS** as `[data-mark]` attribute selectors.
+  - **Sonic OEM grid (three small files)** — `SonicOemGrid.vue` holds Logo `?url` imports, the **`oemCells`** list, `<ul class="sog">` layout, and the empty placeholder cell for the 4×6 raster. **`SonicOemLogoCells.vue`** takes `cells: readonly SonicOemLogoCellData[]` and **`v-for`** renders rows (cleaner **`vue-tsc` / template inference** than one mega-SFC). **`SonicOemLogoCell.vue`** is one OEM `<li>` + `<img>`, exports **`SonicOemLogoCellData`**, and scopes per-mark **`[data-mark]`** sizing (same 23 OEM order as Figma — Audi … Volvo).
   - `EchoParkLocationsGrid.vue` — EchoPark 3-column / 6-row city list (16 EchoPark locations: Birmingham, Centennial, Charlotte, Colorado Springs, Grand Prairie, Houston North, Houston SW, Las Vegas, Nashville, New Braunfels, Phoenix, Raleigh, Sacramento, San Antonio, St Louis, Thornton). 14 / 22 / -0.5 px Roboto Light. Default list is overridable via the `locations` prop.
   - `PowersportsLogoRow.vue` — Sonic Powersports 3-logo dealership row (Team Mancuso Powersports, Motorcycles Charlotte, Harley-Davidson) at the per-logo Figma sizes (73 × 57 / 64 × 63 / 77 × 59) using `[data-mark]` selectors.
   - Tactical Fleet does **not** ship a helper — its expanded state is description-only. The card's empty-slot path renders the description filling the body and pins the CTA at the bottom.
@@ -1307,7 +1323,7 @@ A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches
 ### SVG loader setup
 - **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — used in `vite.config.ts` and `vite.lib.config.ts`
 - **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`, `@illustrations/` → `Illustrations/`
-- **Types**: `src/vite-env.d.ts` declares `*.svg?component` (Vue component), `*.svg?url` (string URL), and `*.svg?raw` (inline SVG string for `v-html` / icons inside styled wrappers)
+- **Types**: `src/vite-env.d.ts` — triple-slash reference **`vite/client`**; declares `*.svg?component`, `*.svg?url`, `*.svg?raw`; plus **`declare module '*?url'`** for **deep** imports (**e.g.** `@logos/.../*.svg?url`) where single-segment patterns do not apply
 
 ### System icons (`icon/Style=*.svg`)
 - 24×24, single-colour `fill="#242C33"`, always imported with `?component` query
