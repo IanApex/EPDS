@@ -1,0 +1,122 @@
+---
+description: EPDS design token reference — Figma → CSS mapping, three-layer architecture, white-label brand registry, and all color/spacing/border/typography tokens.
+globs: src/tokens/**, **/*.vue, **/*.css
+alwaysApply: false
+---
+
+# EPDS — Tokens
+
+## Token Architecture (White-Label)
+
+The token system has three layers loaded in order:
+
+| Layer | File | Purpose |
+|---|---|---|
+| **Primitives** | `src/tokens/primitives/echopark.css` (or `sonic.css`) | Concrete brand values: color palette + `--font-family-brand` |
+| **Semantic** | `src/tokens/semantic.css` | Intent aliases mapping purpose → primitive |
+| **Scales** | `src/tokens/tokens.css` | Brand-agnostic: spacing, border, shadow, opacity, typography |
+
+The TypeScript wrapper is `src/tokens/tokens.ts` (exports `tokens.semantic.*` and `tokens.color.*`). Breakpoints live in `src/tokens/breakpoints.ts` as JS constants — CSS vars can't be used in `@media`.
+
+### Registered brands
+
+| Brand | Primitives file | Font | Primary | Accent |
+|---|---|---|---|---|
+| EchoPark | `primitives/echopark.css` | Roboto (300/400/500/700) | Green (#3E8500) | Blue (#006FA6) |
+| Sonic Automotive | `primitives/sonic.css` | Roboto (300/400/500/700) | Red (#EE4128) | Steel blue (#2B4560) |
+
+**To white-label for a new brand**: create `primitives/brand-b.css`, redefine the color vars and `--font-family-brand`, then point `src/epds.css` at that primitives file. `main.ts`, Storybook `preview.ts`, and library consumers all pull tokens through `epds.css`. No component changes needed.
+
+### Storybook brand toggle
+A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches between EchoPark and Sonic at dev time. The decorator injects the Sonic primitives CSS as a runtime override — no rebuild needed. Both brand fonts are loaded in `.storybook/preview-head.html`.
+
+### Semantic token groups
+- `--color-action-primary[-hover|-press|-vivid|-subtle]` — primary brand CTA color
+- `--color-action-accent[-hover|-press|-active|-muted|-tint|-subtle]` — secondary/link color
+- `--color-focus-ring` — universal focus indicator
+- `--color-surface-disabled`, `--color-text-disabled` — disabled state
+- `--color-feedback-error[-text|-surface]` — error/destructive states
+- `--color-feedback-warning[-surface]` — caution states
+- `--color-feedback-success[-surface]` — success/confirmation states
+- `--color-feedback-info[-surface]` — informational/notification states
+- `--color-nav-text[-hover|-active|-focus]`, `--color-nav-focus-ring` — global navigation colours; defined identically in both `primitives/echopark.css` and `primitives/sonic.css` (SA-derived nav design is the global default for now). Used by `NavItem` and future nav atoms.
+
+### Font family chain
+`--font-family-brand` (primitives) → `--font-family-base` (tokens.css) → `--font-family-btn` (tokens.css)
+
+## Token Reference
+
+### Figma variable name → CSS custom property convention
+- `Base Colors/Primary50` → `--color-base-primary-50`
+- `Accent Colors/Accent90` → `--color-accent-90`
+- `Neutral Colors/Neutral70` → `--color-neutral-70`
+- `Neutral Colors/SecondaryNeutral90` → `--color-neutral-secondary-90`
+- `Neutral Colors/TertiaryNeutral90` → `--color-neutral-tertiary-90`
+- `Feedback Colors/Warning50` → `--color-warning-50`
+- `Feedback Colors/Alert80` → `--color-alert-80`
+- `Feedback Colors/Acceessibility80` → `--color-accessibility-80`
+- `System/Alert Colors/Red60` → `--color-system-red-60`
+- `$border-radius-sm` → `--border-radius-sm`
+- `$border-width-hairline` → `--border-width-hairline`
+- `$opacity-level-medium` → `--opacity-level-medium`
+- `$shadow-level-2` → `--shadow-level-2`
+- `$spacing_STACK-nano` → `--spacing-nano`
+- `$spacing_inset-sm` → `--spacing-inset-sm`
+- `$spacing_Squish-nano` → `--spacing-squish-nano`
+- `$spacing_Stretch-nano` → `--spacing-stretch-nano`
+- `$font-family-base` → `--font-family-base`
+- `$font-weight-bold` → `--font-weight-bold`
+- `$line-height-sm` → `--line-height-sm`
+- `Heading/H1` → `--text-h1-*`
+- `Paragraph/Body LG` → `--text-body-lg-*`
+- `Button/BTN` → `--font-*-btn`
+
+### Color tokens
+```
+--color-base-primary-40/50/55/60/90
+--color-accent-30/40/60/80/85/90
+--color-neutral-0/20/40/70/80/85/90/95/100
+--color-neutral-secondary-40/70/80/85/90/95
+--color-neutral-tertiary-70/80/85/90/95
+--color-warning-40/50/90
+--color-alert-50/70/80/90
+--color-system-red-60
+--color-accessibility-80
+--color-white (alias: --color-neutral-100)
+--color-parkgray-0 (alias: --color-neutral-0)
+```
+
+### Spacing tokens
+Stack/inline scale: `--spacing-quarck(4) nano(8) micro(12) xxxs(16) xxs(24) xs(32) sm(40) md(48) lg(56) xl(64) xxl(80) xxxl(120) huge(160) giant(200)`
+Inset default: `--spacing-inset-quarck/nano/xs/sm/md/lg`
+Inset squish: `--spacing-squish-quarck/nano/sm/md/lg` (L/R = 2× T/B)
+Inset stretch: `--spacing-stretch-quarck/nano/xs/sm/md/lg` (T/B = 2× L/R)
+
+### Border tokens
+Radius: `--border-radius-none/sm(4)/md(8)/lg(16)/pill(9999)/circular(50%)`
+Width: `--border-width-none/hairline(1)/thin(2)/thick(4)/heavy(8)`
+
+### Opacity & shadow tokens
+Opacity: `--opacity-level-semiopaque(.8) intense(.64) medium(.32) light(.16) semitransparent(.08)`
+Shadow: `--shadow-level-1/2/3/4`
+
+### Typography tokens
+Font family: `--font-family-base` ("Roboto", sans-serif)
+Font weights: `--font-weight-light(300) regular(400) medium(500) bold(700)`
+Line heights: `--line-height-default(1) xs(1.1) sm(1.2) md(1.4) lg(1.5)`
+
+Text styles (each has `-size`, `-weight`, `-line-height`, `-letter-spacing`):
+`--text-h1-* --text-h2-* --text-h3-* --text-h4-* --text-h5-*`
+`--text-h2-bold-* --text-h5-bold-* --text-h6-bold-*`
+`--text-subhead-* --text-body-lg-* --text-body-sm-* --text-label-*`
+
+Button text (flat, used by BaseButton):
+`--font-family-btn --font-size-btn --font-weight-btn --line-height-btn --letter-spacing-btn`
+`--font-size-btn-sm --font-weight-btn-sm --line-height-btn-sm --letter-spacing-btn-sm`
+
+### Grid tokens
+`--grid-columns-sm/md/lg/xlg/max`
+`--grid-padding-sm(24)/md(24)/lg(32)/xlg(32)/max(32)`
+`--grid-margin-md(16)/lg(16)/xlg(80)/max(128)`
+`--grid-mini-unit(8) --grid-side-rail(281)`
+Breakpoints (JS only — see `breakpoints.ts`): sm=0 md=600 lg=1024 xlg=1440 max=1920

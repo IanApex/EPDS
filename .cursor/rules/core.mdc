@@ -1,0 +1,61 @@
+---
+description: EPDS constitution — voice, anti-patterns, principles, and "fetch this other rule when" pointers. Applied to every session.
+alwaysApply: true
+---
+
+# EPDS — Constitution
+
+This is the always-applied core rule. It establishes the principles and tells you which other rule files to fetch for deeper reference.
+
+## Stack (do not deviate without sign-off)
+- **Framework**: Vue 3 with `<script setup>` + TypeScript — **Composition API only, no Options API**
+- **Build**: Vite 8 + `@vitejs/plugin-vue` + `vite-svg-loader`; library bundle via `vite.lib.config.ts` + `vite-plugin-dts`
+- **Docs**: Storybook 10 (`@storybook/vue3-vite`) — a11y addon at **error** level (failing stories must be fixed, not suppressed)
+- **Styling**: Three-layer CSS custom property system (primitives → semantic → scales); **scoped `<style>` blocks** in SFCs
+- **Font**: Roboto via Google Fonts (weights 300/400/500/700/900) — loaded in `index.html` and `.storybook/preview-head.html`
+- **Path aliases**: `@/` → `src/`, `@icons/` → `icon/`, `@logos/` → `Logos/`, `@illustrations/` → `Illustrations/`
+
+## Design Token Rules
+- **Always** use CSS custom properties — **never** hardcode raw color/spacing/radius/typography values
+- In component `<style scoped>` blocks, prefer **semantic tokens** (`--color-action-primary`, `--color-focus-ring`, etc.) for any brand-variable color. Use **primitive tokens** (`--color-neutral-*`, `--color-neutral-secondary-*`) only for structural neutrals unlikely to differ by brand.
+- When adding a new token, update **both** the CSS file and `src/tokens/tokens.ts` in the same change.
+- Figma variable definitions are the source of truth.
+- Legacy aliases (`warmgray-*`, `parkgray-70`, `green-50`, `--color-parkgray-0`, `--color-white`) are **not** to be used in components.
+
+## Component Rules (high level)
+- Every component lives in its own folder: `src/components/ComponentName/` containing `.vue` + `.stories.ts` + `index.ts`
+- **Library**: export new components from `src/index.ts` after adding the component's `index.ts`
+- Use `<script setup lang="ts">`, `defineProps<{}>()`, `defineEmits<{}>()` — no Options API
+- `<style scoped>` only — no global selectors in component files
+- No inline styles unless dynamically computed
+- **Reuse first**: before new markup, check whether an existing component already fits
+- **No new sub-components without checking the user** — if a composite needs a new primitive, propose it first
+- **Vue + TypeScript templates**: bind props using the **camelCase name from `defineProps`** (e.g. `ariaLabel`, not `aria-label`). `vue-tsc` treats `aria-label` as a separate attribute and reports required props missing.
+
+## Naming Conventions
+- Components: PascalCase (`BaseButton`, `FormInput`, `NavigationBar`)
+- Props: camelCase; emits: camelCase (`"update:modelValue"`, `"click"`, `"dismiss"`)
+- CSS custom properties: kebab-case matching the Figma variable name pattern
+- Story titles: `Atoms/...`, `Molecules/...`, `Organisms/...`, `Pages/...`, `Components/...`
+
+## Accessibility
+- Semantic HTML first; ARIA only when native semantics are insufficient
+- All interactive components need correct roles/attributes
+- Storybook a11y addon errors **must** be resolved before considering a component done
+
+## When to fetch which rule
+The catalog rules below are description-only (not auto-loaded) — fetch them when you need cross-component context:
+
+| If you are working on... | Fetch this rule |
+|---|---|
+| Any `.vue` / `.css` file, tokens, or color/spacing decisions | `tokens.mdc` (auto-applies) |
+| Files in `src/components/**` | `components-conventions.mdc` (auto-applies) |
+| `*.stories.ts` or `.storybook/` | `storybook.mdc` (auto-applies) |
+| Anything that imports icons/logos/illustrations/photos | `icons-and-assets.mdc` (auto-applies for `src/components/`, `src/pages/`, `src/stories/`) |
+| `npm run build`, CI, GitHub Pages, tsconfig, project structure | **Fetch** `build-and-ci.mdc` |
+| Importing a Figma node and scaffolding a new component from it | **Fetch** `figma-mcp-workflow.mdc` |
+| "How is BaseButton/LinkCta/etc. already built?" — atom-level look-ups | **Fetch** `atoms-catalog.mdc` |
+| "How is SrpTile/CompareTray/etc. already built?" — molecule-level look-ups | **Fetch** `molecules-catalog.mdc` |
+| Headers, footers, nav bars, full pages, BrandPortfolio, SrpFiltersPanel | **Fetch** `organisms-catalog.mdc` |
+
+Catalog files are the source of truth for what's already built. When adding a new component, update the matching catalog file in the same change so the project knowledge stays current.

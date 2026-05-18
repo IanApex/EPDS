@@ -1,0 +1,165 @@
+---
+description: EPDS organism + page catalog — global header, footer, nav bars, brand portfolio, package carousel, SRP filter panel, plus SrpPage and VdpPage full-page compositions. Fetch when composing or modifying any site-wide chrome.
+alwaysApply: false
+---
+
+# EPDS — Organisms & Pages Catalog
+
+## Global Chrome
+
+### `GlobalHeader` — `src/components/GlobalHeader/`
+- **Figma**: Site header — full-width, responsive (DT/TB/MB via CSS media queries)
+- **Props**: `variant?: 'global' | 'global-search' | 'homepage' | 'homepage-search' | 'purchase'` (default `'global'`), `guest?: boolean` (default `false`), `zipCode?: string`, `phoneNumber?: string`, `searchPlaceholder?: string`, `logoHref?: string`, `logoUrl?: string`, `logoLightUrl?: string`, `brandName?: string` (default `'EchoPark Automotive'`), `navLinks?: NavLink[]`
+- **Type export**: `NavLink` — `{ label: string, href?: string, dropdown?: boolean }`
+- **Emits**: `search`, `menu-click`, `location-click`, `favorites-click`, `profile-click`, `sign-in-click`, `more-click`
+- **Brand configuration**: All brand-specific content (logo, brand name, nav links) is prop-driven. Pass Sonic values via props — no component changes needed.
+- **Stories**: EP variants (global, global-search, homepage, homepage-search, purchase) + Sonic variants (global, global-guest, global-search, purchase)
+- **Storybook `title`**: `Organisms/GlobalHeader`
+
+### `GlobalFooter` — `src/components/GlobalFooter/`
+- **Figma**: Site footer — full-width, responsive (DT/TB/MB via CSS container queries)
+- **Props**: `phoneNumber?: string`, `logoHref?: string`, `logoUrl?: string`, `brandName?: string` (default `'EchoPark Automotive'`), `linkColumns?: FooterLinkColumn[]`, `socialLinks?: SocialLink[]`, `trustBadges?: TrustBadge[]`, `legalLinks?: LegalLink[]`, `copyrightText?: string`
+- **Type exports**:
+  - `FooterLinkColumn` — `{ heading: string, links: { label: string, href: string }[] }`
+  - `SocialLink` — `{ platform: string, href: string, ariaLabel: string }` (icon resolved from built-in platform→SVG map; supported platforms: `facebook`, `x`, `youtube`, `instagram`, `tiktok`)
+  - `TrustBadge` — `{ src: string, alt: string, height?: number }`
+  - `LegalLink` — `{ label: string, href: string }`
+- **Brand configuration**: All content is prop-driven with EchoPark defaults. Pass `trustBadges: []` to hide badges entirely.
+- **Stories**: EP viewports (Desktop, Tablet, Mobile, AllViewports) + Sonic variants (Desktop, Mobile, AllViewports)
+- **Storybook `title`**: `Organisms/GlobalFooter`
+
+### Brand configuration pattern (GlobalHeader + GlobalFooter)
+Both site chrome components follow the same pattern: **EchoPark content is the default; other brands override via props.**
+- **Colours** adapt automatically via the semantic token / primitives swap (e.g. `--color-action-primary` becomes red for Sonic).
+- **Content** (logos, links, badges, phone numbers) is passed as structured props.
+- **Storybook** stories for each brand demonstrate the configuration; use the Brand toolbar toggle to preview colour theming.
+
+## Sonic Nav Bar
+
+### `SonicNavBar` — `src/components/SonicNavBar/`
+- **Figma**: "Frame 2492" (node `7639:20938`) — single nav frame with five Property 1 variants. **Default** (desktop bar, 1440×72), **Variant 2** (mobile bar, 375×64), **Variant 3** (desktop with mega-menu open, 1440×412), **Variant 4** (mobile drawer with parent list, 375×552), **Variant 5** (mobile drawer drilled into a parent submenu, 375×952).
+- **Role**: Sonic-style global navigation organism. Composes every nav atom in the system: `NavItem` (desktop primary nav + dropdown triggers), `NavItemMobile` (mobile drawer parent rows), `NavItemSubmenu` (drilled submenu leaf links), `MenuToggle` (hamburger / close), `NavIconButton` (favourites + profile), `BaseButton` (primary CTA), `Divider` (mobile drilled-submenu separator).
+- **Props**: `navItems: NavBarItem[]` (**required**), `logoUrl?: string` (default Sonic SA-FullColor logo), `logoHref?: string` (default `'/'`), `brandName?: string` (default `'Sonic Automotive'`), `ctaLabel?: string` (default `'Join the Sonic Circuit'`), `ctaHref?: string`, `favoritesHref?: string` (default `'/favorites'`), `profileHref?: string` (default `'/account'`), `favoritesSelected?: boolean`, `profileSelected?: boolean`, `forceMobile?: boolean` (Storybook escape hatch), `sticky?: boolean` (default `true`)
+- **Type exports**:
+  - `NavBarLink` — `{ label: string, href?: string }`
+  - `NavBarSection` — `{ heading: string, links: NavBarLink[] }`
+  - `NavBarItem` — `{ key: string, label: string, href?: string, dropdown?: NavBarSection[] }`. When `dropdown` is omitted the item is a direct link. When supplied, the item becomes a desktop dropdown trigger and a drilled-mobile parent row.
+- **Emits**: `cta-click`, `favorites-click`, `profile-click`, `submenu-link-click: [{ item, link, event }]`, `nav-item-click: [{ item, event }]`
+- **Layout** (toolbar):
+  - **Desktop** (≥ 1440 px / full Figma spec): 72 px height, 80 px horizontal padding. Logo (104 × 41 px) + horizontal nav (49 px gap) + favourites/profile + primary CTA.
+  - **Mid-range desktop progressive tightening** (1024–1439 px): tightens spacing in three steps:
+    - **1280–1439 px**: page gutter 80 → 32 px, nav gap 49 → 32 px, bar inter-cluster gap 32 → 24 px
+    - **1024–1279 px**: nav gap 32 → 24 px, utility cluster + icons gap 24 → 16 px
+    - **1024–1199 px**: hide the desktop CTA so the icons sit flush against the nav. The CTA still renders inside the mobile drawer at <1024.
+  - **Mobile** (< 1024 px or `forceMobile`): 64 px height, 24 px horizontal padding. Logo (94 × 37 px) + favourites/profile + `MenuToggle`.
+- **Mega-menu** (Variant 3 — desktop only):
+  - Opens flush below the toolbar with `border-top: 1px solid var(--color-nav-active-indicator)` (Sonic dark red `#D9320D`, EchoPark green).
+  - 80 px / 40 px padding. Section columns laid out with `gap: 119px`. Second section auto-wraps into a 2-column grid.
+  - Section heading: 18 px Bold; links: 16 px Regular; focus ring: 3 px `--color-nav-focus-ring` outline.
+  - Only one dropdown open at a time. Click outside / press `Escape` to close.
+- **Mobile drawer** (Variant 4 + 5):
+  - Slides in below the 64 px bar with the same brand-coloured `border-top`. Body scroll locks while open.
+  - **Parent list (Variant 4)**: vertical stack of `NavItemMobile` rows (40 px gap). CTA button pinned to the bottom.
+  - **Drilled submenu (Variant 5)**: back-arrow header on top, then each section as a labelled block, separated by `Divider color="light"`.
+- **Keyboard**: `Escape` collapses one level at a time — drilled submenu → parent drawer → desktop dropdown.
+- **Brand awareness**: Component itself is brand-agnostic. CTA themes red on Sonic / green on EchoPark via `BaseButton variant="primary"`. Mega-menu / drawer top border reads from `--color-nav-active-indicator` (Sonic `#D9320D`, EchoPark `var(--color-base-primary-50)`).
+- **Stories** (`Organisms/SonicNavBar`): `Default` (desktop bar with placeholder body), `Variant 2 — mobile bar`, `Variant 3 — desktop mega-menu open`, `Variant 4 — mobile drawer parent list`, `Variant 5 — mobile drilled submenu`, `Interactive` (fully interactive sandbox)
+- **Token additions**: `--color-nav-active-indicator` added to **both** `primitives/echopark.css` and `primitives/sonic.css`. EchoPark maps it to `var(--color-base-primary-50)`; Sonic maps it to `var(--color-btn-primary-surface-hover)` (`#D9320D`).
+- **Storybook `title`**: `Organisms/SonicNavBar`
+
+## Sonic Circuit Section
+
+### `SonicCircuit` — `src/components/SonicCircuit/`
+- **Figma**: "The Sonic Circuit" — desktop node `7680:16688`, mobile node `7680:16721`. Full-bleed dark-navy panel pitching the Sonic Circuit rewards membership.
+- **Role**: Reusable "membership benefits" organism. Composes a stack of `SonicCircuitBenefit` atoms between a centered title block and a primary `BaseButton` CTA. Every label and the benefit list is prop-driven.
+- **Props**: `title?: string` (default `'The Sonic Circuit'`), `subtitle?: string` (default `'One membership across every Sonic brand nationwide.'`), `benefits: SonicCircuitBenefitItem[]` (**required** — designed for 3–4 items per Figma), `ctaLabel?: string` (default `'Join the Circuit'`), `ctaHref?: string`, `ariaLabel?: string`
+- **Type export**: `SonicCircuitBenefitItem` — `{ id: string; iconSvg: string; caption: string }`. `iconSvg` is the raw SVG markup (import with `?raw`).
+- **Emits**: `cta-click: [event: MouseEvent]`
+- **Composes**: `SonicCircuitBenefit` (one per item in `benefits`) + `BaseButton variant="primary" size="md"` for the CTA.
+- **Layout**: Full-bleed `<section>` with a fixed `#25303d` navy background. Inner content rail is `max-width: 1440px` with `padding: 80px`. Outer flex column with `gap: 68px` between heading / benefits / CTA. Heading is a 564 px centered column (title 42 / 54 / -1.2; subtitle 24 / 1.3 / -0.264). Benefits row is a `<ul role="list">` flex row with `gap: 47px` and `justify-content: center`. CTA wrapped at `width: 175px` (Figma spec).
+- **Responsive**:
+  - **Desktop (≥1024)** — 80 px section padding, 4-up benefits row, 68 px gap
+  - **Tablet (≤1023)** — Section padding `64px 32px`; outer gap 56 px; benefits row gets `flex-wrap: wrap` with `gap: 47px 32px`
+  - **Mobile (<600)** — Section padding `40px 24px`; outer gap 40 px; title scales to 32 px; benefits stack vertically with 47 px gap
+- **Brand awareness**: The CTA uses `BaseButton variant="primary"` so the fill colour automatically themes (Sonic red on Sonic, EchoPark green on EchoPark). The `#25303d` navy is intentionally a section-local literal — promote to a token once a second surface adopts it.
+- **Accessibility**: `<section aria-label="…">` landmark (overridable via `ariaLabel`). The benefits row is a `<ul role="list">`. The decorative disks are `aria-hidden="true"`.
+- **HomePage integration**: `HomePage.vue` mounts the section directly below `ShopByCategories`. Four Figma-spec benefits seeded using existing system icons reused via `?raw` imports — `Style=Location, Detail=Map-Location`, `Style=Finance, Detail=Payment, Icon=Coin`, `Icon Type=Vehicle Descriptors, Size=Medium, Theme=Steering`, `Icon Type=Vehicle Descriptors, Size=Small, Theme=Medal`.
+- **Stories**: `Default`, `Mobile` (375 px viewport), `ThreeBenefits`, `TwoBenefits`, `CustomCopy`
+- **Storybook `title`**: `Organisms/SonicCircuit`
+
+## Carousels
+
+### `PackageCarousel` — `src/components/PackageCarousel/`
+- **Figma**: VDP "Installed packages & options" — horizontal card carousel for vehicle packages
+- **Props**: `label?: string` (default `'Packages:'`), `packages: PackageItem[]` (**required**, `{ title, description, seeMoreHref? }`)
+- **Type export**: `PackageItem` — `{ title: string, description: string, seeMoreHref?: string }`
+- **Card**: 272px wide, 16px border-radius (`--border-radius-lg`), 1px `--color-neutral-90` border, padding 24px top/sides, 8px gap between elements
+- **Card without link**: 164px min-height, 40px padding-bottom
+- **Card with link**: auto height, 16px padding-bottom; "See more" right-aligned, `--color-accent-40`, medium weight
+- **Typography**: title 16px bold; description 14px regular #313D47
+- **Controls (≥ 3 items)**: progress bar + arrows; hidden when < 3 items
+- **Progress bar**: 2px height, `--color-neutral-90` track, `--color-base-primary-60` fill, 6px radius; fills proportionally as scroll position advances
+- **Arrows**: 48px circles, same accent-blue states as Pagination arrows; positioned at viewport edges with `box-shadow`; right edge has white gradient fade
+- **Scroll**: native CSS `overflow-x: auto` + `scroll-snap-type: x mandatory`
+- **Resize**: `ResizeObserver` recalculates scroll dimensions on container resize
+- **Stories**: TwoPackages, ThreePackages, FivePackages, SixPackages, ConstrainedWidth, MobileWidth, AllVariants
+- **Storybook `title`**: `Organisms/PackageCarousel`
+
+## Brand Portfolio
+
+### `BrandPortfolio` — `src/components/BrandPortfolio/`
+- **Figma**: "Brand Portfolio" frame — first sub-frame shows all four cards in default state; the next four sub-frames show one of Sonic Automotive / EchoPark / Tactical Fleet / Powersports expanded.
+- **Role**: Organism that composes 4 (configurable to N) `BrandShowcaseCard` molecules into a horizontal row with **exactly-one** selection state. Clicking a collapsed card animates the row so the new card grows to 384 px while the other three flex equally to fill the remaining width.
+- **Props**:
+  - `brands: BrandShowcaseEntry[]` (**required**) — array of card configs; each entry mirrors `BrandShowcaseCard`'s prop surface plus a stable `key` and an optional `ctaLabel` (set to `undefined` to suppress the molecule's default single-CTA when a `#cta-<key>` slot is provided instead)
+  - `modelValue?: string | null` (v-model) — currently selected card's `key`. Pass `null` to render the "all collapsed" Figma frame.
+  - `selectFirstByDefault?: boolean` (default `true`) — when `modelValue` is `undefined` at mount, initialise selection to `brands[0].key`. Set to `false` (and pass `:modelValue="null"`) for the "Default" / "all collapsed" story.
+- **Emits**:
+  - `update:modelValue: [string | null]`
+  - `select: [key: string]`
+  - `cta-click: [{ key: string, event: MouseEvent }]`
+- **Slots** (per-brand, dynamic by `brand.key`):
+  - `#content-<key>` — replaces `BrandShowcaseCard`'s `#selected-content` slot for the specified brand.
+  - `#cta-<key>` (scope: `{ onCtaClick: (event: MouseEvent) => void }`) — replaces `BrandShowcaseCard`'s `#cta` override slot. EchoPark uses this to render a primary + secondary `BaseButton` pair side-by-side.
+- **Layout**:
+  - **Desktop (≥ 600 px)**: row capped at `max-width: 1286px`, `margin: 0 auto`, no gap between cards. Selected slot is `flex: 0 0 384px`; collapsed slots are `flex: 1 1 0; max-width: 322px`. The molecule's `--bsc-width-collapsed` / `--bsc-width-selected` CSS vars are overridden to `100%`.
+  - **Mobile (≤ 599 px)**: row stacks vertically; cards keep their 322 / 384 px widths and centre horizontally. Tap-to-expand still works the same as desktop.
+- **Animation**: the row's flex-basis transitions sync with the molecule's `width` transition (both `0.3s ease`)
+- **Stories** (`Organisms/BrandPortfolio`): `Default` (all collapsed), `SonicSelected`, `EchoParkSelected` (demonstrates the `#cta-echopark` slot for primary + secondary CTAs), `TacticalFleetSelected` (description-only body), `PowersportsSelected`, `Interactive`
+- **Storybook `title`**: `Organisms/BrandPortfolio`
+
+## SRP Filters Panel
+
+### `SrpFiltersPanel` — `src/components/SrpFiltersPanel/`
+- **Figma**: "SRP Filters" — sliding parent/child panel; parent list shows filter categories, child panel slides in from right
+- **Props**: `categories: FilterCategory[]` (**required**), `modelValue?: string | null` (v-model, active child key or `null` for parent), `hideHeader?: boolean` (default `false`)
+- **Type export**: `FilterCategory` — `{ key: string, label: string, hasSelection: boolean, hideTitle?: boolean }`
+- **Emits**: `update:modelValue`, `reset`
+- **Slot**: `#child="{ activeFilter }"` — parent renders the active child filter component via this slot
+- **Behaviour**: Two-pane slide animation (parent slides left, child slides in from right); back button returns to parent list; optional `hideTitle` per category suppresses the built-in child title heading; `hideHeader` suppresses the "Filters / Reset" header (for mobile drawer use)
+- **Composes**: `SrpFilterParent`
+- **Storybook `title`**: `Organisms/SRP Filters/FiltersPanel`
+
+---
+
+## Pages (`src/pages/`)
+
+Full-page compositions — not published library components, used for Storybook page-level demos.
+
+### `SrpPage` — `src/pages/SrpPage.vue`
+- **Role**: Full SRP (Search Results Page) composition
+- **Props**: `brandName?: string` (default `'EchoPark'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
+- **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalFooter` and **swaps the entire header**: Sonic renders the new `SonicNavBar` organism (mega-menu + mobile drawer, `:sticky="false"` so it doesn't fight the SRP's own sticky filter sidebar) while EchoPark continues to use the legacy `GlobalHeader` (`variant="global-search"` with zip / phone). The Sonic primary-nav structure is sourced from the shared `src/pages/sonicNavItems.ts`.
+- **Composes**: `SonicNavBar` (Sonic) **or** `GlobalHeader` (EchoPark), `GlobalFooter`, `SrpTile`, `CompareTray`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Vehicle status + Condition are both Sonic-only; EchoPark shows 10, Sonic shows 12 with Vehicle status directly above Condition at the top of the list after Distance), `SrpFilterPill`, `BaseButton`
+- **Vehicle-status filtering**: `SrpPage` seeds each listing with an optional `vehicleStatus` and derives `visibleListings = listings.filter(...)` that honours the Vehicle-status filter selections. Tiles in the grid iterate over `visibleListings`, and `toggleFavorite` / `toggleCompared` now key off `car.id` (not array index) so filtered views still write back to the right listing. The `vehicleStatus` prop is only passed to tiles when `isSonic` — EchoPark tiles always render the delivery block.
+- **Stories** (`Pages/SRP`): `EchoPark Brand` (default brand + globals) and `Sonic Automotive Brand` (passes `brandName: 'Sonic Automotive'` + Sonic globals for primitives toggle)
+- **Storybook `title`**: `Pages/SRP`
+
+### `VdpPage` — `src/pages/VdpPage.vue`
+- **Role**: Vehicle Detail Page composition. First pass is **desktop + Sonic-only + above-the-fold only**; below-the-fold sections are flagged in-file with a `TODO`.
+- **Props**: `brandName?: string` (default `'Sonic Automotive'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
+- **Composes**: `SonicNavBar` (Sonic) **or** `GlobalHeader` (EchoPark), `GlobalFooter`, `VdpGallery`, `VdpSummary`. Hero row is a flex container with `gap: 80px` (Figma spec) that shrinks to `--spacing-xxl` below 1280 px.
+- **Seed data**: Matches the Figma frame — 2026 BMW X5 M60i, `$50,000` MSRP, `BMW of Birmingham`, VIN `5UX33EU01T9307218`, Stock `T9307218`. `favorited` is a local `ref(false)` toggled via `@update:favorited` on `VdpGallery`. `onTestDrive`, `onSeeStorePrice`, and `onOpenPhotos` are stubbed to `console.log`.
+- **Brand awareness**: Same white-label pattern as `SrpPage`: `isSonic` swaps the header (`SonicNavBar` for Sonic, sticky enabled here because the VDP doesn't have its own top-of-viewport sticky element; `GlobalHeader` for EchoPark) and overrides the footer logo / link columns / legal / social / copyright. Sonic primary-nav structure imported from the shared `src/pages/sonicNavItems.ts`. Today only the Sonic brand variant is published as a Storybook page demo.
+- **Stories** (`Pages/VDP`): `Sonic Automotive Brand` with `layout: 'fullscreen'`.
+- **Storybook `title`**: `Pages/VDP`

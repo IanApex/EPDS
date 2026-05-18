@@ -1,0 +1,393 @@
+---
+description: EPDS molecule catalog — cards, tiles, modals, navigation/pagination, SRP filter components, and VDP molecules. Fetch when looking up an existing molecule's props or composing a new one from atoms.
+alwaysApply: false
+---
+
+# EPDS — Molecules Catalog
+
+## Cards, Tiles, and Marketing Content
+
+### `BrandShowcaseCard` — `src/components/BrandShowcaseCard/`
+- **Figma**: "Card" — default node `7669:6028`, hover `7669:6031`, selected `7669:6034`. Designed for the Sonic Group **brand-portfolio organism** (one card per sub-brand: Sonic Automotive, EchoPark, Tactical Fleet, Powersports). Exactly one card in the group is selected/expanded at a time; the parent organism owns "exactly-one" group state.
+- **Role**: Selectable photo card with three visual states. Brand-agnostic — every visual detail that varies per brand is a prop, so the same molecule renders any sub-brand without overrides. Brand-specific expanded-state body content is provided via the `#selected-content` slot.
+- **Dimensions**: `width: 322px` collapsed → `width: 384px` selected, `height: 455px` constant. Width transitions via `transition: width 0.3s ease`.
+- **Props** (all visual specifics defaulted to the Sonic Automotive Figma frame):
+  - `name: string` (**required**)
+  - `imageUrl: string` (**required** — full-bleed background photo)
+  - `tagline?: string`
+  - `logoLight: string` (**required**) + `logoLightHeight?: number` (default `83`)
+  - `logoColor?: string` + `logoColorHeight?: number` (default `57`)
+  - `description?: string`
+  - `hoverScrimColor?: string` (default `'rgba(242, 73, 34, 0.7)'`)
+  - `defaultScrimColor?: string` (default `'rgba(37, 45, 55, 0.7)'`)
+  - `selectedScrimColor?: string` (default `'rgba(255, 255, 255, 0.9)'`)
+  - `ctaLabel?: string` — text for the bottom CTA (rendered as `BaseButton size="sm" variant="primary"`)
+  - `selected?: boolean` (v-model)
+  - `ariaLabel?: string`
+- **Slots**:
+  - `#selected-content` — brand-specific markup rendered between the description and the CTA in the expanded state.
+  - `#cta` (scope: `{ onCtaClick: (event: MouseEvent) => void }`) — optional override slot for the entire CTA area. When this slot is present **and** `ctaLabel` is also set, the slot wins. CTA area is `flex; gap: 16px; justify-content: center`.
+- **Width CSS vars**: `--bsc-width-collapsed` (default `322px`) and `--bsc-width-selected` (default `384px`). The parent `BrandPortfolio` organism overrides them to `100%`.
+- **Emits**: `update:selected: [boolean]` (only ever `true` — molecule never emits `false`), `select: [event: Event]`, `cta-click: [event: MouseEvent]`
+- **Visual states**: Default (dark-navy scrim) · Hover (brand-colour scrim 70%) · Selected (white scrim 90% + colour logo + description + `BaseButton sm primary` CTA)
+- **Click semantics**: Collapsed-state card root is `<div role="button" tabindex="0" aria-pressed="false">`; selected-state root drops `role`, `tabindex`, and `aria-pressed`.
+- **Co-located helpers** (story-only — not exported from `src/index.ts`):
+  - **Sonic OEM grid (three small files)** — `SonicOemGrid.vue`, `SonicOemLogoCells.vue` (takes `cells: readonly SonicOemLogoCellData[]`), `SonicOemLogoCell.vue` (exports `SonicOemLogoCellData`).
+  - `EchoParkLocationsGrid.vue` — EchoPark 3-column / 6-row city list. Default list is overridable via the `locations` prop.
+  - `PowersportsLogoRow.vue` — Sonic Powersports 3-logo dealership row.
+- **Stories**: `Default`, `Hover` (uses `pseudo` addon), `Selected`, `AllStates`, `Interactive`. Story scaffolding lives in `BrandShowcaseCard.stories.css`.
+- **Storybook `title`**: `Molecules/BrandShowcaseCard`
+
+### `BlogArticleCard` — `src/components/BlogArticleCard/`
+- **Figma**: "Blog Articles" — teaser card with two states: "Article photo" and "Article Branded"
+- **Props**: `variant?: 'photo' | 'branded'` (default `'photo'`), `meta: string` (**required**), `title: string` (**required**), `imageUrl?: string`, `href?: string`, `target?: string`
+- **Anatomy**: 384px wide card; 240px media panel (16px border-radius) + 16px gap + text block
+- **Photo variant**: Hero image (`object-fit: cover`) + top-down gradient overlay
+- **Branded variant**: `--color-action-primary` (green) background, centered white EchoPark logo (160px wide)
+- **Typography**: meta = Label style (12px / 16px / 0.2px); title = 22px bold / 26px
+- **Link mode**: When `href` provided, renders as `<a>`, title underlines on hover
+- **Stories**: Photo, PhotoNoImage, Branded, AsLink, ThreeUp, AllVariants
+- **Storybook `title`**: `Molecules/BlogArticleCard`
+
+### `ContentTile` — `src/components/ContentTile/`
+- **Figma**: "Content Tiles" — marketing tile/banner with decorative circular image
+- **Props**: `heading: string` (**required**), `body?`, `type?: 'tile' | 'banner'`, `size?: 'sm'|'md'|'lg'|'xl'`, `imageLocation?`, `imageUrl?`, `linkLabel?`, `linkHref?`, `linkTarget?`
+- **Reuses**: `LinkCta` (`arrow: true`, `theme: 'light'`)
+- **Stories**: `Molecules/ContentTile`
+
+### `SrpTile` — composes `SmallIconButton`, `ArrowCircleButton`, `MediumIconButton`, `TileCta`, `CarouselDots`, `CompareButton`
+- Supports `vehicleStatus?: 'on-lot' | 'in-transit'` which replaces the delivery block with a single status row: 16×16 leading icon + status label (`onLotLabel` / `inTransitLabel`). Icons inherit `currentColor` via `:deep(path) { fill: currentColor }`.
+- Stories: `StatusOnLot`, `StatusInTransit`.
+- **Storybook `title`**: `Molecules/SRPTile`
+
+### `LocationTile` / `LocationTileVdp`
+- Store-picker tile (radio group) and VDP-oriented location tile, respectively.
+- **Storybook `title`**: `Molecules/LocationTile` · `Molecules/LocationTileVdp`
+
+### `VscTable` — `src/components/VscTable/`
+- **Figma**: "Graphics/VSC" — Vehicle Service Contract comparison table
+- **Props**: `size?: 'sm' | 'lg'` (default `'lg'`), `rows?: VscTableRow[]` (default 5 standard repair types)
+- **Type export**: `VscTableRow` — `{ label: string, withoutPlan: string, withPlan: string }`
+- **Layout**: 3-column grid — "Repair type" (left-aligned labels), "without plan" (centered), "with plan" (centered, highlighted)
+- **Two sizes**:
+  - `lg` (desktop): header 71px (24px bold titles), data rows 67px (16px labels, 14px/16px values)
+  - `sm` (mobile): includes banner ("Save more with a **vehicle service contract**"), header 71px (16px bold titles), data rows 52px (14px text throughout)
+- **Alternating rows**: even rows `--color-neutral-95`, odd rows `--color-neutral-100`
+- **Highlight column**: "with plan" column has `border-radius: 4px`, `box-shadow: 0 1px 20px 0 rgba(0,0,0,0.12)`, green accent text (`--color-base-primary-50`)
+- **Default rows**: Brakes ($1,574 / $100), Electrical system ($808 / $100), Air conditioning ($1,402 / $100), Fuel system ($1,382 / $100), Engine ($5,329 / $100)
+- **Stories**: Large, Small, CustomRows, SideBySide, Interactive
+- **Storybook `title`**: `Molecules/VscTable`
+
+### `GapGraphic` — `src/components/GapGraphic/`
+- **Figma**: "Graphics/Gap" — GAP (Guaranteed Asset Protection) infographic
+- **Props**: `size?: 'sm' | 'lg'` (default `'lg'`)
+- **Content**: Static — "E.g. $20,000 loan balance" title, "$15,000" insurance payout, "$5,000" total loss protection coverage, bracket lines, split car image
+- **Two sizes**:
+  - `lg` (desktop, max-width 671px): 40px italic light title, 28px medium amounts
+  - `sm` (mobile, max-width 336px): 16px italic title, 16px bold amounts
+- **Bracket lines**: Pure CSS — horizontal line with vertical tick marks at each end
+- **Car image**: `Illustrations/GapCar.png` — half-grey / half-green split car
+- **Stories**: Large, Small, SideBySide, Interactive
+- **Storybook `title`**: `Molecules/GapGraphic`
+
+### `ProtectionPlansGraphic` — `src/components/ProtectionPlansGraphic/`
+- **Figma**: "Graphics/ProtectionPlans" — static infographic with 4 annotated protection coverage areas
+- **Props**: `size?: 'sm' | 'lg'` (default `'lg'`)
+- **Content**: Static — car image with 4 callout annotations connected by leader lines
+- **Callouts**: Windshield repairs & replacements, Ding & dent repairs, Interior/exterior appearance upkeep, Engine & core system maintenance
+- **Two sizes**:
+  - `lg` (desktop, 653×345 aspect): 52px blue check icons, 16px bold titles + 14px descriptions, full leader lines
+  - `sm` (mobile, 360×224 aspect): 38px check icons, 12px bold titles only, compact layout
+- **Car image**: `Illustrations/ProtectionPlansCar.png` — white sedan with transparent background
+- **Check icons**: Inline SVG (24→52/38px scaled), Blue60 (#006FA6) with subtle drop-shadow
+- **Stories**: Large, Small, SideBySide, Interactive
+- **Storybook `title`**: `Molecules/ProtectionPlansGraphic`
+
+## Modals & Tabs
+
+### `Accordion` — `src/components/Accordion/`
+- **Figma**: "Components/Accordion" — expandable disclosure with animated expand/collapse
+- **Props**: `label: string` (**required**), `size?: 'sm' | 'lg'` (default `'sm'`), `modelValue?: boolean`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Rules**: multiple items may be open; do not nest; full header row is clickable; works uncontrolled or with `v-model`
+- **Root CSS**: BEM `accordion` / `accordion__*`
+- **Stories**: `Molecules/Accordion`
+
+### `Alert` — `src/components/Alert/`
+- **Figma**: "Components/Alert" — inline feedback banner
+- **Props**: `variant?: 'error' | 'warning' | 'success' | 'notification'` (default `'warning'`), `title?: string`
+- **Slots**: default — body
+- **Accessibility**: `role="alert"` for `error`/`warning`; `role="status"` for `success`/`notification`
+- **Root CSS**: `alert` / `alert--*`
+- **Stories**: `Molecules/Alert`
+
+### `BaseModal` — `src/components/BaseModal/`
+- **Figma**: "UI Components/Modal base" — overlay dialog
+- **Composes**: `Overlay` (scrim atom at `zIndex: 1000`) — all backdrop, scroll-lock, ESC, and click-to-dismiss behaviour is delegated to `Overlay`
+- **Props**: `modelValue: boolean` (**required**, v-model), `size?: 'sm' | 'lg'` (default `'lg'`), `theme?: 'light' | 'dark'` (default `'light'`), `ariaLabel?: string`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Behaviour**: backdrop click, ESC, body scroll lock — all via composed `Overlay`
+- **Stories**: `Molecules/BaseModal`
+
+### `ModalTabs` — `src/components/ModalTabs/`
+- **Figma**: "Navigation/ModalTabs" — horizontal tabs for modals and slide-in panels only (not used standalone on pages)
+- **Props**: `tabs: ModalTab[]` (**required**, `{ id, label }`), `modelValue?: string`, `showSeparator?: boolean` (default `true`)
+- **Emits**: `update:modelValue: [id: string]`
+- **Slot**: `#default="{ activeId }"` — parent shows/hides content with `v-show`
+- **Auto-select**: emits first tab's id on `onMounted` if `modelValue` is empty
+- **Keyboard**: roving tabindex; Left/Right arrows cycle between tabs
+- **Accessibility**: `role="tablist"` on bar, `role="tab"` on buttons, `aria-selected`, `role="tabpanel"` on content
+- **Tab anatomy**: `height: 34px` (16px label + 16px gap + 2px bar). `padding-right: 24px`. Active indicator bar is `::after`, absolutely positioned.
+- **Bar states**: no bar (default) → 1px (hover inactive) → 2px (active) → 3px (active+hover). All `--color-accent-40`.
+- **Focus**: 2px `--color-accessibility-80` outline
+- **Separator**: 1px `--color-neutral-80` line below tab bar — always shown in modal context
+- **Overflow**: horizontal scroll on `.modal-tabs__bar`; right-edge white gradient fade via `.modal-tabs__fade` overlay
+- **Stories**: FeaturesAndSpecs, FirstTabAutoSelected, ManyTabsScrollable, TabBarOnly, NoSeparator, AllStates
+- **Storybook `title`**: `Molecules/ModalTabs`
+
+### `FaqBlogTab` — `src/components/FaqBlogTab/`
+- FAQ / blog tab switcher.
+- **Storybook `title`**: `Molecules/FaqBlogTab`
+
+## Forms & Inputs
+
+### `CarOfferInputCard` — `src/components/CarOfferInputCard/`
+- **Figma**: Car offer input card — VIN vs license plate segmented control, underline fields, primary CTA
+- **Props**: `offerType?` (`'vin'|'license'`, **v-model**), `vin?`, `licensePlate?`, `state?` (**v-models**), `stateOptions?` (for `SelectDropdown`), `disabled?`
+- **Emits**: `submit`, `vin-help` (VIN helper link + info icon)
+- **Composes**: `SegmentedControl`, `TextField`, `SelectDropdown`, `BaseButton`, `LinkCta` + info SVG (`?raw`)
+- **VIN helper Tooltip**: uses `caretAlign="left"` with text "A VIN is a 17 character long number that you can find inside your door or on the windshield of your car."
+- **Stories**: `Molecules/CarOfferInputCard`
+
+## Navigation / Pagination
+
+### `Breadcrumbs` — `src/components/Breadcrumbs/`
+- **Figma**: "Breadcrumbs" — horizontal breadcrumb nav bar for wayfinding at the top of pages
+- **Props**: `items: BreadcrumbItem[]` (**required**, `{ label: string, href?: string }`), `phone?: string`
+- **Type export**: `BreadcrumbItem` — `{ label: string, href?: string }`
+- **Layout**: `height: 48px` (16px top/bottom padding), flex row, 24px gap between trail and phone
+- **Trail**: `<ol>` with inline `<li>` items; `/` separator between each item (12px horizontal margin)
+- **Typography**: Label style — 12px Roboto Regular, 0.2px letter-spacing, 16px line-height
+- **Colors**: links `--color-accent-30` (#004D80), current page + separators `--color-neutral-0`
+- **Current page**: last item without `href` renders as `<span aria-current="page">`
+- **Phone**: 18px phone icon + 16px number text, flex-shrink-0, right-aligned; hidden on mobile (`max-width: 599px`)
+- **Wrapping**: breadcrumb list uses `flex-wrap: wrap`
+- **Accessibility**: `<nav aria-label="Breadcrumb">`, `<ol>` semantics, `aria-current="page"` on current item
+- **Stories**: Default, WithPhone, AccountPage, SRPWithPhone, ManyItems (wrapping), AllVariants
+- **Storybook `title`**: `Molecules/Breadcrumbs`
+
+### `Pagination` — `src/components/Pagination/`
+- **Figma**: "Pagination" — standard pagination control with arrow buttons and numbered pill
+- **Props**: `totalPages: number` (**required**), `modelValue?: number` (default `1`, v-model)
+- **Emits**: `update:modelValue: [page: number]`
+- **Anatomy**: Left arrow + pill container (page numbers + ellipsis) + right arrow; 8px gap between arrow and pill
+- **Arrow buttons**: 48×48px circles; states Default (white bg, 1px `--color-neutral-90` border) · Hover (`--color-accent-90`) · Pressed (#C8E0E9) · Focus (3px `--color-accessibility-80` border); hidden via `opacity: 0` when at first/last page
+- **Number buttons**: 44×44px circles inside 48px pill (2px padding); Active = `--color-accent-40` bg + white bold
+- **Pill**: 48px height, 2px padding, `border-radius: 46px`, 1px `--color-neutral-90` border, white bg
+- **Ellipsis**: "..." in `--color-neutral-70`, shown when page gap exists
+- **Page window algorithm**: ≤5 pages shows all; page 1–3 active: `[1,2,3,4,...,last]`; near end: `[1,...,n-3,n-2,n-1,n]`; middle: `[1,...,c-1,c,c+1,...,last]`
+- **Mobile**: pill stretches (`flex: 1`) below 600px; pages spread with `justify-content: space-between`
+- **Arrow icons**: `Style=Arrows, Detail=Tail, Icon=Left/Right.svg?raw` — scales to 26px on hover/pressed
+- **Accessibility**: `<nav aria-label="Pagination">`, `aria-current="page"` on active number, `aria-label` on all buttons
+- **Stories**: FirstPageActive, Pages2To3Active, MiddlePageActive, LastPageActive, Only2Pages, Only3Pages, Interactive, AllPagePositions, MobileWidth
+- **Storybook `title`**: `Molecules/Pagination`
+
+### `Stepper` — `src/components/Stepper/`
+- **Figma**: "Stepper" — circular progress indicator showing current step in a multi-step flow
+- **Props**: `steps: StepperStep[]` (**required**, `{ label: string }`), `modelValue?: number` (default `1`, v-model, 1-based)
+- **Type export**: `StepperStep` — `{ label: string }`
+- **Progress**: Green arc fills `(currentStep - 1) / totalSteps`; e.g. step 3 of 5 = 40% (2 completed of 5)
+- **Circle**: 90×90px SVG; 8px stroke; track `--color-neutral-90`, fill `--color-base-primary-60` (green), `stroke-linecap: round`; animated with 0.4s transition
+- **Counter**: step number 26px bold + "of N" 14px regular, centered in the circle
+- **Text**: step label 26px bold; "Next: [label]" 14px regular #666B70; hidden on last step
+- **Layout**: flex row, 16px gap, 331px width; circle 90px fixed, text flex-1
+- **Usage**: Standard SCA flow (5 steps) or co-applicant flow (7 steps)
+- **Accessibility**: `role="group"`, `aria-label` includes step number, total, and current label
+- **Stories**: Step1of5 through Step5of5, CoApplicantStep5of7, CoApplicantStep7of7, AllStepsStandard, AllStepsCoApplicant, Interactive
+- **Storybook `title`**: `Molecules/Stepper`
+
+### `CarouselDots`
+- Photo carousel indicators; `count`, `v-model` index.
+- **Storybook `title`**: `Molecules/CarouselDots`
+
+## Status / Feedback
+
+### `CompareTray` — `src/components/CompareTray/`
+- **Figma**: nodes `13945:38154` (count + CTA) and `13945:38159` (prompt-only) — floating notification card that appears once the user flags a vehicle on an SRP tile.
+- **Props**: `count: number` (**required**), `ctaThreshold?: number` (default `2`), `addMoreLabel?: string` (default `'Add more to compare'`), `selectedLabel?: string` (default `'vehicles selected'`), `compareLabel?: string` (default `'Compare'`), `ariaLabel?: string`
+- **Emits**: `compare: [event: MouseEvent]`
+- **Behaviour**:
+  - `count === 0` → component renders nothing
+  - `0 < count < ctaThreshold` → 85px card with **prompt** text only (`addMoreLabel`)
+  - `count >= ctaThreshold` → 149px card showing `<count> {selectedLabel}` (count is bold, rest Light 300) plus a 148×56 `BaseButton variant="primary"` labelled `compareLabel`
+- **Layout**:
+  - **Desktop (≥600px)**: 412px fixed-width card, `position: fixed; right: 0; bottom: 0; z-index: 900`, shadow falls up-and-left
+  - **Mobile (<600px)**: stretches to 100vw, pinned to the bottom of the viewport, shadow straight up
+- **Animation**: fade + slide-up on enter/leave (`transition: transform 0.25s ease, opacity 0.2s ease`). `@media (prefers-reduced-motion)` drops the transform.
+- **Typography**: Prompt + count label share Roboto Light 22px, line-height 1.2, `--color-neutral-0`. The count number is `font-weight: 700`.
+- **Brand awareness**: The CTA uses `BaseButton variant="primary"` so the filled background automatically themes brand colour.
+- **Accessibility**: `<aside role="status" aria-live="polite">` so assistive tech announces state changes
+- **Stories**: AddMorePrompt, TwoSelected, ThreeSelected, Hidden, Interactive, Mobile
+- **Storybook `title`**: `Molecules/CompareTray`
+
+## Marketing
+
+### `SeoCarousel` — `src/components/SeoCarousel/`
+- **Figma**: SEO link carousel — horizontal scrolling pill of keyword links with chevron arrows
+- **Props**: `heading: string` (**required**), `items: SeoCarouselItem[]` (**required**, `{ label, href }`)
+- **Anatomy**: heading (22px Roboto Light, Neutral0) + pill container (55px height, 12px border-radius, 1px `#D4D7D9` border, white bg)
+- **Links**: 16px Roboto Medium, Accent40, 48px gap, `white-space: nowrap`, scroll inside the pill
+- **Edge fades**: 30px white-to-transparent gradient on left; ~41px gradient + chevron arrows on right
+- **Arrows**: 24px No-Tail chevron icons (Left-Small / Right-Small); disabled state dims to `opacity: 0.5`
+- **Scrolling**: native `overflow-x: auto` (hidden scrollbar) with smooth `scrollBy`, 280px step
+- **Responsive**: works at any width
+- **Stories**: ByMake, ByBodyStyle, ByMakeInCity, FewItems, MobileWidth, AllVariants, AllVariantsMobile
+- **Storybook `title`**: `Molecules/SeoCarousel`
+
+## VDP-specific
+
+### `VdpGallery` — `src/components/VdpGallery/`
+- **Figma**: node `13948:43354` (gallery frame), `13948:43357` (photos button), `13948:43358` (favorite button) — VDP above-the-fold hero.
+- **Props**: `imageUrl?: string`, `imageAlt?: string`, `title?: string` (used for fallback alt + gallery aria-label), `imageCount?: number` (reserved for a future count badge), `favorited?: boolean`
+- **Emits**: `update:favorited: [value: boolean]` (two-way with `v-model:favorited`), `click:photos: [event: MouseEvent]`
+- **Layout**: Outer `.vdpg` is `max-width: 864px`; inner `.vdpg__frame` pins the Figma `864 / 455` aspect ratio (`aspect-ratio` CSS) with `overflow: hidden`. Photo fills via `object-fit: cover`. Overlay buttons sit at `top: 20px; right: 16px; gap: 8px; z-index: 2`.
+- **Overlay buttons**: Two `OverlayIconButton` atoms pinned to the frame — photos (opens gallery) + favorite (`:selected="favorited"`).
+- **Icons**: `Style=Media, Detail=Image` (photos) and `Style=Account, Detail=Heart-Filled` (favorite).
+- **Accessibility**: Each button renders a real `aria-label`.
+- **Stories**: `Default`, `NoImage` (placeholder), `Favorited`, `Interactive`
+- **Storybook `title`**: `Molecules/VdpGallery`
+
+### `VdpSummary` — `src/components/VdpSummary/`
+- **Figma**: node `13948:43443` ("Group 1631") — VDP above-the-fold right column.
+- **Props**: `year?: number | string`, `make?: string`, `model: string` (**required**), `trim?: string`, `price?: number | string`, `priceLabel?: string` (default `'MSRP'`), `secondaryLabel?: string` (default `'See Store Price'`), `dealerName?: string`, `ctaLabel?: string` (default `'Test Drive'`), `vin?: string`, `stockNumber?: string`
+- **Emits**: `click:cta: [event: MouseEvent]`, `click:secondary: [event: MouseEvent]`
+- **Layout**: `max-width: 416px` column. Title block (`year + make` 27 px regular → `model + trim` 40 px bold, `letter-spacing: -1px`, line-heights 1 / 1.1) sits 40 px above the body. Body stacks two groups with `gap: 40px`:
+  1. Price-group (`gap: 24px`) — price row + dealer location
+  2. CTA-group (`gap: 32px`) — full-width primary CTA + VIN meta row
+- **Price row**: Flex row with `justify-content: space-between; align-items: flex-end`. Price is an inline-flex baseline-aligned triplet: `$` (18 px) + value (40 px, `letter-spacing: -1px`) + `priceLabel` (14 px, `--color-neutral-40`). Numeric `price` values are auto-formatted via `toLocaleString('en-US')`.
+- **Location row**: `Style=Location, Detail=Map-Location` 18 × 18 icon tinted `--color-action-accent`, followed by the dealer name (16 px, line-height 18 px, `--color-neutral-0`).
+- **Primary CTA**: `BaseButton variant="primary" size="sm"` stretched to full summary width via `max-width: none`. Brand color adapts automatically.
+- **Meta row**: `VIN: <vin>` · `|` · `Stock #: <stockNumber>` at 12 px / 16 px. Row renders only if either value is present. Meta text is `user-select: text`.
+- **Stories**: `Default`, `LongModelName`, `NoTrim`, `CustomCtaLabel`, `NoSecondary`
+- **Storybook `title`**: `Molecules/VdpSummary`
+
+## SRP Filters
+
+### `SrpFilterParent` / `SrpFilterChild` / `SrpFilterChildTextLink`
+- The internal sub-components used by `SrpFiltersPanel`. Filter shell, row, and text-link variant.
+- **Storybook `title`**: `Molecules/SRP Filters/FilterParent` · `FilterChild` · `FilterChildTextLink`
+
+### `SrpFilterPill` — `src/components/SrpFilterPill/`
+- SRP active filter pills with two modes: `location` (Map-Location icon + zip + distance) and `dismissible` (label + close).
+- Separate hit targets + Figma state styling.
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterPill`
+
+### `SrpPricePaymentFilter` — `src/components/SrpPricePaymentFilter/`
+- **Figma**: "Price & Payment Filter" — segmented price/payment toggle with min/max inputs + dual-thumb slider
+- **Props**: `priceAbsMin/priceAbsMax/priceMin/priceMax` (price range), `paymentAbsMin/paymentAbsMax/paymentMin/paymentMax` (payment range)
+- **Emits**: `update:priceMin`, `update:priceMax`, `update:paymentMin`, `update:paymentMax`, `commit: [{ priceMin, priceMax, paymentMin, paymentMax }]`
+- **Internal mode**: `'price' | 'payment'` toggle (not exposed as prop)
+- **Composes**: `SegmentedControl`, `BaseSlider`
+- **Key behaviour**: Formatted currency inputs (focus → raw number, blur → formatted); step snapping (`$1,000` price / `$50` payment); `commit` on blur, Enter, and slider `pointerup`
+- **Storybook `title`**: `Molecules/SRP Filters/PricePaymentFilter`
+
+### `SrpFilterDistance` — `src/components/SrpFilterDistance/`
+- **Figma**: "Distance & Stores" — shop by radius / shop by store toggle with zip code location fly-in
+- **Props**: `mode?: 'radius' | 'store'`, `zipCode?: string`, `radius?: number` (default 100), `selectedStores?: string[]`, `stores?: DistanceStoreItem[]`, `storeCountInRadius?: number`, `locationStores?: LocationStoreItem[]`
+- **Type export**: `DistanceStoreItem` — `{ id: string, name: string, distanceMiles: number }`
+- **Emits**: `update:mode`, `update:radius`, `update:selectedStores`, `update:zipCode`
+- **Key behaviour**: Radius options 25–250 mi via `SelectDropdown`; switching mode resets selections; "Shop by store" auto-selects closest store; expand/collapse store list; internal drill-down sub-panel for `SrpLocationFlyIn` (slides in from right)
+- **Composes**: `SegmentedControl`, `SelectDropdown`, `SrpLocationFlyIn`, `SrpFilterChild`
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterDistance`
+
+### `SrpLocationFlyIn` — `src/components/SrpLocationFlyIn/`
+- **Figma**: "Location fly-in" — zip code entry panel with store list
+- **Props**: `zipCode?: string`, `stores?: LocationStoreItem[]`, `hideHeader?: boolean`
+- **Type export**: `LocationStoreItem` — `{ id: string, name: string, distanceMiles: number, address: string, phone: string }`
+- **Emits**: `close`, `update:zipCode`
+- **Composes**: `LinkCta`
+- **Key behaviour**: Text input for 5-digit zip; "Change" button applies new zip without closing; each store shows name, address, phone, distance, and directions link
+- **Storybook `title`**: `Molecules/SRP Filters/SrpLocationFlyIn`
+
+### `SrpFilterMakeModelTrim` — `src/components/SrpFilterMakeModelTrim/`
+- **Figma**: "Make/Model/Trim Filter" — three-level drill-down with search
+- **Props**: `makes: MakeItem[]` (**required**), `selectedMakes/selectedModels/selectedTrims?: string[]`, `initialView?: 'make' | 'model' | 'trim'`, `initialMake/initialModel?: string`
+- **Type exports**: `MakeItem`, `ModelItem`, `TrimItem`
+- **Emits**: `update:selectedMakes`, `update:selectedModels`, `update:selectedTrims`
+- **Key behaviour**: Three sub-views (make → model → trim) with slide animation; live search (word-start matching, activates from 2 chars); committed selections float to top on return
+- **Storybook `title`**: `Molecules/SRP Filters/MakeModelTrimFilter`
+
+### `SrpFilterYear` — `src/components/SrpFilterYear/`
+- **Figma**: "Year Filter" — min/max dropdowns + dual-thumb range slider
+- **Props**: `absMin/absMax?: number` (bounds), `minYear/maxYear?: number` (v-model)
+- **Emits**: `update:minYear`, `update:maxYear`, `commit: [{ minYear, maxYear }]`
+- **Composes**: `BaseSlider` (range, step 1)
+- **Key behaviour**: Min dropdown ascending (oldest first), max dropdown descending (newest first); cross-clamp ensures min ≤ max
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterYear`
+
+### `SrpFilterMileage` — `src/components/SrpFilterMileage/`
+- **Figma**: "Mileage Filter" — single dropdown for max mileage
+- **Props**: `absMax?: number` (default 150,000), `modelValue?: number` (v-model)
+- **Emits**: `update:modelValue`
+- **Key behaviour**: Options generated in 10,000-mile increments; labels formatted as "X or less"
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterMileage`
+
+### `SrpFilterFeatures` — `src/components/SrpFilterFeatures/`
+- **Figma**: "Features Filter" — two-section checkbox filter (Popular with icons + More features without)
+- **Props**: `popular: FeatureOption[]` (**required**), `more: FeatureOption[]` (**required**), `selected?: string[]`, `committed?: string[]`
+- **Type export**: `FeatureOption` — `{ value: string, label: string, count: number, icon?: string }`
+- **Emits**: `update:selected`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: **AND relationship** (not OR like other filters); "Popular" section items have trailing vehicle descriptor icons; committed selections float to top in original order
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterFeatures`
+
+### `SrpFilterMpgEngine` — `src/components/SrpFilterMpgEngine/`
+- **Figma**: "MPG & Engine Type Filter" — MPG min/max text inputs + slider, plus engine type checkboxes
+- **Props**: `absMin/absMax?: number` (MPG bounds), `minMpg/maxMpg?: number` (v-model), `engineTypes: EngineTypeOption[]` (**required**), `selectedEngines?: string[]`, `committedEngines?: string[]`
+- **Type export**: `EngineTypeOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:minMpg`, `update:maxMpg`, `update:selectedEngines`
+- **Composes**: `BaseSlider` (range, step 1), `SrpFilterChild`
+- **Key behaviour**: Auto-clamp on blur (no error state); engine types listed alphabetically; selected engines float to top of Engine type section
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterMpgEngine`
+
+### `SrpFilterDriveTrans` — `src/components/SrpFilterDriveTrans/`
+- **Figma**: "Drive type & Transmission Filter" — two-section checkbox filter
+- **Props**: `driveTypes: DriveTransOption[]` (**required**), `transmissions: DriveTransOption[]` (**required**), `selectedDriveTypes/selectedTransmissions?: string[]`, `committedDriveTypes/committedTransmissions?: string[]`
+- **Type export**: `DriveTransOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:selectedDriveTypes`, `update:selectedTransmissions`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: Listed in inventory order; selected items float to top of their own section; independent committed state per section
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterDriveTrans`
+
+### `SrpFilterCondition` — `src/components/SrpFilterCondition/`
+- **Figma**: Sonic SRP only — not present on EchoPark SRP because EchoPark only sells used vehicles
+- **Role**: Multi-select checkbox filter letting Sonic shoppers narrow inventory by **New**, **Pre-owned**, **Certified pre-owned**
+- **Props**: `options: ConditionOption[]` (**required**), `selected?: string[]`, `committed?: string[]`
+- **Type export**: `ConditionOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:selected`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: Committed selections float to top in the "returning" green style on re-open; no internal section headings
+- **SrpPage integration**: `SrpPage` conditionally inserts a `condition` category only when `isSonic` is true, placed right after `distance`
+- **Stories**: Default, NewSelected, MultipleSelected, AllSelected, Returning, Interactive
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterCondition`
+
+### `SrpFilterVehicleStatus` — `src/components/SrpFilterVehicleStatus/`
+- **Figma**: Sonic SRP only — not shown on the EchoPark SRP.
+- **Role**: Multi-select checkbox filter letting Sonic shoppers narrow inventory by **On the lot** vs **In transit**
+- **Props**: `options: VehicleStatusOption[]` (**required**), `selected?: string[]`, `committed?: string[]`
+- **Type export**: `VehicleStatusOption` — `{ value: string, label: string, count: number }`
+- **Emits**: `update:selected`
+- **Composes**: `SrpFilterChild`
+- **Key behaviour**: Structurally identical to `SrpFilterCondition` — committed selections float to the top in the "returning" green style on re-open
+- **SrpPage integration**: Sonic-only. `SrpPage` splices both `vehicle-status` and `condition` into position 1 of the category list (right after `distance`) when `isSonic` is true, with **Vehicle status appearing directly above Condition**. `SrpPage` exposes `visibleListings` — a computed that filters `listings` by the `vehicleStatus` field when this filter is active (listings without an explicit status are treated as `'on-lot'`).
+- **Stories**: Default, OnLotSelected, InTransitSelected, BothSelected, Returning, Interactive
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterVehicleStatus`
+
+### `SrpFilterColor` — `src/components/SrpFilterColor/`
+- **Figma**: "Color Filter" — Exterior/Interior segmented toggle with color swatch rows
+- **Props**: `exteriorColors/interiorColors: ColorOption[]` (**required**), `mode?: 'exterior' | 'interior'`, `selectedExterior/selectedInterior?: string[]`, `committedExterior/committedInterior?: string[]`
+- **Type export**: `ColorOption` — `{ value: string, label: string, count: number, swatch: string }`
+- **Emits**: `update:mode`, `update:selectedExterior`, `update:selectedInterior`
+- **Composes**: `SegmentedControl`, `SrpFilterChild`
+- **Key behaviour**: 40px circular swatches (CSS radial gradients) in trailing-icon slot; separate selection state per mode; committed selections float to top on return; parent `SrpFiltersPanel` renders title
+- **Storybook `title`**: `Molecules/SRP Filters/SrpFilterColor`

@@ -1,0 +1,56 @@
+---
+description: SFC conventions for components in src/components — folder layout, library export pattern, BEM, child-SFC prop binding, sub-component approval rule.
+globs: src/components/**
+alwaysApply: false
+---
+
+# EPDS — Component Conventions
+
+## File layout
+Every component lives in its own folder under `src/components/ComponentName/`:
+
+```
+src/components/ComponentName/
+  ComponentName.vue
+  ComponentName.stories.ts
+  index.ts
+```
+
+The component's `index.ts` re-exports the SFC default and any public types.
+
+## Library export
+After adding a component, **register it in `src/index.ts`** so it ships in `dist/epds.js`. Also re-export shared types the same way as existing entries.
+
+## SFC rules
+- Use `<script setup lang="ts">`, `defineProps<{}>()`, `defineEmits<{}>()` — **no Options API**
+- `<style scoped>` only — no global selectors in component files
+- No inline styles unless dynamically computed
+- BEM-style class names rooted on the component (e.g. `accordion`, `accordion__header`, `accordion__header--open`)
+
+## Reuse first
+Before writing new markup, check whether an existing component (`BaseButton`, `LinkCta`, `Alert`, `Accordion`, etc.) already fits. **Do not** add hidden one-off primitives inside larger components without explicit sign-off.
+
+## No new sub-components without checking the user
+If a composite needs a new primitive, propose it first. The catalog rules (atoms/molecules/organisms) are the source of truth for what's already built — fetch them when unsure.
+
+## Vue + TypeScript template gotcha
+On child SFCs, bind props using the **camelCase name from `defineProps`** — `vue-tsc` treats DOM-style `aria-label` as a separate attribute and will report required props missing.
+
+```vue
+<!-- BAD: vue-tsc will complain ariaLabel is missing -->
+<MediumIconButton aria-label="Open menu" />
+
+<!-- GOOD -->
+<MediumIconButton :aria-label="'Open menu'" />
+<!-- or just -->
+<MediumIconButton ariaLabel="Open menu" />
+```
+
+## Vue + TypeScript: typed union for input modes
+On `TextField` and similar inputs, `inputmode` is a **typed union**, not a plain `string`. Use the typed prop value — `vue-tsc` flags `string` as too wide.
+
+## Brand awareness
+Components themselves are usually brand-agnostic. Brand-specific values come through CSS custom properties — see the `tokens.mdc` rule for the three-layer architecture and white-label pattern. When a component needs brand-specific structural overrides (e.g. Sonic-only hover underline on `BaseButton` secondary), scope them with `[data-brand="sonic"]`.
+
+## When to update the catalog
+When you add a new component, update the matching catalog rule (`atoms-catalog.mdc` / `molecules-catalog.mdc` / `organisms-catalog.mdc`) in the same change. The catalogs are the project's component memory — they stay current only if updates are paired with code.

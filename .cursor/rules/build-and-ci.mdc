@@ -1,0 +1,99 @@
+---
+description: EPDS build pipeline, library packaging, GitHub Actions, tsconfig quirks, and project folder structure. Fetch when running npm scripts, debugging CI, or auditing the file layout.
+alwaysApply: false
+---
+
+# EPDS — Build, CI, and Project Structure
+
+## Project Structure
+
+```
+EPDS/
+├── index.html                              ← Google Fonts link lives here
+├── icon/                                   ← All SVG icons (Figma exports, original names kept)
+│   ├── Style=Account, Detail=..., Icon=NA.svg     ← system icons (24×24, fill=#242C33)
+│   ├── Style=Arrows, Detail=No-Tail, Icon=Right.svg
+│   ├── Icon=Illustrative, Name=*.svg              ← multi-colour illustrative icons
+│   └── Icon Type=Vehicle Descriptors, *.svg       ← vehicle icons (Large/Medium/Small)
+├── Illustrations/                          ← Multi-colour SVG illustrations (1x + @2x retina)
+│   ├── Property 1=Car.svg
+│   ├── Property 1=PersonDriving.svg
+│   ├── Property 1=HoldingACar.svg
+│   └── Property 1=Variant4.svg            (+ @2x variants of each)
+├── Photos/                                 ← Photography assets (PNG) by category
+│   ├── Car only/
+│   ├── EchoPark team/
+│   ├── Nascar promo/
+│   ├── People/
+│   ├── Service and protection/
+│   └── VDP cars/
+├── Logos/                                  ← Brand + 3rd-party logos (multi-colour SVGs)
+│   ├── Color=EP-FullColor.svg             ← EchoPark full-colour logo (dark bg)
+│   ├── Color=EP-GreenWhite.svg            ← EchoPark green/white logo (transparent header)
+│   ├── Color=SA-FullColor.svg             ← Sonic Automotive full-colour logo
+│   ├── Property 1=EP-FullColor.svg        ← EchoPark alternate exports
+│   ├── Property 1=EP-GreenWhite.svg
+│   └── 3rd Party/                          ← Partner/trust logos
+├── src/
+│   ├── index.ts                            ← Library public API (re-exports components + tokens); side-effect import of epds.css
+│   ├── epds.css                            ← Token layers + global reset (same order as consumed by the library)
+│   ├── tokens/
+│   │   ├── primitives/
+│   │   │   ├── echopark.css                ← EchoPark brand palette + --font-family-brand
+│   │   │   └── sonic.css                   ← Sonic Automotive brand palette (red primary, steel-blue accent)
+│   │   ├── semantic.css                    ← Intent aliases: --color-action-*, --color-focus-ring, --color-feedback-*
+│   │   ├── tokens.css                      ← Brand-agnostic scales: spacing, border, shadow, opacity, typography
+│   │   ├── tokens.ts                       ← TypeScript token map (tokens.semantic.* + tokens.color.*)
+│   │   └── breakpoints.ts                  ← Breakpoint constants for JS/media queries
+│   ├── components/
+│   │   └── ComponentName/
+│   │       ├── ComponentName.vue
+│   │       ├── ComponentName.stories.ts
+│   │       └── index.ts
+│   ├── pages/                              ← Full-page compositions (not published as library components)
+│   │   ├── SrpPage.vue                     ← SRP demo page; brand-aware via `brandName` prop
+│   │   └── SrpPage.stories.ts
+│   ├── stories/                            ← Foundation/asset gallery stories
+│   │   ├── Icons.stories.ts
+│   │   └── Logos.stories.ts
+│   ├── vite-env.d.ts                       ← Vite client ref + `*?url` (deep `@logos/...?url`) module typings
+│   ├── App.vue
+│   ├── main.ts                             ← imports `./epds.css` (local dev shell)
+│   └── style.css                           ← global resets only (pulled in via epds.css)
+├── vite.lib.config.ts                      ← `npm run build` — ESM lib + `dist/epds.css` + `dist/index.d.ts`
+├── tsconfig.lib.json                       ← Typecheck scope for the library (excludes stories)
+├── .github/workflows/
+│   ├── ci.yml                              ← on push / PR → `main`: `npm ci` + `npm run build` (lib artifact gate)
+│   └── deploy-storybook.yml                ← on push → `main`: Storybook static build → GitHub Pages
+├── .storybook/
+│   ├── main.ts
+│   ├── preview.ts                          ← imports `../src/epds.css`
+│   └── preview-head.html                   ← Google Fonts link for Storybook iframe
+└── .cursor/rules/                          ← scoped rule set (core, tokens, components-conventions, storybook, icons-and-assets, build-and-ci, figma-mcp-workflow, atoms/molecules/organisms catalogs)
+```
+
+## Library consumption (`npm run build`)
+
+- **Output**: `dist/epds.js` (ESM), `dist/epds.css` (tokens + reset + extracted SFC styles), `dist/index.d.ts` (types). `public/` is not copied into `dist` for lib builds.
+- **Peer dependency**: `vue` ^3.5 (see `package.json` `peerDependencies`).
+- **Install in a host app**: `npm install epds` (when published) or `"epds": "file:../EPDS"` / workspace protocol for local monorepos — run `npm run build` in EPDS first so `dist/` exists.
+- **Host app usage**:
+  ```ts
+  import { BaseButton, tokens } from 'epds'
+  ```
+  The package entry side-imports `epds.css`; bundlers should emit/load `dist/epds.css` automatically. Load **Roboto** (300/400/500/700) in the host app the same way as `index.html` / Storybook preview-head.
+- **App shell vs library**: `npm run build` writes **`dist/`** (publish this for npm). `npm run build:app` writes **`dist-app/`** so it never overwrites the library output; use `vite preview` after `build:app` if you need to check the shell. Storybook is unchanged (`npm run storybook` / `build-storybook`).
+- **New components**: add a barrel under `src/components/Name/` and register the export in `src/index.ts` (plus any public types already exported from the component `index.ts`).
+
+## CI & GitHub Pages
+
+- **`npm run build`** runs **`vue-tsc -p tsconfig.lib.json --noEmit`** then **`vite build --config vite.lib.config.ts`** — verifies typings and emits **`dist/epds.js`**, **`dist/epds.css`**, **`dist/index.d.ts`**. Dependencies must exist locally (`npm ci` / `npm install`).
+- **`.github/workflows/ci.yml`** — on every **push** and **pull request** targeting **`main`**: `npm ci` → **`npm run build`**. Confirms the **library** stays buildable on clean CI (orthogonal to docs).
+- **`.github/workflows/deploy-storybook.yml`** — on **push** to **`main`** (plus **workflow_dispatch**): `npm ci` → **`npm run build-storybook`** → uploads **`storybook-static`** → **GitHub Pages** (`STORYBOOK_BASE=/EPDS/` for the `/EPDS/` site path).
+- **npm publish** / registry releases are **not** automated here; workflows **verify** the lib build and **host** Storybook only.
+
+## TypeScript & tooling notes
+
+- **`tsconfig.app.json`** extends **`./node_modules/@vue/tsconfig/tsconfig.dom.json`** (relative path so editors resolve the Vue baseline even when package-style `@vue/tsconfig/...` `extends` is flaky).
+- **`src/vite-env.d.ts`**: keep **`/// <reference types="vite/client" />`**. Declare **`declare module '*?url' { … }`** so multi-segment URL imports typecheck (e.g. `@logos/OEMs/Audi.svg?url`) — Vite's default **`*.svg?url`** patterns only match a single path segment.
+- **Strict unused locals**: `vue-tsc` honours **`noUnusedLocals`** from the TS config chain — remove unused script symbols (stub helpers that are never wired to the template) or the lib build fails.

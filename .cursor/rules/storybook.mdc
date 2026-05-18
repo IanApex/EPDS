@@ -1,0 +1,45 @@
+---
+description: Storybook conventions for EPDS — CSF3 format, a11y enforcement, story title hierarchy, and preview.ts storySort.
+globs: **/*.stories.ts, .storybook/**
+alwaysApply: false
+---
+
+# EPDS — Storybook
+
+## Story file rules
+- Stories are co-located in the component folder
+- CSF3 format: `satisfies Meta<typeof Component>`
+- Use `storybook-addon-pseudo-states` for hover/active/focus-visible stories
+- a11y addon is set to `'error'` — **failing stories must be fixed, not suppressed**
+
+## Top-level sidebar groups
+**`Atoms`**, **`Molecules`**, **`Organisms`**, **`Pages`**, **`Components`**.
+
+Set each story's `title` on `Meta`. Order is controlled in **`.storybook/preview.ts`** via the inline `storySort` comparator (`order` array — **must stay inline** for Storybook 10 static analysis; **no TypeScript types inside that function**).
+
+## Title hierarchy
+
+### Atoms
+- **Buttons / CTAs**: `'Atoms/Buttons/ComponentName'` — e.g. `BaseButton`, `LinkCta`, `IconButton`, `TileCta`, `MediumIconButton`, `SmallIconButton`, `OverlayIconButton`, `CompareButton`, `ArrowCircleButton`, `VideoControlButton`, `JourneySelector`
+- **Inputs**: `'Atoms/Inputs/ComponentName'` — e.g. `TextBoxSM`, `TextBoxLG`, `TextField`, `BaseSlider`, `BaseRadio`, `BaseCheckbox`, `BaseToggle`, `SegmentedControl`, `SelectDropdown`, `LogicSelector`, `BoxSelector`
+- **Box inputs (sub-folder)**: `'Atoms/Inputs/Box Input/XS'` (and `/SM`, `/MD`, `/LG`)
+- **Navigation**: `'Atoms/Navigation/NavItem'`, `'Atoms/Navigation/NavItemMobile'`, `'Atoms/Navigation/NavItemSubmenu'`, `'Atoms/Navigation/MenuToggle'`, `'Atoms/Navigation/NavIconButton'`
+- **Asset galleries** (`src/stories/`): `'Atoms/Icons'`, `'Atoms/Illustrations'`, `'Atoms/Logos'`, `'Atoms/Photos'` — **no** `Foundations/` parent
+
+### Molecules
+Flat (`'Molecules/Name'`) or sub-folder. Examples:
+- `'Molecules/Accordion'`, `'Molecules/Alert'`, `'Molecules/BaseModal'`, `'Molecules/CarOfferInputCard'`, `'Molecules/CompareTray'`, `'Molecules/ContentTile'`, `'Molecules/LocationTile'`, `'Molecules/LocationTileVdp'`, `'Molecules/CarouselDots'`, `'Molecules/FaqBlogTab'`, `'Molecules/ModalTabs'`, `'Molecules/SRPTile'`, `'Molecules/VdpGallery'`, `'Molecules/VdpSummary'`
+- **`'Molecules/SRP Filters/...'`** sub-folder: `FilterParent`, `FilterChild`, `FilterChildTextLink`, `SrpFilterPill`, `SrpFilterDistance`, `SrpLocationFlyIn`, `MakeModelTrimFilter`, `PricePaymentFilter`, `SrpFilterYear`, `SrpFilterMileage`, `SrpFilterFeatures`, `SrpFilterMpgEngine`, `SrpFilterDriveTrans`, `SrpFilterColor`, `SrpFilterCondition`, `SrpFilterVehicleStatus`
+
+### Organisms
+Flat:
+- `'Organisms/GlobalHeader'`, `'Organisms/GlobalFooter'`, `'Organisms/SonicNavBar'`, `'Organisms/SonicCircuit'`, `'Organisms/PackageCarousel'`, `'Organisms/BrandPortfolio'`, `'Organisms/SRP Filters/FiltersPanel'`
+
+### Pages (`src/pages/`)
+- `'Pages/SRP'`, `'Pages/VDP'` — full-page compositions showing components in context. Each page story has per-brand variants (EchoPark + Sonic).
+
+### Components
+Reserved for future standalone app stories — none yet (keep `'Components'` in `preview.ts` `order` if you add some later).
+
+## Storybook backgrounds
+Registered in `preview.ts`: **light** (#FFFFFF), **dark** (#242C33), **neutral-95** (#F4F5F7). Use `backgrounds: { default: 'dark' }` on stories that need to demonstrate dark-theme variants (e.g. secondary buttons on a dark surface).

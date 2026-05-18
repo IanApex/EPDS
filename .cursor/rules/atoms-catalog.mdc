@@ -1,0 +1,501 @@
+---
+description: EPDS atom catalog — every published atom component (buttons, inputs, navigation, divider, tooltip, overlay, badges). Fetch when looking up an existing atom's props/states or before building a new one.
+alwaysApply: false
+---
+
+# EPDS — Atoms Catalog
+
+This catalog covers every atom in `src/components/` keyed by Storybook title group: `Atoms/Buttons/...`, `Atoms/Inputs/...`, `Atoms/Navigation/...`, and standalone atoms.
+
+## Buttons / CTAs
+
+### `BaseButton` — `src/components/BaseButton/`
+- **Figma**: "Buttons/Primary" (primary md), "Buttons/Tertiary" (primary sm), "Buttons/Secondary" (secondary light md), "Buttons/TertiaryOutlined" (secondary light sm), "Buttons/SecondaryDark" (secondary dark md), "Buttons/TertiaryDark" (secondary dark sm). Sonic equivalent: "Buttons" frame (`Primary` / `Secondary Dark` / `Secondary Light` × `Large` / `Small` × `Default` / `Hover` / `Pressed`).
+- **Props**: `variant?: 'primary' | 'secondary'`, `size?: 'md' | 'sm'`, `theme?: 'light' | 'dark'`, `label?: string`, `disabled?: boolean`
+- **Emits**: `click: [event: MouseEvent]`
+- **Sizes** (brand-driven via `--btn-md-*` / `--btn-sm-*` tokens):
+  - `md` — EchoPark **56px h, 13px / 40px padding, 16px / 500 / 0.4px text**; Sonic **48px h, 12px / 24px padding, 18px / 700 / -0.198px / lh 1.3 text** (Sonic Figma "Large").
+  - `sm` — EchoPark **40px h, 13px / 24px padding, 14px / 500 / 0 text**; Sonic **40px h, 12px / 16px padding, 14px / 700 / -0.154px / lh 1.3 text** (Sonic Figma "Small").
+- **Border-radius**: EchoPark = pill (`--border-radius-pill`); Sonic = **2px** (`--button-border-radius` overridden in `primitives/sonic.css`).
+- **Primary states**: hover (darker bg + underline), active (deepest bg, no underline), focus-visible (accessibility-blue ring via `border-color`), disabled (grey). Theme prop has no effect. Surface colours flow through `--color-btn-primary-surface[-hover|-press]` so brands can supply button-specific values that diverge from the broader `--color-action-primary` chain. **Sonic** overrides them to `#F24922 / #D9320D / #9A2409` (Figma button frame, slightly more orange than the rest of the Sonic primary palette).
+- **Secondary states**: shape is identical across brands (2px → 3px inset box-shadow on hover, focus-visible = accessibility-blue ring, disabled = grey bg). Colours and press treatment are token-driven:
+  - **EchoPark — light theme**: transparent surface, `--color-neutral-0` border + text, hover thickens to 3px (no fill change), press = 3px border + `--color-neutral-95` fill.
+  - **EchoPark — dark theme**: white border + text on dark, hover thickens to 3px (no fill change), press = 3px border + `--color-neutral-0` fill.
+  - **Sonic — light theme** ("Secondary Dark" in Figma): same outlined defaults as EchoPark, but **press keeps the border at 2px** and adds a `rgba(242, 242, 242, 0.10)` overlay fill (controlled via `--btn-secondary-press-border-width` and `--color-btn-secondary-surface-press`). Hover also adds an underline (Sonic-only structural override scoped via `[data-brand="sonic"]`).
+  - **Sonic — dark theme** ("Secondary Light" in Figma): same white border / white text as EchoPark, but **press keeps the border at 2px** and uses `rgba(242, 242, 242, 0.10)` overlay (`--color-btn-secondary-surface-press-dark`). Same Sonic-only hover underline.
+- **Brand override mechanics**:
+  - Token swaps in `primitives/sonic.css` cover: border-radius, button typography (`--font-size-btn`, `--font-weight-btn`, `--line-height-btn`, `--letter-spacing-btn` and their `-sm` siblings), button dimensions (`--btn-md-height`, `--btn-md-padding`, `--btn-sm-*`), primary surface colours, secondary surface / border / text + press border-width.
+  - `[data-brand="sonic"]` selector inside `BaseButton.vue` adds the secondary-hover underline that cannot be expressed as a token swap.
+- **Stories**: full coverage of variant×size×theme×state + VariantComparison, SizeComparison, AllVariants. Plus **`Sonic — All States`** and **`Sonic — Secondary / Light (on dark bg)`** stories that mirror the Figma "Buttons" frame layout (3 variants × 2 sizes × 3 states) — switch the Storybook **Brand** toolbar to *Sonic Automotive* to see the Sonic styling. Dark-background stories use `backgrounds: { default: 'dark' }`.
+- **Storybook backgrounds**: light (#FFFFFF), dark (#242C33), neutral-95 (#F4F5F7) — registered in `preview.ts`.
+- **Key tokens used**: `--color-btn-primary-surface/-hover/-press`, `--color-btn-primary-text`, `--color-btn-secondary-surface/-hover/-press`, `--color-btn-secondary-surface-press-dark`, `--color-btn-secondary-border`, `--color-btn-secondary-text`, `--btn-secondary-press-border-width`, `--btn-md-height/-padding`, `--btn-sm-height/-padding`, `--button-border-radius`, `--font-*-btn*`, `--color-neutral-0/95/100`, `--color-focus-ring`.
+
+### `LinkCta` — `src/components/LinkCta/`
+- **Figma**: "CommonInputs/TextLink" (light), "CommonInputs/TextLink Dark" (dark)
+- **Props**: `label?: string`, `arrow?: boolean` (default `false`), `theme?: 'light' | 'dark'` (default `'light'`), `href?: string`, `target?: string`, `disabled?: boolean`
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided
+- **Light states**: default/hover/focus = Accent40; pressed = Accent30; hover/pressed add underline
+- **Dark states**: default/hover/focus = Accent80; pressed = Accent90; hover/pressed add underline
+- **Focus ring**: 3px solid Accessibility80, outline-offset 2px, border-radius 2px (rectangular per Figma)
+- **Disabled**: opacity `--opacity-level-medium` (32%), pointer-events none
+- **Arrow icon**: imported from `@icons/Style=Arrows, Detail=No-Tail, Icon=Right.svg?component` — `.link-cta__arrow :deep(path) { fill: currentColor }` makes it inherit the link colour
+- **Stories**: full Light×arrow×state + Dark×arrow×state coverage + AsAnchor + AllVariants
+- **Key tokens**: `--color-accent-30/40/80/90`, `--color-accessibility-80`, `--opacity-level-medium`, `--font-*-btn`
+
+### `IconButton` — `src/components/IconButton/`
+- **Figma**: "IconButtons/SignIn"
+- **Props**: `label?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (leading 24×24 SVG — import from `@icons/` using `?component`), default (label text)
+- **Icon colour**: `.icon-button__icon :deep(path/circle/rect/polygon) { fill: currentColor }` in scoped CSS ensures the slotted SVG inherits the button colour automatically
+- **Always**: small (40px), primary green — no variant/size/theme props
+- **Layout**: `gap: 8px`, `padding: 4px 16px`, `border-radius: var(--border-radius-pill)`
+- **States**: default=Primary50, hover=Primary40+underline, pressed=Primary55, focus=3px Accessibility80 border, disabled=SecondaryNeutral90 bg + Neutral70 text
+- **Focus**: `border: 3px solid transparent` base, `border-color: --color-accessibility-80` on focus-visible (same overflow-clip technique as BaseButton primary)
+- **Key tokens**: `--color-base-primary-40/50/55`, `--color-accessibility-80`, `--color-neutral-secondary-90`, `--color-neutral-70/100`
+- **Stories**: Default, Hover, Active, Focus, Disabled, NoIcon, AllStates
+
+### `TileCta` — `src/components/TileCta/`
+- **Figma**: "IconButtons/SrpTile"
+- **Props**: `label?: string`, `href?: string`, `target?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (leading 24×24 SVG), default (label text)
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided
+- **Dimensions**: height 40px, `border-radius: var(--border-radius-pill)`, gap 8px, padding 0 12px
+- **Color scheme**: Accent (blue) — NOT primary green
+- **Base**: `border: 3px solid transparent` (space reserved) + `box-shadow: inset 0 0 0 2px --color-accent-40` for layout-stable 2px border
+- **States**: default=Accent40 2px border, hover=Accent30 3px border+text, active=Accent40 3px border+Accent90 bg, focus=Accessibility80 3px border, disabled=SecondaryNeutral90 bg+Neutral70 text
+- **Icon colour**: `.tile-cta__icon :deep(path/circle/rect/polygon) { fill: currentColor }` — inherits all state colour changes automatically
+- **Stories**: Default, Hover, Active, Focus, Disabled, AsAnchor, NoIcon, AllStates
+
+### `MediumIconButton` — `src/components/MediumIconButton/`
+- **Figma**: "IconButtons/Calculator" (icon-only circular button)
+- **Props**: `ariaLabel: string` (**required** — no visible text), `href?: string`, `target?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (SVG rendered at 20×20 inside the 40×40 circle)
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided
+- **Shape**: Fixed 40×40px circle (`width: 40px; height: 40px; border-radius: var(--border-radius-pill)`)
+- **Icon size**: 20×20px (not 24×24) — the wrapper shrinks the icon to Figma spec
+- **Color scheme**: Accent (blue) — same as TileCta
+- **States**: same inset box-shadow pattern as TileCta (default=2px Accent40, hover=3px Accent30, active=3px Accent40+Accent90 bg, focus=3px Accessibility80, disabled=SecondaryNeutral90 bg+Neutral70)
+- **Accessibility**: `ariaLabel` prop is always rendered as `aria-label` — mandatory since there is no visible label
+- **Stories**: Default, Hover, Active, Focus, Disabled, AsAnchor, AllStates, IconVariety
+
+### `SmallIconButton` — `src/components/SmallIconButton/`
+- **Figma**: "IconButtons/Favorite" (32×32 toggle button)
+- **Props**: `ariaLabel: string` (**required**), `selected?: boolean` (default `false`), `disabled?: boolean`
+- **Slots**: `#icon` (24×24 SVG — full size inside 32px circle)
+- **Emits**: `click: [event: MouseEvent]` — parent is responsible for toggling `selected`
+- **Shape**: Fixed 32×32px circle, `background: --color-neutral-100` (white)
+- **Key difference from other icon buttons**: white background + neutral grey border (NOT Accent blue)
+- **Border**: real `border` (not box-shadow inset) — `box-sizing: border-box` keeps outer size exactly 32px regardless of border-width, so no layout shift. 1px Neutral90 default, 2px Neutral90 hover, 3px Accessibility80 focus
+- **Icon colour via currentColor**:
+  - Unselected: `--color-neutral-70` (grey)
+  - Selected: `--color-base-primary-50` (green)
+  - Hover + selected: `--color-base-primary-55` (lighter green)
+  - Disabled: `--color-neutral-80` + `--opacity-level-medium`
+- **Accessibility**: `ariaLabel` → `aria-label`; `selected` → `aria-pressed` (browser announces both)
+- **Stories**: DefaultUnselected, DefaultSelected, HoverUnselected, HoverSelected, Focus, FocusSelected, Disabled, Interactive, AllStates, IconVariety
+
+### `OverlayIconButton` — `src/components/OverlayIconButton/`
+- **Figma**: VDP gallery overlays (nodes `13948:43357` photos, `13948:43358` favorite).
+- **Purpose**: 40 × 40 circular icon button for placement over a photo. Shared by `VdpGallery`'s photos + favorite buttons.
+- **Props**: `ariaLabel: string` (**required**), `selected?: boolean`, `ariaPressed?: boolean`, `disabled?: boolean`
+- **Slots**: `#icon` (SVG rendered at 20×20). Fills inherit `currentColor` via `:deep(path|circle|rect|polygon|polyline|ellipse)`, so a single SVG tracks hover and selected states.
+- **Emits**: `click: [event: MouseEvent]`
+- **Default**: white surface (`--color-neutral-100`) + accent icon (`--color-action-accent`); hover deepens the icon to `--color-action-accent-hover`.
+- **Selected**: surface flips to `--color-action-accent` with a white icon; hover deepens to `--color-action-accent-hover`. Wire `ariaPressed` to mirror `selected` for toggles.
+- **Focus**: 3 px `--color-focus-ring` outer box-shadow. **Disabled**: 50 % opacity.
+- **Stories**: `Default`, `Selected`, `Disabled`, `Interactive` (photos + favorite toggle on a real photo backdrop).
+- **Storybook `title`**: `Atoms/Buttons/OverlayIconButton`
+
+### `CompareButton` — `src/components/CompareButton/`
+- **Figma**: "Buttons/Compare" — 32×32 pill-shaped toggle used on SRP tiles to add/remove a vehicle from the compare list. Figma only defines six states (Un-added / Added × default / hover / focus); there is no disabled state.
+- **Props**: `selected?: boolean` (v-model via `v-model:selected`), `compareLabel?: string` (default `'Compare'`), `removeLabel?: string` (default `'Remove'`), `ariaLabelUnselected?: string` (default `'Add to compare'`), `ariaLabelSelected?: string` (default `'Remove from compare'`)
+- **Emits**: `update:selected: [boolean]`, `click: [event: MouseEvent]`
+- **Behaviour**: Hover/focus expands the pill **to the left** to reveal the label (animated via `grid-template-columns: 0fr → 1fr`, 0.25s). Click toggles `selected`. Mouse off collapses back to the circle. Icon switches from `+` (Add.svg) when unselected to ✓ (Check.svg) when selected.
+- **No-bounce rule**: The component renders as a 32×32 `position: relative` anchor slot containing a `position: absolute; right: 0` button. This pins the button's right edge regardless of parent layout (normal flow, flex, grid, absolute) — the button grows **leftward** only. `padding-right` is also held constant at 3px so the icon stays exactly 4px (border + pad) from the outer right edge throughout the animation. `z-index: 1` is applied on hover/focus so the expanded pill sits above adjacent content.
+- **States**:
+  - Un-added (default): 32×32 white circle, 1px `--color-neutral-90` border, `+` icon in **`--color-action-primary`** (green for EchoPark, red for Sonic)
+  - Un-added hover/focus: expanded pill with "Compare" label in `--color-neutral-0`; `+` icon stays `--color-action-primary`; focus swaps border to `--color-focus-ring`
+  - Added (default): 32×32 `--color-action-primary` circle, 1px `--color-neutral-90` border, white check icon
+  - Added hover/focus: expanded pill with "Remove" label in white; focus swaps border to `--color-focus-ring`
+- **Icon vs label colour**: icon colour is controlled on `.compare-btn__icon` (brand-primary when unselected, white when selected) — it is intentionally **decoupled** from the label text colour so the unselected `+` can remain brand-coloured while the hover label renders in dark `Neutral0`.
+- **Brand awareness**: Both the unselected icon colour and the selected fill use `--color-action-primary`, so the button automatically themes green (EchoPark) or red (Sonic) — no brand prop needed.
+- **Dimensions**: 32×32 collapsed; height fixed at 32px when expanded (padding `0 3px 0 8px`, 5px gap, 24×24 icon on right, 14px Roboto Medium label on left)
+- **Accessibility**: `aria-pressed` reflects `selected`; `aria-label` is always applied (not a decorative button); focus ring uses `--color-focus-ring`
+- **Icons**: `icon/Style=Display, Detail=Default, Icon=Add.svg?raw` and `icon/Style=Display, Detail=Default, Icon=Check.svg?raw`, both rendered via `v-html` so `:deep(path) { fill: currentColor }` inherits the icon wrapper's `color`
+- **Usage**: Designed for the SRP tile. In standalone use the component renders a 32×32 anchor slot that reserves layout space while the button absolutely positions over it (`position: absolute; right: 0`), so the icon stays pinned when the pill expands to the left — works inside flex, grid, or positioned parents.
+- **SrpTile integration**: `SrpTile` exposes `compared?: boolean` (`v-model:compared`) and emits `update:compared`. The button is placed via `.srpt__compare` at `bottom: 0; right: 16px; transform: translateY(50%); z-index: 6;` inside the image area — above the carousel dots (z-index 5) so the hover expansion never gets clipped. Click handler calls `preventDefault()` + `stopPropagation()` so the underlying `srpt__image-link` does not navigate to the VDP.
+- **Stories**: UnaddedDefault, UnaddedHover, UnaddedFocus, AddedDefault, AddedHover, AddedFocus, AllStates, Interactive, SrpTileContext
+- **Storybook `title`**: `Atoms/Buttons/CompareButton`
+
+### `ArrowCircleButton` — `src/components/ArrowCircleButton/`
+- **Figma**: "Buttons/ArrowCircle" — circular navigation/action button designed for image & carousel overlays
+- **Props**: `ariaLabel: string` (**required**), `direction?: 'right' | 'left' | 'expand'` (default `'right'`), `size?: 'sm' | 'lg'` (default `'sm'`), `disabled?: boolean`, `href?: string`, `target?: string`
+- **Emits**: `click: [event: MouseEvent]`
+- **No icon slot** — icons are bundled internally based on `direction` prop (no need for consumers to import SVGs)
+- **Theme is derived automatically** from `size` + `direction` — not a separate prop:
+  - `sm` + `right|left` → "dark": `rgba(36,44,51, 0.3→0.6→0.75)` background, white icon (`--color-neutral-100`)
+  - `sm` + `expand` → "green": Primary50→Primary40→Primary60 on hover/press, white icon
+  - `lg` + `right|left` → "white": `rgba(255,255,255, 0.6)` → full white on hover/press, dark icon (`--color-neutral-0`)
+- **Sizes**: sm = 32×32px circle; lg = 64×64px circle. Icon always 24×24px
+- **Border**: `border: 3px solid transparent` (always reserves focus-ring space, `box-sizing: border-box`). Focus state sets `border-color: --color-accessibility-80` — no layout shift
+- **Icons used**: `icon/Style=Arrows, Detail=Tail, Icon=Right.svg?raw`, `...Left.svg?raw`, `icon/Style=Media, Detail=Expand, Icon=NA.svg?raw`
+- **Stories**: SmallRight, SmallLeft, SmallExpand (+ hover/focus variants), LargeRight, LargeLeft, AllVariants
+
+### `VideoControlButton` — `src/components/VideoControlButton/`
+- **Figma**: "Buttons/VideoControls" — 40×40px circular media control button
+- **Props**: `ariaLabel: string` (**required**), `color?: 'dark' | 'light'` (default `'dark'`), `disabled?: boolean`, `href?: string`, `target?: string`
+- **Slots**: `#icon` (24×24 SVG — import with `?raw`, wrap in `<span v-html="..." style="display:contents">`)
+- **Emits**: `click: [event: MouseEvent]`
+- **Themes**:
+  - `dark`: Default `--color-neutral-20` (#313D47) → Hover/Press/Focus `--color-neutral-0` (#242C33); icon `--color-neutral-100` (white)
+  - `light`: Default `rgba(255,255,255,0.6)` → Hover/Press/Focus `--color-neutral-100` (full white); icon `--color-neutral-0` (dark)
+- **Focus border**: `border: 3px solid transparent` base + `box-sizing: border-box` → focus sets `border-color: --color-accessibility-80` (no layout shift)
+- **Available media icons**: Play, Pause, Stop, Skip-Forward, Skip-Backward, Fullscreen, Exit-Fullscreen, Refresh (all in `icon/Style=Media, Detail=*, Icon=NA.svg`)
+- **Stories**: DarkDefault, DarkHover, DarkPressed, DarkFocus, DarkDisabled, LightDefault, LightHover, LightFocus, AllStates, IconVariety
+
+### `JourneySelector` — `src/components/JourneySelector/`
+- **Figma**: "Inputs/JourneySelectors" — one-click card that immediately routes the user into a flow
+- **Props**: `label: string` (**required**), `selected?: boolean`, `disabled?: boolean`, `href?: string`, `target?: string`
+- **Slots**: `#icon` — 24×24 SVG imported with `?raw` and wrapped in `<span v-html="..." style="display:contents" />`
+- **Emits**: `select: [event: MouseEvent]`
+- **Size**: `90px` height, `min-width: 120px`, `padding: 12px 16px`; use `style="flex:1"` on each card to fill equal widths in a flex container
+- **Usage**: 2–4 cards side-by-side in a flex row with `gap: 16px`. Parent manages `selected` state. **No "Continue" button** needed.
+- **UX guideline**: Allow a ~5-second delay in the parent between `select` emit and page navigation so the selected state is visible before the view changes.
+- **Background**: always `--color-accent-90` (#E6F1F5 blue tint)
+- **States** (all via CSS — inset box-shadow, no layout shift):
+  - Default: 1px `--color-accent-40` border, `--color-accent-40` text/icon
+  - Hover: 2px `--color-accent-40` border, `--color-accent-85` bg, `--color-accent-30` text, underline
+  - Selected: 2px `--color-accent-30` border, `--color-accent-30` text
+  - Focus: 3px `--color-accessibility-80` border
+  - Disabled: `opacity: --opacity-level-medium`, `pointer-events: none`
+- **Stories**: Default, Hover, Selected, Focus, Disabled, AllStates, TwoOptions, ThreeOptions, FourOptions, PaymentPaths
+
+## Inputs
+
+### `TextBoxSM` — `src/components/TextBoxSM/`
+- **Figma**: "Inputs/TextBoxSM" — single-line numeric/text input; 44px fixed height; ideal for price, payment, mileage entries
+- **Props**: `label: string` (**required**), `modelValue?: string`, `prefix?: string` (left symbol, e.g. `$`), `suffix?: string` (right unit, e.g. `mi`), `name?: string`, `type?: string` (default `text`), `inputmode?: string`, `maxlength?: number`, `disabled?: boolean`, `error?: string`, `autocomplete?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Anatomy**: 44px bordered box (`border-radius: 8px`, 2px border) · optional prefix span (Neutral40) · `<input>` flex-1 · optional suffix span (Neutral40) · floating label above · error below
+- **Border**: 2px `--color-neutral-85` default → `--color-accent-30` focused → `--color-warning-50` error
+- **Label**: `position: absolute; top: -20px; left: 0; font-size: 12px; letter-spacing: 0.2px; color: --color-neutral-40`; `opacity: 0` in empty+unfocused state, `opacity: 1` when focused or has value
+- **Placeholder**: `label` prop text, `--color-neutral-40` color — acts as visual label inside when unfocused/empty
+- **Input text**: 16px Roboto Regular `--color-neutral-0`, `text-align: right`; prefix/suffix always `--color-neutral-40`
+- **Error**: `position: absolute; top: 48px; left: 0; font-size: 12px; --color-warning-50`
+- **Disabled**: no "disabled filled" visual state — disabled prop applies `opacity: --opacity-level-medium` to the control
+- **Build notes**: Decimal commas auto-applied on 4/6-digit numbers (handled by consumer, not the component). 6-digit char max for numerics — pass `maxlength="6"`.
+- **Stories**: Default, Focused, Filled, WithPrefix, WithPrefixFilled, WithSuffix, DisabledFilled, WithError, AllStates, Interactive, NumericUseCases
+
+### `TextBoxLG` — `src/components/TextBoxLG/`
+- **Figma**: "Inputs/TextBoxLG" — multi-line textarea; 140px fixed height; ideal for open-ended text (experience, reviews)
+- **Props**: `label: string` (**required**), `modelValue?: string`, `name?: string`, `maxlength?: number` (default 500), `disabled?: boolean`, `error?: string`, `autocomplete?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Anatomy**: 140px bordered box (`border-radius: 8px`, 2px border, `padding: 16px`) · `<textarea>` fill · floating label above · footer row (error left + counter right)
+- **Border**: same as TextBoxSM
+- **Label**: same as TextBoxSM
+- **Textarea**: `resize: none`, `overflow-y: auto` (scroll appears after ~7 lines), 16px/20px Roboto Regular `--color-neutral-0`
+- **Character counter**: shown at bottom-right when focused; format `X/maxlength`; turns `--color-warning-50` at limit; stops typing at `maxlength`
+- **Error**: shown bottom-left; sits in the same footer row as counter, both at `margin-top: 4px`
+- **Disabled filled**: apply `opacity: --opacity-level-medium` on the control; `cursor: not-allowed`
+- **Stories**: Default, Filled, DisabledFilled, WithError, AllStates, Interactive, AtCharacterLimit, SideBySide
+
+### `TextField` — `src/components/TextField/`
+- Underline-style single-line input with floating label; **light/dark** themes and **`default` | `feedback`** variants
+- **Props**: `label: string` (**required**), `modelValue?: string`, `name?: string`, `type?: string`, `inputmode?` (typed union — avoid plain `string` for `vue-tsc`), `maxlength?`, `disabled?`, `error?`, `autocomplete?`, `theme?`, `variant?`
+- **Emits**: `update:modelValue: [value: string]`
+- **Stories**: `Atoms/Inputs/TextField`
+
+### `BaseSlider` — `src/components/BaseSlider/`
+- **Figma**: "Inputs/Slider" — two variants: single-thumb (max only) and dual-thumb (range/min-max)
+- **Props**: `modelValue?: number` (single, v-model), `minValue?: number` / `maxValue?: number` (range, v-model:minValue / v-model:maxValue), `min?: number` (default 0), `max: number` (**required**), `step?: number` (default 1), `range?: boolean` (default false), `trackMinLabel?: string`, `trackMaxLabel?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue`, `update:minValue`, `update:maxValue`
+- **Track**: 4px height, `--color-neutral-80` unfilled, `--color-neutral-20` filled, 11px border-radius. Rendered as a custom div (not the native track) for full cross-browser control.
+- **Thumb**: 24×24px solid `--color-neutral-20` circle; `cursor: grab` on hover, `cursor: grabbing` on active; focus ring `box-shadow: 0 0 0 2px --color-accessibility-80`
+- **Labels below track**: 14px/22px Roboto Regular `--color-neutral-40`; `8px gap` from track area to labels
+- **Parent spacing**: parent should add `16px` gap between the companion label/input row and this component
+- **Range fill**: single = `left:0, width: singlePercent%`; range = `left: minPercent%, width: (maxPercent - minPercent)%`
+- **Dual-thumb overlap fix**: min input gets `z-index: 3` when `minPercent > 95%` so it remains reachable
+- **Usage rules**: always pair with a label + value input above (never standalone); step and range determined per use-case by designer
+- **Stories**: SingleDefault, SingleMidValue, SingleAtMax, SingleDisabled, RangeDefault, RangeMidValues, RangeDisabled, InteractiveSingle, InteractiveRange, InteractiveMonthlyPayment, InteractiveDownPayment, BothTypes
+
+### `BaseRadio` — `src/components/BaseRadio/`
+- **Figma**: "Inputs/RadioButton" — single radio button; compose multiples into a group with a shared `name`
+- **Props**: `value: string` (**required**), `name: string` (**required**), `modelValue?: string`, `label?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: string]`
+- **Anatomy**: 24×24px circle (outer ring) + 12×12px inner dot (shown when checked) + optional label text. Gap circle↔label: 12px.
+- **List spacing**: 16px `gap` between radio items in a group.
+- **Outer ring states**: Default 2px `--color-neutral-40` → Hover(unselected) 3px `--color-neutral-40` → Checked 2px `--color-base-primary-50` → Hover+Checked 2px `--color-base-primary-40` → Disabled 2px `--color-neutral-85`
+- **Inner dot**: `--color-base-primary-50` (checked), `--color-neutral-85` (disabled+checked), hidden otherwise. Scale-in transition (0→1) on check.
+- **Focus**: `box-shadow: 0 0 0 2px --color-accessibility-80` on the circle (2px outside ring per Figma)
+- **Hover text**: `text-decoration: underline` on label in hover state (both checked and unchecked)
+- **Disabled**: `opacity: --opacity-level-medium`; never remove from DOM
+- **Accessibility**: visually hidden `<input type="radio">` provides all semantics; parent should wrap group in `role="radiogroup"` with an `aria-label`
+- **Label wrapping**: `align-items: flex-start` on the wrapper — long labels wrap and indent under the first character, not under the circle
+- **Stories**: Default, Selected, Disabled, DisabledSelected, NoLabel, AllStates, RadioGroup, TwoColumn, LongLabel, WithDefaultSelection
+
+### `BaseCheckbox` — `src/components/BaseCheckbox/`
+- **Figma**: "Inputs/Checkboxes"
+- **Props**: `label?: string`, `modelValue?: boolean`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Renders as**: `<label>` wrapping a visually-hidden `<input type="checkbox">` + custom `.checkbox__box` span + `.checkbox__label` span
+- **Box**: 24×24px, `border-radius: 4px`, `box-sizing: border-box` (outer size constant despite border changes)
+- **Check icon**: `icon/Style=Display, Detail=Default, Icon=Check-Small.svg?raw` rendered via `v-html` inside `.checkbox__check`; `opacity: 0` by default, `opacity: 1` when `:checked`
+- **9 states**: Default, Hover, Pressed, Focus, Selected, HoverSelected, FocusSelected, Disabled, DisabledSelected (see component code for exact bg/border per state)
+- **Build guidelines**: 12px gap (box ↔ label, built-in); 16px gap between list items (add `gap: 16px` to wrapper); long labels wrap and align under first line (box top-aligned via `align-items: flex-start`)
+- **Stories**: Default, Hover, Pressed, Focus, Selected, HoverSelected, FocusSelected, Disabled, DisabledSelected, AllStates, LongLabel, CheckboxList, MixedList
+
+### `BaseToggle` — `src/components/BaseToggle/`
+- **Figma**: "Inputs/Toggle" — 48×28 pill switch
+- **Props**: `modelValue?: boolean`, `disabled?: boolean`, `label?: string`, `name?: string`
+- **Emits**: `update:modelValue: [value: boolean]`
+- **Stories**: `Atoms/Inputs/BaseToggle`
+
+### `SegmentedControl` — `src/components/SegmentedControl/`
+- **Figma**: "Inputs/SegmentedControl" — pill-shaped track of 2–3 mutually exclusive options for view/filter switching
+- **Props**: `options: SegmentedControlOption[]` (**required**, `{ value, label }`), `name: string` (**required**), `modelValue?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: string]`
+- **Auto-select**: emits `options[0].value` on `onMounted` if `modelValue` is empty
+- **Container**: `height: 38px`, `padding: 4px`, `border-radius: 42px`, `border: 1px solid --color-neutral-85`, `background: --color-neutral-100`, `gap: 1px` between chips
+- **Chip**: `height: 30px`, `padding: 8px 16px`, `border-radius: 69px`, 14px/500 Roboto text
+- **Chip states**: Default (no fill, Neutral0 text) → Hover (Neutral90 fill) → Selected (Primary50 fill, white text) → Focus (Selected + `box-shadow: 0 0 0 2px --color-accessibility-80`)
+- **Accessibility**: visually hidden `<input type="radio">`, `:has(:focus-visible)` for focus ring, `role="group"` on container
+- **Usage rules**: max 3 options; always one selected; never use for dissimilar actions (use tabs or separate buttons instead)
+- **Stories**: TwoOptions, TwoOptionsSecond, ThreeOptions, ThreeOptionsMiddle, Disabled, AllChipStates, Interactive, AutoSelect, SRPSortFilter
+
+### `SelectDropdown` — `src/components/SelectDropdown/`
+- **Figma**: "Inputs/Dropdowns" — underline-style native select with floating label
+- **Props**: `label: string` (**required**), `options: SelectOption[]` (**required**, `{ value, label }`), `modelValue?: string`, `theme?: 'light' | 'dark'`, `disabled?: boolean`, `error?: string`, `name?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Architecture**: Uses the device's **native `<select>`** element (`appearance: none`) per Figma build guideline ("Clicking the form will open that device's native menu/list")
+- **Floating label**: Sits at input text level when empty (acts as grey placeholder); floats 12px above the control when a value is selected (`hasValue` computed). CSS `transition` animates the movement.
+- **Underline only** — no box border. 2px line at bottom of the 34px control area.
+- **Fixed control height**: 34px regardless of state or error. Error text is `position: absolute; top: 38px` so it never shifts layout.
+- **Chevron**: `icon/Style=Arrows, Detail=No-Tail, Icon=Down.svg?raw` rendered with `v-html`, `fill: currentColor` via `:deep(path)`
+- **States**: Default (empty), Filled (has value), Focused (Accessibility80 line), Disabled, Error
+- **Light theme colors**: label grey=Neutral40 → float to Neutral70; value text Neutral0; line Neutral80; error `--color-warning-40` (#B30715)
+- **Dark theme colors**: label/line Neutral85; value text white; focused line Accessibility80; error `#fa848e`; disabled hides the line entirely
+- **Stories**: LightDefault, LightFilled, LightError, LightFilledError, LightDisabledFilled, DarkDefault, DarkFilled, DarkError, DarkDisabledFilled, AllStatesLight, AllStatesDark, WidthVariants, Interactive
+
+### `LogicSelector` — `src/components/LogicSelector/`
+- **Figma**: "Inputs/LogicSelectors" — compact inline single-choice picker that drives form logic (shows/hides fields)
+- **Props**: `options: LogicSelectorOption[]` (**required**, `{ value, label }`), `name: string` (**required**), `modelValue?: string`, `disabled?: boolean`, `error?: string`
+- **Emits**: `update:modelValue: [value: string]`
+- **Key UX rules**: No default selection on load (user must choose). State persists when user returns to the step. No "Continue" button needed.
+- **Layout**: `inline-flex; flex-direction: column; gap: 4px`. Chip row uses `flex-wrap: wrap` so chips stack vertically on mobile. 8px gap between chips.
+- **Chip size**: `height: 44px`, `padding: 8px 12px`, `border-radius: 4px`
+- **Font**: Body SM (14px / 22px line-height, 400 weight)
+- **Hidden radio inputs** for accessibility (`role="group"` on container)
+- **States** (all via inset `box-shadow` — no layout shift):
+  - Unselected: white bg, 1px `--color-neutral-85` border, `--color-neutral-40` text
+  - Hover (unselected): `--color-neutral-90` bg, same border, same text + underline
+  - Selected: `--color-neutral-20` bg (#313D47), same 1px border (subtle highlight), white text
+  - Focus: 2px `#6fcfff` (Blue80) border on whichever chip has keyboard focus
+  - Disabled: `opacity: --opacity-level-medium; pointer-events: none` on container
+- **Error**: 12px `--color-warning-40` text below chip row, 4px gap (via `gap: 4px` on container)
+- **Stories**: Default, WithSelection, HoverState, FocusState, ErrorState, Disabled, AllStates, DrivesFormFields, TradeIn, PaymentType, MobileWrapping
+
+### `BoxSelector` — `src/components/BoxSelector/`
+- **Figma**: "Inputs/Box Selectors/Sets" — segmented radio control for 2–4 closely related options
+- **Props**: `options: BoxSelectorOption[]` (**required**, 2–4 items `{ value, label }`), `name: string` (**required**), `modelValue?: string`, `disabled?: boolean`
+- **Emits**: `update:modelValue: [value: string]`
+- **Structure**: Container (`280px`, `border-radius: 4px`, `padding: 1px`, `bg: --color-neutral-85`, `overflow: hidden`) wraps chips with `gap: 1px` — the Neutral85 background *is* the 1px divider between chips
+- **Chip states**: Unselected (white) · Hover (Neutral40 bg, underline) · Pressed/Active (Neutral20 bg, underline) · Selected (Neutral20 bg, bold, no underline) · Focus Selected (Selected + `inset box-shadow 3px accessibility-80`)
+- **Chip dimensions**: `height: 42px`, `flex: 1 0 0`, `min-width: 68px`, `max-width: 140px`, `padding: 8px`
+- **Corner radius**: First chip `border-radius: 3px 0 0 3px`; last chip `border-radius: 0 3px 3px 0`
+- **Accessibility**: `role="radiogroup"` on container; hidden `<input type="radio">` per chip; `focus-visible` outline via `:has()`
+- **Typography**: 14px / 22px line-height; selected = `--font-weight-bold`, unselected = `--font-weight-regular`
+- **Stories**: TwoOptions, ThreeOptions, FourOptions, NoneSelected, Disabled, YesNo, VehicleCondition, PriceRange, TransmissionType, AllCounts
+
+### `BoxInputXS` — `src/components/BoxInputXS/`
+- **Figma**: "Inputs/BoxInputs/XS" — 48px selection box, pick-one-from-several (styled radio button)
+- **Props**: `value: string` (**required**), `name: string` (**required**), `label?: string`, `modelValue?: string`, `disabled?: boolean`
+- **Slots**: `#icon` (optional 16×16 SVG pinned to left edge at `left: 16px`, import with `?raw`)
+- **Emits**: `update:modelValue: [value: string]`
+- **Renders as**: `<label>` wrapping a visually-hidden `<input type="radio">` — fully accessible, native keyboard nav
+- **States** (CSS `:has()` driven from native radio state):
+  - Default: white bg, `inset 0 0 0 1px --color-neutral-90`
+  - Hover: `--color-neutral-95` bg, 1px Neutral90
+  - Selected: white bg, `inset 0 0 0 2px --color-base-primary-50`
+  - Focus: `inset 0 0 0 3px --color-accessibility-80`
+- **Dimensions**: `height: 48px; min-width: 175px; border-radius: --border-radius-md (8px); padding: 12px 16px`
+- **Label typography**: `--text-body-lg-size` (16px) / `--text-body-lg-weight` (400) / `--text-body-lg-line-height` (1.5); centered
+- **Usage pattern**: wrap multiple instances in a `<fieldset>` with shared `name` prop + single `v-model`
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, WithIcon, YesNoGroup, TimeSlotGroup, CategoryGroup, AllStates
+
+### `BoxInputSM` — `src/components/BoxInputSM/`
+- **Figma**: "Inputs/BoxInputs/Small" — identical API to BoxInputXS, visual differences only:
+  - Height: **64px** (XS = 48px)
+  - Padding: **24px uniform** (XS = 12px top/bottom, 16px left/right)
+  - Min-width: **140px** (XS = 175px)
+  - Icon left/top offset: **24px** from element edge (XS = 16px)
+- All other props, states, tokens, and patterns are identical to `BoxInputXS`
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, WithIcon, YesNoGroup, TimeSlotGroup, SizeComparison
+
+### `BoxInputMD` — `src/components/BoxInputMD/`
+- **Figma**: "Inputs/BoxInputs/Medium" — 86px location/store selection box with rich label layout
+- **Props**: `value: string` (**required**), `name: string` (**required**), `primaryLabel?: string` (bold, always shown), `secondaryLabel?: string`, `tertiaryLabel?: string`, `sideLabel?: string` (right-aligned, e.g. "4 mi"), `modelValue?: string`, `disabled?: boolean`
+- **Slots**: `#secondary-icon` (optional 16×16 icon before secondary text — **only shown in default state**, CSS hides it on hover/selected/focus)
+- **Emits**: `update:modelValue: [value: string]`
+- **Dimensions**: `height: 86px; padding: 24px; min-width: 126px; border-radius: --border-radius-md`
+- **Typography**:
+  - Primary: 16px bold / 24px line-height (`--font-weight-bold`)
+  - Secondary/tertiary: 12px regular / 16px line-height / 0.2px letter-spacing
+  - Side label: `--text-body-sm-size` (14px) / 22px line-height / right-aligned / `width: 77px`
+- **States**: same inset box-shadow pattern as XS/SM (1px neutral → 2px green → 3px blue focus)
+- **Icon hide behaviour**: `.box-input-md:hover`, `.box-input-md--selected`, and `:has(:focus-visible)` all set `.box-input-md__secondary-icon { display: none }`
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, WithSecondaryLabel, WithSecondarySelected, WithAllLines, NoSideLabel, LocationPicker (interactive), AllStates
+
+### `BoxInputLG` — `src/components/BoxInputLG/`
+- **Figma**: "Inputs/BoxInputs/Large" — 132px vertical card-style selection box
+- **Props**: `value: string` (**required**), `name: string` (**required**), `label?: string` (bold header, 1–2 words), `description?: string` (body text), `modelValue?: string`, `disabled?: boolean`
+- **Slots**: `#label` (override header text), `#description` (override body text)
+- **Emits**: `update:modelValue: [value: string]`
+- **Layout**: `flex-direction: column` — header section (bold 16px) + divider + body section (14px regular)
+- **Divider**: `box-shadow: 0 Npx 0 0 color` on `.box-input-lg__header` — thickens with state (1px → 2px → 3px) without any layout shift
+- **Default border**: `--color-neutral-85` (#D4D7D9) — slightly darker than XS/SM/MD which use Neutral90
+- **Outer border**: same `inset box-shadow` pattern as other BoxInput sizes (1px neutral-85 → 2px Primary50 → 3px Accessibility80)
+- **`overflow: hidden`** on root clips the inner header shadow to the rounded corners
+- **Stories**: Default, Hover, Selected, FocusSelected, Disabled, ConditionGroup, PaymentGroup, AllStates
+
+## Navigation
+
+### `NavItem` — `src/components/NavItem/`
+- **Figma**: Single component covering both Figma variants — "Navigation / no dropdown" (node `7639:20395`) and "Navigation / with dropdown" (node `7639:20405`). First atoms of the global header / nav organism.
+- **Props**: `label?: string` (alternatively use the default slot), `active?: boolean` (default `false` — current page on no-dropdown, open menu on dropdown — supports `v-model:active`), `dropdown?: boolean` (default `false` — show trailing 24×24 chevron), `href?: string` (renders as `<a>` when set), `target?: string`, `ariaLabel?: string`
+- **Emits**: `update:active: [value: boolean]`, `click: [event: MouseEvent]`
+- **Click semantics**: The component toggles `active` itself (via `update:active`) **only for the dropdown variant** — clicking a dropdown trigger emits the next active value so it works as `v-model:active` out of the box (open / close menu). **Plain nav links never toggle on click** — they navigate, and the parent app sets `active` from the current route. Both variants always emit `click` for analytics / `preventDefault` interception.
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided. No-dropdown active anchors get `aria-current="page"`; no-dropdown active buttons get `aria-pressed="true"`. Dropdown variants always wire `aria-haspopup="true"` and surface `aria-expanded` from `active`.
+- **Anatomy**: 8 px-gap inline-flex of `[label]` + optional `[chevron]`. Chevron is the bundled `Style=Arrows, Detail=No-Tail, Icon=Down.svg` rendered at 24 × 24 via `?raw` + `v-html`; it rotates 180 ° when `active` is true (re-uses the single Down asset rather than shipping an Up duplicate). `:deep(path) { fill: currentColor }` lets the chevron track the same colour as the label across all states.
+- **States** (Figma):
+  - **Default** — Roboto Regular 16 px, line-height 1, letter-spacing -0.032 px, `--color-nav-text` (`#292B2E`); chevron points Down
+  - **Hover** (only when not active) — `--color-nav-text-hover` (`#445366`) + underline on the label only; chevron stays Down
+  - **Active** (current page / open menu) — Roboto **Black 900**, `--color-nav-text-active` (`#292B2E`); no underline; chevron flipped Up; hover styling is suppressed while active
+  - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring` (Accessibility90 `#6FCFFF`) + `--color-nav-text-focus` (`#566F8F`); active items keep their bold weight + Up chevron while showing the focus border
+- **Layout-stable focus ring**: `border: 3px solid transparent` + `padding: 0 4px` are reserved at all times so toggling `:focus-visible` never shifts the surrounding nav bar.
+- **Brand awareness**: All colour comes from `--color-nav-*` tokens defined in **both** `primitives/echopark.css` and `primitives/sonic.css` with **identical Figma values** for now. The component still ships `var()` fallbacks (`--color-neutral-0`, `--color-action-accent`, `--color-action-accent-muted`, `--color-focus-ring`) for any future brand that doesn't declare nav tokens. Font follows `--font-family-brand`.
+- **Roboto Black (900)**: Loaded in `index.html` and `.storybook/preview-head.html`. Falls back to `bold` (700) if the weight isn't loaded.
+- **Stories**: `Default`, `Hover`, `Active`, `FocusSelected`, `DropdownDefault`, `DropdownHover`, `DropdownActive`, `DropdownFocus`, `AsAnchor`, `ActiveAnchor`, `AllStates`, `AllStatesDropdown`, `DropdownInteractive`, `NavBarPreview`.
+- **Storybook `title`**: `Atoms/Navigation/NavItem`
+
+### `NavItemMobile` — `src/components/NavItemMobile/`
+- **Figma**: "Navigation / hidden menu" (node `7639:20419`) — full-width drill-in row used inside the mobile menu drawer.
+- **Props**: `label?: string` (alternatively use the default slot), `active?: boolean` (default `false`), `href?: string`, `target?: string`, `ariaLabel?: string`
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided. Click never toggles internally — parent app handles drill-in navigation.
+- **Anatomy**: `display: flex; width: 100%; justify-content: space-between; gap: 8px` so the label sits flush left and the 24×24 Right chevron pins to the right edge. Chevron uses `Style=Arrows, Detail=No-Tail, Icon=Right.svg` via `?raw` + `v-html`.
+- **Typography**: 18 px / line-height 1 / letter-spacing -0.036 px (vs 16 px / -0.032 px on desktop `NavItem`).
+- **States** (Figma): Default · Hover (underline) · Pressed (Roboto Black 900) · Focus (3 px `--color-nav-focus-ring`)
+- **Layout-stable focus ring**: `border: 3px solid transparent` + `padding: 0 4px`.
+- **Brand awareness**: Uses the same global `--color-nav-*` tokens as `NavItem` and `--font-family-brand`.
+- **Stories**: `Default`, `Hover`, `Pressed`, `FocusSelected`, `AsAnchor`, `AllStates`, `MobileMenuPreview`, `VariableLabels`
+- **Storybook `title`**: `Atoms/Navigation/NavItemMobile`
+
+### `NavItemSubmenu` — `src/components/NavItemSubmenu/`
+- **Figma**: "Submenu" (node `7639:20454`) — leaf-level link inside a drilled-in mobile sub-menu (the level **below** `NavItemMobile`). No chevron — clicking simply navigates.
+- **Props**: `label?: string`, `active?: boolean`, `href?: string`, `target?: string`, `ariaLabel?: string`
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button>` by default; `<a>` when `href` is provided. Active anchors get `aria-current="page"`; active buttons get `aria-pressed="true"`.
+- **Anatomy**: Single content-sized `inline-flex` link (no chevron, no icon).
+- **Typography**: 16 px / **line-height 1.5** / **letter-spacing -0.352 px** (vs `NavItemMobile`'s 18 px / 1 / -0.036 px and `NavItem`'s 16 px / 1 / -0.032 px).
+- **States**: Default · Hover (underline) · Pressed (Roboto Black 900) · Focus (3 px `--color-nav-focus-ring`)
+- **Layout-stable focus ring**: `border: 3px solid transparent` + `padding: 0 4px`.
+- **Brand awareness**: Uses the same global `--color-nav-*` tokens.
+- **Stories**: `Default`, `Hover`, `Pressed`, `FocusSelected`, `AsAnchor`, `AllStates`, `SubmenuList`
+- **Storybook `title`**: `Atoms/Navigation/NavItemSubmenu`
+
+### `MenuToggle` — `src/components/MenuToggle/`
+- **Figma**: "Hamburger menu / closed" (node `7639:20490`) + open/X states (node `7639:20520`).
+- **Role**: Mobile menu hamburger / close toggle. Click toggles `open` automatically — works as `v-model:open` out of the box.
+- **Props**: `open?: boolean` (default `false`), `ariaLabel?: string` (defaults to `'Open menu'` / `'Close menu'`), `disabled?: boolean`
+- **Emits**: `update:open: [value: boolean]`, `click: [event: MouseEvent]`
+- **Renders as**: `<button type="button">` only — never an anchor. `aria-expanded` and `aria-pressed` both reflect `open`.
+- **Icons**: Bundled from `icon/Style=Display, Detail=Menu, Icon=Menu.svg` (hamburger) and `icon/Style=Display, Detail=Default, Icon=Close.svg` (X), imported with `?raw` and rendered via `v-html`. Both inherit `currentColor` via `:deep(path) { fill: currentColor }`.
+- **Layout**: `display: inline-flex; width: 30px; height: 30px; box-sizing: border-box; border: 3px solid transparent`. Inner icon area is always `24 × 24`.
+- **States** (Figma): Default · Hover · Pressed · Focus (3 px solid `--color-nav-focus-ring`) · Disabled (`opacity: var(--opacity-level-medium)`)
+- **Stories**: `ClosedDefault`, `ClosedHover`, `ClosedPressed`, `ClosedFocus`, `OpenDefault`, `OpenHover`, `OpenPressed`, `OpenFocus`, `Disabled`, `AllStates`, `Interactive`
+- **Storybook `title`**: `Atoms/Navigation/MenuToggle`
+
+### `NavIconButton` — `src/components/NavIconButton/`
+- **Figma**: Favorites heart (node `7639:21078`) and Profile avatar (node `7639:21038`).
+- **Role**: Generic 24 × 24 nav-area icon button. Used by the global header for the Favorites heart, Profile avatar, and any future single-icon nav action.
+- **Props**: `ariaLabel: string` (**required**), `selected?: boolean` (default `false` — persistent "current page" state), `href?: string`, `target?: string`, `disabled?: boolean`
+- **Slots**: `#icon` — 24 × 24 SVG. Import the SVG with `?raw` and wrap in `<span v-html="..." />`. Inherits `currentColor`.
+- **Emits**: `click: [event: MouseEvent]`
+- **Renders as**: `<button type="button">` by default; `<a>` when `href` is provided.
+- **States** (Figma):
+  - **Default** — `--color-nav-text` (`#292B2E`)
+  - **Hover** — `--color-nav-text-hover` (`#445366`)
+  - **Pressed** (`:active`) **and Selected** — `--color-nav-text-focus` (`#566F8F`); `selected` is the persistent "current page" indicator
+  - **Focus** (`:focus-visible`) — 3 px solid `--color-nav-focus-ring`
+  - **Disabled** — `opacity: var(--opacity-level-medium)` + `pointer-events: none`
+- **Layout-stable focus ring**: `width: 30px; height: 30px; box-sizing: border-box; border: 3px solid transparent`.
+- **Stories**: `FavoritesDefault`, `FavoritesHover`, `FavoritesPressed`, `FavoritesSelected`, `FavoritesFocus`, `ProfileDefault`, `ProfileHover`, `ProfilePressed`, `ProfileSelected`, `ProfileFocus`, `AsAnchor`, `AllStates`, `HeaderRowPreview`
+- **Storybook `title`**: `Atoms/Navigation/NavIconButton`
+
+## Other Atoms
+
+### `BadgePriceDrop` — `src/components/BadgePriceDrop/`
+- **Figma**: "Badge/PriceDrop" — inline badge indicating a price reduction on a vehicle
+- **Props**: `label?: string` (default `"New price drop"`), `showIcon?: boolean` (default `true`), `variant?: 'srp' | 'vdp'` (default `'srp'`)
+- **Two variants**:
+  - **SRP**: Designed to overlay the top-left corner of an SRP tile image. `border-radius: 8px 0 0 0` top-left + `0 0 2px 0` bottom-right. `padding: 6px 15px 6px 16px`.
+  - **VDP**: Standalone rounded pill. `height: 32px`, `border-radius: 4px`, `padding: 8px`, `overflow: hidden`.
+- **Anatomy**: `--color-base-primary-90` background · 24px circle (`--color-base-primary-40` bg) with `Style=Arrows, Detail=Tail, Icon=Down-Right.svg` arrow icon (white via `currentColor`) · Body SM Bold text in `--color-base-primary-40`
+- **Gap**: 8px between icon and label
+- **Usage rules** (Figma): Only one badge per car. The price-drop amount text ("Just dropped $2,000") can be toggled on/off globally — never a mix.
+- **SrpTile integration**: `SrpTile` exposes `badgeLabel?: string` prop — when set, a `BadgePriceDrop` renders at `position: absolute; top: 0; left: 0` inside the image area.
+- **Stories**: SrpDefault, SrpWithAmount, SrpNoIcon, VdpDefault, VdpNoIcon, AllVariants, Interactive, OnSrpTile, OnSrpTileWithAmount
+- **Storybook `title`**: `Atoms/BadgePriceDrop`
+
+### `Divider` — `src/components/Divider/`
+- **Figma**: "Components/Divider" — 1px rule for separating content
+- **Props**: `color?: 'light' | 'dark'` (default `'light'`), `orientation?: 'horizontal' | 'vertical'` (default `'horizontal'`)
+- **Colours**: Light = `--color-neutral-90` (#E8E9EB); Dark = `--color-neutral-40` (#666B70)
+- **Dimensions**: Horizontal = `width: 100%; height: 1px`; Vertical = `width: 1px; height: 100%`
+- **Accessibility**: `role="separator"`, `aria-orientation`
+- **Usage rules** (Figma): Use to separate content and create visual hierarchy. Never decorative.
+- **Stories**: HorizontalLight, HorizontalDark, VerticalLight, VerticalDark, AllVariants, CardContext, Interactive
+- **Storybook `title`**: `Atoms/Divider`
+
+### `Tooltip` — `src/components/Tooltip/`
+- **Figma**: "Components/Tooltip" — click-to-toggle context hint (dark bubble + caret, always above trigger)
+- **Props**: `text: string` (**required**), `ariaLabel: string` (**required**), `caretAlign?: 'center' | 'right' | 'left'` (default `'center'`), `closeOnClickOutside?: boolean`, `closeOnEscape?: boolean`
+- **Slots**: `#icon` — trigger icon (16×16 SVG, typically the info icon `Style=Alerts, Detail=Info, Icon=NA.svg`)
+- **Anatomy**: 16×16px trigger button + absolutely positioned dark panel above + caret triangle pointing down
+- **Panel**: `background: --color-neutral-0`; `color: --color-neutral-100`; `border-radius: 6px`; `padding: 16px`; `max-width: 175px`; `width: max-content`; `bottom: calc(100% + 12px)`
+- **Typography**: `--text-label-size` (12px), `--text-label-line-height`, `--text-label-letter-spacing` (0.2px), `--font-weight-regular`, `text-align: center`
+- **Caret**: 16×8px CSS triangle pointing down, same `--color-neutral-0` fill
+- **Caret alignment**: `center`, `right`, `left` — shifts both panel and caret positions
+- **Behaviour**: Click trigger toggles panel; optional `closeOnClickOutside` and `closeOnEscape`
+- **Accessibility**: `aria-expanded`, `aria-controls`, `role="tooltip"` on panel, `aria-label` on trigger
+- **Integrations**: SrpTile uses Tooltip for payment info; CarOfferInputCard VIN helper uses `caretAlign="left"`
+- **Stories**: CenterDefault, RightCaret, LeftCaret, LongText, AllOrientations, Interactive, SrpPaymentContext
+- **Storybook `title`**: `Atoms/Tooltip`
+
+### `Overlay` — `src/components/Overlay/`
+- **Figma**: "Overlay" — full-viewport semi-transparent scrim used behind modals, fly-out panels, and other focus-stealing UI
+- **Props**: `modelValue?: boolean` (v-model), `lockScroll?: boolean` (default `true`), `dismissOnClick?: boolean` (default `true`), `dismissOnEsc?: boolean` (default `true`), `zIndex?: number` (default `900`)
+- **Emits**: `update:modelValue: [value: boolean]`, `click: [event: MouseEvent]`
+- **Slots**: default — content rendered on top of the scrim
+- **Behaviour**: Teleports to `<body>`; click on scrim emits close; ESC key emits close; body scroll lock when visible
+- **Visual**: `position: fixed; inset: 0; background: rgba(36, 44, 51, 0.5)` — Neutral0 at 50% opacity; `z-index` via prop (default 900)
+- **Transition**: 200ms opacity fade in/out
+- **Usage**: **Default overlay for the entire design system.** `BaseModal` composes this component internally.
+- **Stories**: Default (Interactive), ModalContext, FlyOutContext
+- **Storybook `title`**: `Atoms/Overlay`
+
+### `SonicCircuitBenefit` — `src/components/SonicCircuitBenefit/`
+- **Figma**: derived from the per-tile pattern inside "The Sonic Circuit" frame (desktop node `7680:16688`, mobile `7680:16721`).
+- **Role**: Atomic icon-on-circle + caption tile. Building block for the `SonicCircuit` organism — not used standalone on the page. Renders as a `<li>` so the parent `<ul role="list">` carries proper benefits-list semantics.
+- **Props**: `caption: string` (**required** — body text rendered below the disk), `iconSvg: string` (**required** — raw SVG markup for the icon; import the source SVG with `?raw`).
+- **No slots**: The icon is a prop, not a slot, so `v-html` runs **inside** the atom on `.scb__icon` itself.
+- **Icon tint**: The atom rewrites every `path / circle / rect / polygon / polyline / ellipse` fill to `currentColor` and sets `.scb__icon { color: #D0D4D9 }`.
+- **Layout**: `flex-direction: column; align-items: center; gap: 16px; width: 284px` on desktop; `width: 100%` on mobile.
+- **Disk**: 102 × 102 px (desktop) / 64 × 64 px (mobile) circle with `background: rgba(255, 255, 255, 0.15)`.
+- **Inner art**: `width: 78 / 49 px` on desktop / mobile.
+- **Caption**: 16 / 22 / -0.5 px Roboto Regular, white, centered.
+- **Stories**: `MapPin`, `Coin`, `Steering`, `Medal`, `Mobile`
+- **Storybook `title`**: `Atoms/SonicCircuitBenefit`

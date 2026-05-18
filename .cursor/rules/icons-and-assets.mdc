@@ -1,0 +1,64 @@
+---
+description: Icon, logo, illustration, and photo import patterns — vite-svg-loader, path aliases, currentColor inheritance, and gallery stories.
+globs: src/components/**, src/pages/**, src/stories/**
+alwaysApply: false
+---
+
+# EPDS — Icons & Assets
+
+## SVG loader setup
+- **Plugin**: `vite-svg-loader` (`defaultImport: 'component'`) — used in `vite.config.ts` and `vite.lib.config.ts`
+- **Aliases**: `@icons/` → `icon/`, `@logos/` → `Logos/`, `@illustrations/` → `Illustrations/`
+- **Types**: `src/vite-env.d.ts` — triple-slash reference **`vite/client`**; declares `*.svg?component`, `*.svg?url`, `*.svg?raw`; plus **`declare module '*?url'`** for **deep** imports (e.g. `@logos/.../*.svg?url`) where single-segment patterns do not apply
+
+## System icons (`icon/Style=*.svg`)
+- 24×24, single-colour `fill="#242C33"`
+- Import with `?component` query (for `<svg>` Vue component) or `?raw` (for `v-html`)
+- Filenames: `Style=<Category>, Detail=<Name>, Icon=<Variant>.svg` (original Figma export names, keep as-is)
+- **In components that need colour inheritance**: use CSS `:deep()` to override fill so the icon tracks button/link state colours.
+
+```css
+.my-wrapper :deep(path),
+.my-wrapper :deep(circle),
+.my-wrapper :deep(rect),
+.my-wrapper :deep(polygon),
+.my-wrapper :deep(polyline),
+.my-wrapper :deep(ellipse) {
+  fill: currentColor;
+}
+```
+
+- **Gallery story**: `src/stories/Icons.stories.ts` (`Atoms/Icons`)
+
+## Illustrative icons (`icon/Icon=Illustrative, Name=*.svg`)
+Multi-colour, used at larger display sizes — **do NOT** attempt to override colours.
+
+## Vehicle Descriptor icons (`icon/Icon Type=Vehicle Descriptors, *.svg`)
+Three size variants: Large (48px), Medium (32px), Small (16px).
+
+## Logos (`Logos/`)
+- Always import with `?url` to preserve multi-colour fills: `import epLogo from '@logos/Color=EP-FullColor.svg?url'`
+- Use in `<img src="epLogo" alt="EchoPark" />` — **NEVER** as inline Vue component
+- **EchoPark logos**: `Color=EP-FullColor.svg` (dark/standard), `Color=EP-GreenWhite.svg` (light-on-dark for transparent headers)
+- **Sonic Automotive logos**: `Color=SA-FullColor.svg` (full-colour)
+- **Gallery story**: `src/stories/Logos.stories.ts` (`Atoms/Logos`)
+- Subdirectory `Logos/3rd Party/` contains partner/trust badge logos (same `?url` approach)
+
+## Illustrations (`Illustrations/`)
+- Multi-colour SVG illustrations for marketing content, empty states, hero sections
+- Naming: `Property 1=<Name>.svg` (1x) and `Property 1=<Name>@2x.svg` (retina)
+- **SVG illustrations**: `Car`, `PersonDriving`, `HoldingACar`, `Variant4` — each in 1x and @2x
+- **190-Point Inspection** (PNG): `Size=Badge`, `Size=Small`, `Size=Large`
+- **Finance** (PNG): `Financial institutions`
+- **GAP** (PNG): `GapCar` — used by `GapGraphic` component
+- **Protection Plans** (PNG): `ProtectionPlansCar` — used by `ProtectionPlansGraphic` component
+- Always import with `?url`: `import carIllustration from '@illustrations/Property 1=Car.svg?url'`
+- Use in `<img>` — **NEVER** as inline Vue component (same pattern as logos)
+- **Path alias**: `@illustrations/` → `Illustrations/`
+- **Gallery story**: `src/stories/Illustrations.stories.ts` (`Atoms/Illustrations`)
+
+## Photos (`Photos/`)
+- Photography assets (PNG) organized by category subfolders
+- **Categories**: `Car only/` (6), `EchoPark team/` (5), `Nascar promo/` (7), `People/` (14), `Service and protection/` (13), `VDP cars/` (4)
+- Import with `?url` for use in `<img>` tags: `import hero from '/Photos/People/Hero image.png?url'`
+- **Gallery story**: `src/stories/Photos.stories.ts` (`Atoms/Photos`)
