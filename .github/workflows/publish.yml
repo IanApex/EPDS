@@ -1,0 +1,44 @@
+# Publishes @ianapex/epds to the public npm registry when a GitHub Release is published.
+# Verifies the lib build (vue-tsc + vite.lib.config.ts) before npm publish.
+#
+# Requirements:
+#   - npm automation token stored as repo secret NPM_TOKEN
+#     (npmjs.com → Access Tokens → Generate New → "Automation")
+#   - Release tag should match the package.json "version" (e.g. release tag "v0.1.0" ↔ version "0.1.0")
+
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for npm provenance
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      # Produces dist/epds.js, dist/epds.css, dist/index.d.ts.
+      - run: npm run build
+
+      # --provenance attaches a signed build attestation (visible on the npm package page).
+      # publishConfig.access in package.json handles the public-scope flag.
+      - run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

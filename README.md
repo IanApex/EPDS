@@ -22,14 +22,15 @@ npm run typecheck     # full project (includes stories): vue-tsc -b
 
 ## CI & deployments (GitHub Actions)
 
-Two workflows run on this repo:
+Three workflows run on this repo:
 
 | Workflow | Trigger | What it does |
 |----------|---------|----------------|
 | **CI** (`.github/workflows/ci.yml`) | Push + pull requests targeting `main` | `npm ci` then **`npm run build`** — proves the publishable library (`dist/epds.js`, `dist/epds.css`, `dist/index.d.ts`) typechecks and bundles on a clean runner. |
 | **Deploy Storybook** (`.github/workflows/deploy-storybook.yml`) | Push to `main` (+ manual dispatch) | `npm ci` then **`npm run build-storybook`**; publishes the static Storybook site to **GitHub Pages** (`STORYBOOK_BASE` is set for the `/EPDS/` path). |
+| **Publish** (`.github/workflows/publish.yml`) | GitHub Release published (+ manual dispatch) | `npm ci` → `npm run build` → `npm publish --provenance` to the public npm registry as `@ianapex/epds`. Requires the `NPM_TOKEN` repo secret. |
 
-These jobs do **not** publish to npm; they verify the build and host the docs. Ensure **Pages** is configured to deploy from GitHub Actions in the repo settings.
+Ensure **Pages** is configured to deploy from GitHub Actions in the repo settings.
 
 ## Recent tooling notes (maintainers)
 
@@ -39,16 +40,28 @@ These jobs do **not** publish to npm; they verify the build and host the docs. E
 
 ## Using EPDS in another app
 
-1. Build this repo (`npm run build`) or depend on a published package that ships `dist/`.
-2. Install with npm (or `file:` / workspace path while developing).
-3. In the host app, ensure **Roboto** (300/400/500/700) is loaded (see `index.html` in this repo).
-4. Import components; global token CSS is pulled in via the package entry:
+Install from the public npm registry:
+
+```bash
+npm install @ianapex/epds vue
+```
+
+In the host app, ensure **Roboto** (300/400/500/700) is loaded (see `index.html` in this repo). Then import components — the global token CSS is pulled in via the package entry (sideEffects-aware bundlers will include it automatically):
 
 ```ts
-import { BaseButton, tokens, breakpoints } from 'epds'
+import { BaseButton, tokens, breakpoints } from '@ianapex/epds'
+// Safety net if your bundler strips side-effect CSS:
+import '@ianapex/epds/style.css'
 ```
 
 `vue` **^3.5** is a peer dependency — the host must provide it.
+
+### Releasing a new version
+
+1. Bump `"version"` in `package.json` (semver).
+2. Commit + push to `main`; wait for CI green.
+3. Create a **GitHub Release** with a tag matching the version (e.g. `v0.2.0`).
+4. The **Publish** workflow runs `npm publish --provenance`. Requires the repo secret `NPM_TOKEN` (an [npm automation token](https://docs.npmjs.com/creating-and-viewing-access-tokens)).
 
 ## Project structure
 

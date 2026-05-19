@@ -1,8 +1,25 @@
 {
-  "name": "epds",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@ianapex/epds",
+  "version": "0.1.0",
+  "description": "EchoPark Design System — Vue 3 component library, design tokens, and Storybook docs.",
+  "license": "UNLICENSED",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IanApex/EPDS.git"
+  },
+  "homepage": "https://ianapex.github.io/EPDS/",
+  "bugs": {
+    "url": "https://github.com/IanApex/EPDS/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "design-system",
+    "component-library",
+    "echopark",
+    "epds"
+  ],
   "files": [
     "dist"
   ],
@@ -13,11 +30,16 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/epds.js"
-    }
+    },
+    "./dist/epds.css": "./dist/epds.css",
+    "./style.css": "./dist/epds.css"
   },
   "sideEffects": [
     "**/*.css"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
     "dev:clean": "node -e \"require('node:fs').rmSync('node_modules/.vite',{recursive:true,force:true})\" && vite",
@@ -27,7 +49,8 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "storybook:clean": "node -e \"require('node:fs').rmSync('node_modules/.vite',{recursive:true,force:true});require('node:fs').rmSync('node_modules/.cache/storybook',{recursive:true,force:true})\" && storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
