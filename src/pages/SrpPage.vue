@@ -93,6 +93,8 @@ import saLogoDefaultUrl from '@logos/Color=SA-FullColor.svg?url'
 
 import SrpTile from '@/components/SrpTile/SrpTile.vue'
 import CompareTray from '@/components/CompareTray/CompareTray.vue'
+import CompareTool from '@/components/CompareTool/CompareTool.vue'
+import type { CompareVehicle } from '@/components/CompareTool/CompareTool.vue'
 import Pagination from '@/components/Pagination/Pagination.vue'
 import SeoCarousel from '@/components/SeoCarousel/SeoCarousel.vue'
 import SrpFiltersPanel from '@/components/SrpFiltersPanel/SrpFiltersPanel.vue'
@@ -959,7 +961,37 @@ interface VehicleListing {
    * delivery block with the resolved status copy ("On the lot" / "In transit").
    */
   vehicleStatus?: 'on-lot' | 'in-transit'
+
+  // ── Comparison-only fields (fed straight through to `CompareTool`).
+  // Excluded from `SrpTile` because they aren't shown on the tile itself.
+  trim?: string
+  bodyStyle?: string
+  engine?: string
+  transmission?: string
+  driveType?: string
+  mpgCity?: number
+  mpgHwy?: number
+  exteriorColor?: string
+  interiorColor?: string
+  features?: string[]
 }
+
+/**
+ * Compact catalogue of comparison-row attributes seeded per listing slot so
+ * the `CompareTool` modal shows meaningfully different values across columns.
+ * Filtered SRP grid still reuses the same 9 records.
+ */
+const COMPARISON_SEEDS = [
+  { trim: 'LP 750-4 Superveloce Roadster SE', bodyStyle: 'Convertible', engine: 'V12 6.5L',                transmission: 'Automated Manual', driveType: 'AWD', mpgCity: 11, mpgHwy: 18, exteriorColor: 'Yellow',           interiorColor: 'Black',       features: ['Backup camera', 'Leather seats', 'Sunroof/Moonroof'] },
+  { trim: 'Quattro Premium Plus',              bodyStyle: 'Wagon',       engine: 'V8 4.0L Twin-Turbo',      transmission: 'Automatic',        driveType: 'AWD', mpgCity: 15, mpgHwy: 22, exteriorColor: 'Nardo Gray',       interiorColor: 'Black',       features: ['Adaptive cruise control', 'Apple CarPlay', 'Heated seats', 'Sunroof/Moonroof'] },
+  { trim: 'Competition xDrive',                bodyStyle: 'Sedan',       engine: 'I6 3.0L Twin-Turbo',      transmission: 'Automatic',        driveType: 'AWD', mpgCity: 16, mpgHwy: 23, exteriorColor: 'Isle of Man Green', interiorColor: 'Tartufo',     features: ['Adaptive cruise control', 'Apple CarPlay', 'Android Auto', 'Heated seats'] },
+  { trim: 'Carrera S',                         bodyStyle: 'Coupe',       engine: 'Flat-6 3.0L Twin-Turbo',  transmission: 'PDK Automatic',    driveType: 'RWD', mpgCity: 18, mpgHwy: 25, exteriorColor: 'GT Silver',         interiorColor: 'Bordeaux Red', features: ['Adaptive cruise control', 'Apple CarPlay', 'Sunroof/Moonroof'] },
+  { trim: 'Limited 4WD',                       bodyStyle: 'SUV',         engine: 'V6 3.5L Hybrid',          transmission: 'CVT',              driveType: '4WD', mpgCity: 36, mpgHwy: 35, exteriorColor: 'Pearl White',       interiorColor: 'Beige',       features: ['3rd row seat', 'Backup camera', 'Blind spot monitor', 'Heated seats'] },
+  { trim: 'TRD Pro',                           bodyStyle: 'Truck',       engine: 'V8 5.7L',                 transmission: 'Automatic',        driveType: '4WD', mpgCity: 13, mpgHwy: 17, exteriorColor: 'Army Green',        interiorColor: 'Black',       features: ['Apple CarPlay', 'Android Auto', 'Backup camera'] },
+  { trim: 'Hatchback Sport',                   bodyStyle: 'Hatchback',   engine: 'I4 2.0L Turbo',           transmission: 'Manual',           driveType: 'FWD', mpgCity: 25, mpgHwy: 32, exteriorColor: 'Rallye Red',        interiorColor: 'Black',       features: ['Apple CarPlay', 'Sunroof/Moonroof'] },
+  { trim: 'Long Range AWD',                    bodyStyle: 'Sedan',       engine: 'Dual Motor Electric',     transmission: 'Single-Speed',     driveType: 'AWD', mpgCity: 130, mpgHwy: 120, exteriorColor: 'Midnight Silver',  interiorColor: 'White',       features: ['Adaptive cruise control', 'Heated seats'] },
+  { trim: 'Touring',                           bodyStyle: 'Van/Minivan', engine: 'V6 3.5L',                 transmission: 'Automatic',        driveType: 'FWD', mpgCity: 19, mpgHwy: 28, exteriorColor: 'Modern Steel',      interiorColor: 'Mocha',       features: ['3rd row seat', 'Backup camera', 'Heated seats', 'Leather seats'] },
+] as const
 
 const listings = ref<VehicleListing[]>(
   Array.from({ length: 9 }, (_, i) => {
@@ -970,6 +1002,7 @@ const listings = ref<VehicleListing[]>(
       if (idx === 3 || idx === 7) return 'on-lot'
       return undefined
     }
+    const seed = COMPARISON_SEEDS[i % COMPARISON_SEEDS.length]
     return {
       id: i + 1,
       year: '2020',
@@ -985,6 +1018,16 @@ const listings = ref<VehicleListing[]>(
       favorited: false,
       compared: false,
       vehicleStatus: statusFor(i),
+      trim:          seed.trim,
+      bodyStyle:     seed.bodyStyle,
+      engine:        seed.engine,
+      transmission:  seed.transmission,
+      driveType:     seed.driveType,
+      mpgCity:       seed.mpgCity,
+      mpgHwy:        seed.mpgHwy,
+      exteriorColor: seed.exteriorColor,
+      interiorColor: seed.interiorColor,
+      features:      [...seed.features],
     }
   })
 )
@@ -1088,10 +1131,73 @@ const comparedCount = computed(() =>
   listings.value.reduce((n, car) => (car.compared ? n + 1 : n), 0),
 )
 
+/* ─── Compare tool modal ────────────────────────────────────────────────────
+ * The modal renders on top of the SRP via the `Overlay` atom (teleport to
+ * <body>). Because the SrpPage itself never unmounts while the modal is
+ * open, every piece of SRP state — scroll position, filter selections,
+ * active-filter pills, the `compared` flag on each car — is preserved.
+ * Closing the modal simply hides the overlay and returns the user to the
+ * SRP exactly as they left it. */
+const showCompareTool = ref(false)
+
+/**
+ * The vehicles passed to `CompareTool`. `SrpTile` + comparison fields are
+ * already on `VehicleListing`, so the mapping is a straight pick — the
+ * `CompareVehicle` shape is a structural subset.
+ */
+const comparedVehicles = computed<CompareVehicle[]>(() =>
+  listings.value
+    .filter(c => c.compared)
+    .map(c => ({
+      id: c.id,
+      year: c.year,
+      mileage: c.mileage,
+      stockNumber: c.stockNumber,
+      title: c.title,
+      price: c.price,
+      monthlyPayment: c.monthlyPayment,
+      deliveryLabel: c.deliveryLabel,
+      deliveryStore: c.deliveryStore,
+      deliveryDistance: c.deliveryDistance,
+      vehicleStatus: c.vehicleStatus,
+      imageUrl: c.imageUrl,
+      imageCount: 5,
+      favorited: c.favorited,
+      href: '#',
+      trim:          c.trim,
+      bodyStyle:     c.bodyStyle,
+      engine:        c.engine,
+      transmission:  c.transmission,
+      driveType:     c.driveType,
+      mpgCity:       c.mpgCity,
+      mpgHwy:        c.mpgHwy,
+      exteriorColor: c.exteriorColor,
+      interiorColor: c.interiorColor,
+      features:      c.features,
+    })),
+)
+
 function onCompareAction() {
-  // TODO: route to the dedicated compare page once it's built.
-  // eslint-disable-next-line no-console
-  console.log('[SrpPage] navigate to compare page — selected:', comparedCount.value)
+  showCompareTool.value = true
+}
+
+/** Cancel from the tray — wipes every `compared` flag so the tray hides. */
+function onCancelCompare() {
+  for (const car of listings.value) {
+    if (car.compared) car.compared = false
+  }
+}
+
+/** X clicked on a tile inside the modal — drop just that vehicle. */
+function onRemoveCompared(payload: { id: number | string }) {
+  const car = listings.value.find(c => c.id === payload.id)
+  if (car) car.compared = false
+}
+
+/** Favorite toggled from inside the modal — write back to the source list. */
+function onCompareFavorite(payload: { id: number | string; value: boolean }) {
+  const car = listings.value.find(c => c.id === payload.id)
+  if (car) car.favorited = payload.value
 }
 
 </script>
@@ -1596,10 +1702,23 @@ function onCompareAction() {
       :copyrightText="footerCopyrightText"
     />
 
-    <!-- Compare tray — appears once the user flags a vehicle on any SRP tile -->
+    <!-- Compare tray — appears once the user flags a vehicle on any SRP tile.
+         Cancel clears every `compared` flag (and the tray hides itself when
+         `count` returns to 0). -->
     <CompareTray
       :count="comparedCount"
       @compare="onCompareAction"
+      @cancel="onCancelCompare"
+    />
+
+    <!-- Compare tool modal — overlays the SRP without unmounting it, so
+         scroll position / filters / pills survive open → close. -->
+    <CompareTool
+      v-model="showCompareTool"
+      :vehicles="comparedVehicles"
+      :is-sonic="isSonic"
+      @remove="onRemoveCompared"
+      @update:favorited="onCompareFavorite"
     />
 
     <!-- ─── Mobile filter drawer (≤1239px) ──────────────────── -->

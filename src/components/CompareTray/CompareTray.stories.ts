@@ -28,8 +28,11 @@ const meta = {
     addMoreLabel:       { control: 'text' },
     selectedLabel:      { control: 'text' },
     compareLabel:       { control: 'text' },
+    cancelLabel:        { control: 'text' },
+    hideCancel:         { control: 'boolean' },
     ariaLabel:          { control: 'text' },
     onCompare:          { action: 'compare' },
+    onCancel:           { action: 'cancel' },
   },
   args: {
     count: 1,
@@ -37,6 +40,8 @@ const meta = {
     addMoreLabel: 'Add more to compare',
     selectedLabel: 'vehicles selected',
     compareLabel: 'Compare',
+    cancelLabel: 'Cancel',
+    hideCancel: false,
   },
 } satisfies Meta<typeof CompareTray>
 
@@ -137,15 +142,38 @@ export const Hidden: Story = {
   }),
 }
 
-/* ─── Interactive stepper ─────────────────────────────────────────────────── */
+/* ─── Cancel hidden (legacy embed) ───────────────────────────────────────── */
 
-export const Interactive: Story = {
-  name: 'Interactive (step through states)',
+export const CancelHidden: Story = {
+  name: '2 selected · Cancel link hidden',
+  args: { count: 2, hideCancel: true },
   parameters: {
     docs: {
       description: {
         story:
-          'Use the **Add** / **Remove** buttons to watch the tray transition between hidden → prompt → count+CTA. Clicking **Compare** logs the event to the Actions panel.',
+          'Pass `hideCancel="true"` to suppress the Cancel text link entirely. Used in legacy embeds that don\'t expose a way to clear the compare selection in-place.',
+      },
+    },
+  },
+  render: (args) => ({
+    components: { CompareTray },
+    setup() { return { args } },
+    template: `
+      ${PAGE_BACKDROP}
+      <CompareTray v-bind="args" />
+    `,
+  }),
+}
+
+/* ─── Interactive stepper ─────────────────────────────────────────────────── */
+
+export const Interactive: Story = {
+  name: 'Interactive (step through states + cancel)',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use the **Add** / **Remove** buttons to watch the tray transition between hidden → prompt → count+CTA. The **Cancel** link clears the count back to 0; **Compare** is logged to the Actions panel.',
       },
     },
   },
@@ -156,7 +184,8 @@ export const Interactive: Story = {
       const add = () => (count.value += 1)
       const remove = () => (count.value = Math.max(0, count.value - 1))
       const onCompare = () => console.log('[CompareTray] compare clicked, count =', count.value)
-      return { count, add, remove, onCompare }
+      const onCancel  = () => { count.value = 0 }
+      return { count, add, remove, onCompare, onCancel }
     },
     template: `
       <div style="position:relative;min-height:100vh;background:#f5f6f7;padding:32px;font-family:Roboto,sans-serif;color:#242c33;">
@@ -174,7 +203,7 @@ export const Interactive: Story = {
             Remove one
           </button>
         </div>
-        <CompareTray :count="count" @compare="onCompare" />
+        <CompareTray :count="count" @compare="onCompare" @cancel="onCancel" />
       </div>
     `,
   }),

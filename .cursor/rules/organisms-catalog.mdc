@@ -128,6 +128,42 @@ Both site chrome components follow the same pattern: **EchoPark content is the d
 - **Stories** (`Organisms/BrandPortfolio`): `Default` (all collapsed), `SonicSelected`, `EchoParkSelected` (demonstrates the `#cta-echopark` slot for primary + secondary CTAs), `TacticalFleetSelected` (description-only body), `PowersportsSelected`, `Interactive`
 - **Storybook `title`**: `Organisms/BrandPortfolio`
 
+## Compare Tool
+
+### `CompareTool` — `src/components/CompareTool/`
+- **Figma**: no dedicated frame — designed against existing EPDS modal / grid / tile conventions.
+- **Role**: SRP compare modal. Overlays the SRP without unmounting it so every piece of SRP state (scroll position, filter selections, active pills, `compared` flags) is preserved when closed.
+- **Props**: `modelValue: boolean` (**required**, v-model), `vehicles: CompareVehicle[]` (**required**), `title?: string` (default `'Compare vehicles'`), `isSonic?: boolean` (forwards `vehicleStatus` to inner tiles when `true`), `emptyLabel?: string`
+- **Type export**: `CompareVehicle` — superset of the `SrpTile` props (`id, year, mileage, stockNumber, title, price, monthlyPayment, deliveryLabel/Store/Distance, vehicleStatus, imageUrl, imageCount, favorited, href`) plus comparison-only fields (`trim, bodyStyle, engine, transmission, driveType, mpgCity, mpgHwy, exteriorColor, interiorColor, features`)
+- **Emits**:
+  - `update:modelValue: [boolean]`
+  - `update:favorited: [{ id, value: boolean }]` — mirrors `SrpTile`'s favorite toggle scoped by vehicle id
+  - `remove: [{ id }]` — X icon on a tile clicked
+- **Composes**: `Overlay` (scrim + teleport + Esc + scroll-lock + click-to-dismiss at `zIndex: 1000`), `SrpTile` (one per column — used unchanged), `SmallIconButton` (X overlay on each tile + close icon), `MediumIconButton` (header close)
+- **Layout**:
+  - Centered panel: `width: min(1280px, 95vw)`, `max-height: 88vh`, `border-radius: --border-radius-lg`, `box-shadow: --shadow-level-3`
+  - Header: title (`--text-h4-*`) + close `MediumIconButton`, separated by `--border-width-hairline` divider
+  - Body: vertically + horizontally scrollable, holds two stacked siblings (`tile-bar` + `compare-grid`) that share the same `--label-col-w / --vehicle-col-w` custom properties so columns align.
+  - **Sticky tile bar** (`.compare-tool__tile-bar`): a single block element with `position: sticky; top: 0; z-index: 5`, a solid `--color-neutral-100` background and `--border-width-hairline` bottom border. `width: max-content; min-width: 100%` keeps the bar **at least** as wide as the visible body (so no whitespace to the left or right of the tiles) while growing to content max-content when there are more vehicles than fit. Inside, a nested CSS grid renders the empty label column + one `SrpTile` per vehicle.
+  - **Comparison grid** (`.compare-tool__compare-grid`): same column template as the tile-grid, `width: max-content; min-width: 100%`. Section headings (`grid-column: 1 / -1`) and row labels are `position: sticky; left: var(--spacing-xxs)` to anchor visibly during horizontal scroll without drifting under the grid's left padding.
+  - **X (remove) overlay**: 32×32 `SmallIconButton` absolutely positioned at `top: 16px; left: 16px` on each tile (mirrors the favorite at top-right). `z-index: 6` to clear `SrpTile`'s internal stacking.
+- **Comparison rows** (deduped — anything `SrpTile` already shows is intentionally excluded):
+  - **Basics**: Trim, Body style
+  - **Drivetrain & efficiency**: Engine, Transmission, Drive type, MPG (city / hwy)
+  - **Color**: Exterior color, Interior color
+  - **Features**: comma-separated feature list
+  - Missing values render as `'—'`. Section headings span the full grid (`grid-column: 1 / -1`) at `--text-h6-bold-*`.
+- **Responsive**:
+  - **Tablet (≤1023.98px)**: `--label-col-w: 140px`, `--vehicle-col-w: 280px` (matches `SrpTile`'s natural `min-width` so the tile never overflows its grid cell). Tiles past what fits live behind a horizontal swipe.
+  - **Mobile (<600px)**: **full-screen overlay** — panel is `width: 100vw`, `height: 100dvh` (with `100vh` fallback), `border-radius: 0`, no box-shadow, and the `Overlay` scrim padding collapses to 0. `--label-col-w: 96px`, `--vehicle-col-w: 280px` — same 280px floor as tablet so tiles render at their designed minimum. Horizontal swipe walks through vehicles.
+- **Auto-close**: if `vehicles.length` drops to `0` while the modal is open (every tile removed via the X), the component emits `update:modelValue: false` so the user lands back on the SRP cleanly.
+- **State preservation**: the modal is a teleport overlay — `SrpPage` never unmounts. Closing via the header X, Esc, or backdrop click drops the overlay only; SRP scroll, filter selections, pill bar, and compare flags survive untouched.
+- **Brand awareness**: brand-agnostic — `SrpTile` already swaps brand-coloured pieces (price, primary action) automatically via tokens. `isSonic` is purely a passthrough for the `vehicleStatus` row on tiles.
+- **Accessibility**: `role="dialog"`, `aria-modal="true"`, `aria-label` from `title`. Tile X buttons get a per-vehicle `aria-label` (`Remove <title> from compare`).
+- **SrpPage integration**: opens when the user clicks `Compare` on `CompareTray`; the page maps `listings.filter(c => c.compared)` to the `CompareTool`'s `vehicles` prop. `@remove` writes `car.compared = false`; `@update:favorited` mirrors back into the source listing so the SRP tile reflects the change after close.
+- **Stories** (`Organisms/CompareTool`): `TwoVehicles`, `ThreeVehicles`, `FourVehicles`, `SonicVehicleStatus`, `Mobile`, `Interactive`
+- **Storybook `title`**: `Organisms/CompareTool`
+
 ## SRP Filters Panel
 
 ### `SrpFiltersPanel` — `src/components/SrpFiltersPanel/`
@@ -150,8 +186,9 @@ Full-page compositions — not published library components, used for Storybook 
 - **Role**: Full SRP (Search Results Page) composition
 - **Props**: `brandName?: string` (default `'EchoPark'`), `phoneNumber?: string` (default `'(877) 708-4049'`)
 - **Brand awareness**: An internal `isSonic` computed (derived from `brandName`) drives brand-specific overrides for `GlobalFooter` and **swaps the entire header**: Sonic renders the new `SonicNavBar` organism (mega-menu + mobile drawer, `:sticky="false"` so it doesn't fight the SRP's own sticky filter sidebar) while EchoPark continues to use the legacy `GlobalHeader` (`variant="global-search"` with zip / phone). The Sonic primary-nav structure is sourced from the shared `src/pages/sonicNavItems.ts`.
-- **Composes**: `SonicNavBar` (Sonic) **or** `GlobalHeader` (EchoPark), `GlobalFooter`, `SrpTile`, `CompareTray`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Vehicle status + Condition are both Sonic-only; EchoPark shows 10, Sonic shows 12 with Vehicle status directly above Condition at the top of the list after Distance), `SrpFilterPill`, `BaseButton`
+- **Composes**: `SonicNavBar` (Sonic) **or** `GlobalHeader` (EchoPark), `GlobalFooter`, `SrpTile`, `CompareTray`, `CompareTool`, `Pagination`, `SeoCarousel`, `SrpFiltersPanel`, all SRP filter components (Vehicle status + Condition are both Sonic-only; EchoPark shows 10, Sonic shows 12 with Vehicle status directly above Condition at the top of the list after Distance), `SrpFilterPill`, `BaseButton`
 - **Vehicle-status filtering**: `SrpPage` seeds each listing with an optional `vehicleStatus` and derives `visibleListings = listings.filter(...)` that honours the Vehicle-status filter selections. Tiles in the grid iterate over `visibleListings`, and `toggleFavorite` / `toggleCompared` now key off `car.id` (not array index) so filtered views still write back to the right listing. The `vehicleStatus` prop is only passed to tiles when `isSonic` — EchoPark tiles always render the delivery block.
+- **Compare flow**: each `VehicleListing` is extended with comparison-only fields (`trim, bodyStyle, engine, transmission, driveType, mpgCity, mpgHwy, exteriorColor, interiorColor, features`) seeded from a per-slot `COMPARISON_SEEDS` table so the modal columns differ. `comparedVehicles` is a computed mapping of `listings.filter(c => c.compared)` to `CompareVehicle`. `showCompareTool` ref opens the `CompareTool` overlay from the tray's `@compare`; the tray's `@cancel` event walks `listings` and zeros every `compared` flag (the tray auto-hides when count returns to 0). The `CompareTool`'s `@remove` and `@update:favorited` events write back to the source listing so the SRP tiles reflect any in-modal changes after close. Because `SrpPage` itself never unmounts while the overlay is open, scroll / filter / pill / compare state is preserved across open → close.
 - **Stories** (`Pages/SRP`): `EchoPark Brand` (default brand + globals) and `Sonic Automotive Brand` (passes `brandName: 'Sonic Automotive'` + Sonic globals for primitives toggle)
 - **Storybook `title`**: `Pages/SRP`
 

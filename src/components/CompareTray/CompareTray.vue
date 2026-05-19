@@ -29,6 +29,16 @@ const props = withDefaults(defineProps<{
    */
   compareLabel?: string
   /**
+   * Label for the Cancel text link rendered below the primary CTA / prompt.
+   * Defaults to `'Cancel'`.
+   */
+  cancelLabel?: string
+  /**
+   * When `true`, hides the Cancel link entirely (e.g. legacy embeds that
+   * shouldn't expose a way to clear the selection). Defaults to `false`.
+   */
+  hideCancel?: boolean
+  /**
    * Override the computed `aria-label` for the tray region.
    */
   ariaLabel?: string
@@ -37,15 +47,24 @@ const props = withDefaults(defineProps<{
   addMoreLabel: 'Add more to compare',
   selectedLabel: 'vehicles selected',
   compareLabel: 'Compare',
+  cancelLabel: 'Cancel',
+  hideCancel: false,
 })
 
 const emit = defineEmits<{
   /** Fired when the user clicks the **Compare** CTA. */
   compare: [event: MouseEvent]
+  /**
+   * Fired when the user clicks the **Cancel** text link. Parents should
+   * clear every compared flag in their listings; the tray's `count` will
+   * drop to `0` and the tray itself hides via its enter/leave transition.
+   */
+  cancel: [event: MouseEvent]
 }>()
 
 const visible = computed(() => props.count > 0)
 const showCta = computed(() => props.count >= props.ctaThreshold)
+const showCancel = computed(() => visible.value && !props.hideCancel)
 
 const computedAriaLabel = computed(() => {
   if (props.ariaLabel) return props.ariaLabel
@@ -56,6 +75,10 @@ const computedAriaLabel = computed(() => {
 
 function onCompareClick(event: MouseEvent) {
   emit('compare', event)
+}
+
+function onCancelClick(event: MouseEvent) {
+  emit('cancel', event)
 }
 </script>
 
@@ -86,6 +109,13 @@ function onCompareClick(event: MouseEvent) {
       <p v-else class="compare-tray__prompt">
         {{ addMoreLabel }}
       </p>
+
+      <button
+        v-if="showCancel"
+        type="button"
+        class="compare-tray__cancel"
+        @click="onCancelClick"
+      >{{ cancelLabel }}</button>
     </aside>
   </Transition>
 </template>
@@ -111,13 +141,13 @@ function onCompareClick(event: MouseEvent) {
   width: 412px;
   max-width: 100vw;
   min-height: 85px;
-  padding: 10px 40px;
+  padding: var(--spacing-xxxs) var(--spacing-sm);   /* 16px / 40px */
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xxs, 24px);
+  gap: var(--spacing-micro, 12px);
 
   background-color: var(--color-neutral-100);
   color: var(--color-neutral-0);
@@ -126,9 +156,11 @@ function onCompareClick(event: MouseEvent) {
   font-family: var(--font-family-base);
 }
 
-/* Count variant is taller to accommodate the CTA. */
+/* Count variant: keep the prompt → CTA spacing roomy while the Cancel
+ * link sits tight against the CTA below. */
 .compare-tray--with-cta {
   min-height: 149px;
+  gap: var(--spacing-xxs, 24px);
 }
 
 /* ─── Prompt text (count < threshold) ─────────────────── */
@@ -158,6 +190,40 @@ function onCompareClick(event: MouseEvent) {
 /* ─── Compare CTA ─────────────────────────────────────── */
 .compare-tray__cta {
   min-width: 148px;
+}
+
+/* ─── Cancel text link ────────────────────────────────────
+ * Sits directly below the primary CTA (count variant) or below the
+ * prompt (prompt variant). Renders as a plain text button using the
+ * accent colour so it visually matches existing `LinkCta` atoms while
+ * staying intentionally subordinate to the primary "Compare" action. */
+.compare-tray__cancel {
+  margin-top: calc(var(--spacing-xxs, 24px) * -1 + var(--spacing-nano, 8px));
+  padding: 4px 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family-base);
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-body-sm-line-height);
+  color: var(--color-action-accent);
+  border-radius: 2px;
+}
+
+.compare-tray--with-cta .compare-tray__cancel {
+  margin-top: 0;
+}
+
+.compare-tray__cancel:hover {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  color: var(--color-action-accent-hover, var(--color-action-accent));
+}
+
+.compare-tray__cancel:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 /* ─── Mobile (<600px) — full-width bar ─────────────────── */

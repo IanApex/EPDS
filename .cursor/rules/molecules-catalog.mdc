@@ -214,20 +214,24 @@ alwaysApply: false
 
 ### `CompareTray` — `src/components/CompareTray/`
 - **Figma**: nodes `13945:38154` (count + CTA) and `13945:38159` (prompt-only) — floating notification card that appears once the user flags a vehicle on an SRP tile.
-- **Props**: `count: number` (**required**), `ctaThreshold?: number` (default `2`), `addMoreLabel?: string` (default `'Add more to compare'`), `selectedLabel?: string` (default `'vehicles selected'`), `compareLabel?: string` (default `'Compare'`), `ariaLabel?: string`
-- **Emits**: `compare: [event: MouseEvent]`
+- **Props**: `count: number` (**required**), `ctaThreshold?: number` (default `2`), `addMoreLabel?: string` (default `'Add more to compare'`), `selectedLabel?: string` (default `'vehicles selected'`), `compareLabel?: string` (default `'Compare'`), `cancelLabel?: string` (default `'Cancel'`), `hideCancel?: boolean` (default `false`), `ariaLabel?: string`
+- **Emits**:
+  - `compare: [event: MouseEvent]` — primary CTA clicked
+  - `cancel: [event: MouseEvent]` — Cancel text link clicked. Parents should clear every `compared` flag in their listings; the tray hides itself when `count` returns to `0`.
 - **Behaviour**:
   - `count === 0` → component renders nothing
-  - `0 < count < ctaThreshold` → 85px card with **prompt** text only (`addMoreLabel`)
-  - `count >= ctaThreshold` → 149px card showing `<count> {selectedLabel}` (count is bold, rest Light 300) plus a 148×56 `BaseButton variant="primary"` labelled `compareLabel`
+  - `0 < count < ctaThreshold` → 85px card with **prompt** text only (`addMoreLabel`) + `Cancel` text link beneath it
+  - `count >= ctaThreshold` → 149px card showing `<count> {selectedLabel}` (count is bold, rest Light 300), a 148×56 `BaseButton variant="primary"` labelled `compareLabel`, and a `Cancel` text link directly below the CTA
 - **Layout**:
   - **Desktop (≥600px)**: 412px fixed-width card, `position: fixed; right: 0; bottom: 0; z-index: 900`, shadow falls up-and-left
   - **Mobile (<600px)**: stretches to 100vw, pinned to the bottom of the viewport, shadow straight up
+- **Cancel link**: rendered for every visible state (skip via `hideCancel="true"`). Plain `<button>` styled as accent-coloured text link — 14px Medium Roboto, `--color-action-accent`, underline on hover, 3 px `--color-focus-ring` outline on focus-visible. Sits in the same flex column as the CTA so the card grows to fit it.
 - **Animation**: fade + slide-up on enter/leave (`transition: transform 0.25s ease, opacity 0.2s ease`). `@media (prefers-reduced-motion)` drops the transform.
 - **Typography**: Prompt + count label share Roboto Light 22px, line-height 1.2, `--color-neutral-0`. The count number is `font-weight: 700`.
 - **Brand awareness**: The CTA uses `BaseButton variant="primary"` so the filled background automatically themes brand colour.
 - **Accessibility**: `<aside role="status" aria-live="polite">` so assistive tech announces state changes
-- **Stories**: AddMorePrompt, TwoSelected, ThreeSelected, Hidden, Interactive, Mobile
+- **SrpPage integration**: `SrpPage` listens for `@compare` (opens the `CompareTool` organism) and `@cancel` (iterates `listings` and sets every `compared = false`).
+- **Stories**: AddMorePrompt, TwoSelected, ThreeSelected, Hidden, CancelHidden, Interactive, Mobile
 - **Storybook `title`**: `Molecules/CompareTray`
 
 ## Marketing
