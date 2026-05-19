@@ -1,0 +1,150 @@
+/*
+ * Wireframe theme primitives
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Layout / anatomy review mode for the EPDS component library.
+ *
+ * NOT a real brand — this is a viewing theme that strips colour and
+ * imagery so designers, PMs, and stakeholders can focus on structure
+ * without arguing over brand colours. It plugs into the existing
+ * Storybook **Brand** toolbar as a third option ("Wireframe") because
+ * it mirrors the same token-override mechanism brands use.
+ *
+ * Scoping
+ * -------
+ * Every rule below is scoped to `[data-theme="wireframe"]`, so the
+ * theme only activates inside a wrapper the Storybook decorator opts
+ * in. Unlike the EchoPark / Sonic primitives, this file does NOT
+ * touch `:root` — that keeps the theme contained to Storybook and
+ * prevents leakage into multi-iframe contexts (docs panels, etc.).
+ *
+ * Loading
+ * -------
+ * Imported as a `?raw` string by `.storybook/preview.ts` and injected
+ * conditionally — same pattern as `sonic.css`. Not bundled into the
+ * public `epds.css`, so library consumers don't ship the wireframe
+ * theme unless they opt in.
+ *
+ * What this overrides
+ * -------------------
+ * 1. Base + Accent palette → neutral greys (kills brand colour)
+ * 2. Feedback colour surfaces → neutral greys (kills error/warning/info hue)
+ * 3. Shadows → none (removes elevation cues)
+ * 4. Photos / logos → hatched placeholder via `<img>` opacity + parent hatch
+ *
+ * What this preserves
+ * -------------------
+ * • Roboto typography + line-heights — typography IS the anatomy.
+ * • Neutral palette + spacing + radius + border tokens — structural cues.
+ * • Focus ring — keeps keyboard interactivity legible for ADA review.
+ * • Layout-only structural overrides (e.g. Sonic button radius) by
+ *   leaving `[data-brand]` set to its previous value.
+ */
+
+[data-theme="wireframe"] {
+  /* ─── Brand Font ──────────────────────────────────────────────
+   * Permanent Marker (Google Fonts) for the "this is a sketch,
+   * not a final design" signal. Overriding `--font-family-brand`
+   * cascades through `--font-family-base` and `--font-family-btn`
+   * so body copy, buttons, prices, and meta rows all swap together.
+   *
+   * Permanent Marker only ships a Regular 400 weight — any
+   * `font-weight: light/medium/bold` declarations are silently
+   * ignored by the font, which is fine: hierarchy in wireframe
+   * mode is communicated through size + spacing, not weight.
+   *
+   * Falls back to Comic Sans MS (universally present on
+   * Windows / macOS / iOS) so a slow Google Fonts response still
+   * lands on something obviously "wireframey" before swap. Final
+   * fallback is the system cursive stack.
+   * ----------------------------------------------------------- */
+  --font-family-brand: "Permanent Marker", "Comic Sans MS", cursive;
+
+  /* ─── Base Colors: Primary ────────────────────────────────────
+   * Collapse the brand primary chain to a single mid-grey ramp.
+   * EchoPark green / Sonic red CTAs both render in neutral here.
+   * Values come from the existing neutral primitives so future
+   * neutral tweaks cascade automatically.
+   * ----------------------------------------------------------- */
+  --color-base-primary-40: #4A5159;
+  --color-base-primary-50: #5E646B;
+  --color-base-primary-55: #6B7079;
+  --color-base-primary-60: #777C82;
+  --color-base-primary-90: #E8E9EB;
+
+  /* ─── Accent Colors ───────────────────────────────────────────
+   * Brand accent chain (blue / steel-blue) collapses to neutrals.
+   * Links and accent icons render as mid-grey text.
+   * ----------------------------------------------------------- */
+  --color-accent-30: #3F4750;
+  --color-accent-40: #5E646B;
+  --color-accent-55: #6B7079;
+  --color-accent-60: #777C82;
+  --color-accent-80: #BCBFC2;
+  --color-accent-85: #D4D7D9;
+  --color-accent-90: #EEF0F2;
+
+  /* ─── Feedback: Warning / Alert / System ──────────────────────
+   * Strip the semantic colour from feedback states. The component
+   * structure (Alert variants, badge surfaces, error inputs) stays
+   * visually distinguishable through positioning and weight, just
+   * not through colour.
+   * ----------------------------------------------------------- */
+  --color-warning-40:    var(--color-neutral-0);
+  --color-warning-50:    var(--color-neutral-40);
+  --color-warning-90:    var(--color-neutral-90);
+  --color-alert-50:      var(--color-neutral-0);
+  --color-alert-70:      var(--color-neutral-40);
+  --color-alert-80:      var(--color-neutral-80);
+  --color-alert-90:      var(--color-neutral-90);
+  --color-system-red-60: var(--color-neutral-40);
+
+  /* ─── Accessibility / Focus ───────────────────────────────────
+   * Keep the focus ring visible — wireframes are reviewed for ADA
+   * tab order too. Darker than the brand cyan so it reads against
+   * a neutral surface.
+   * ----------------------------------------------------------- */
+  --color-accessibility-80: #2E3338;
+  --color-accessibility-90: #5E646B;
+
+  /* ─── Shadows ─────────────────────────────────────────────────
+   * No elevation. Wireframes communicate hierarchy through
+   * borders, spacing, and weight — not lift.
+   * ----------------------------------------------------------- */
+  --shadow-level-1: none;
+  --shadow-level-2: none;
+  --shadow-level-3: none;
+  --shadow-level-4: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+ *  Photo / logo treatment
+ *  ───────────────────────────────────────────────────────────────
+ *  `<img>` elements collapse to `opacity: 0` so the source pixels
+ *  disappear. The IMMEDIATE parent of any `<img>` (matched via the
+ *  modern `:has()` selector) plus any element whose class name
+ *  shouts "photo / image / gallery / hero / showcase" picks up a
+ *  hatched neutral fill. This catches every component in the
+ *  library without per-component plumbing.
+ *
+ *  Why hatch and not flat? A diagonal hatch is the universal
+ *  "imagery goes here" affordance from print + IA wireframes and
+ *  is recognised by every designer / PM who has ever seen a
+ *  Balsamiq mock. A flat block reads as a card body, not a photo.
+ * ─────────────────────────────────────────────────────────────── */
+[data-theme="wireframe"] img {
+  opacity: 0;
+}
+
+[data-theme="wireframe"] *:has(> img),
+[data-theme="wireframe"] [class*="photo"],
+[data-theme="wireframe"] [class*="image-area"],
+[data-theme="wireframe"] [class*="hero"],
+[data-theme="wireframe"] [class*="gallery"],
+[data-theme="wireframe"] [class*="showcase"] {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-neutral-80) 0 1px,
+    transparent 1px 10px
+  );
+  background-color: var(--color-neutral-95);
+}

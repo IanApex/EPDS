@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/vue3-vite'
 import '../src/epds.css'
 import sonicCss from '../src/tokens/primitives/sonic.css?raw'
+import wireframeCss from '../src/tokens/primitives/wireframe.css?raw'
 
 const preview: Preview = {
   globalTypes: {
@@ -10,8 +11,9 @@ const preview: Preview = {
         title: 'Brand',
         icon: 'paintbrush',
         items: [
-          { value: 'echopark', title: 'EchoPark' },
-          { value: 'sonic', title: 'Sonic Automotive' },
+          { value: 'echopark',  title: 'EchoPark' },
+          { value: 'sonic',     title: 'Sonic Automotive' },
+          { value: 'wireframe', title: 'Wireframe' },
         ],
         dynamicTitle: true,
       },
@@ -23,27 +25,61 @@ const preview: Preview = {
   decorators: [
     (story, context) => {
       const brand = context.globals.brand || 'echopark'
-      const id = 'epds-brand-override'
-      let el = document.getElementById(id) as HTMLStyleElement | null
 
+      /* ── Sonic primitives — injected globally on :root (existing pattern) ── */
+      const sonicId = 'epds-brand-override'
+      let sonicEl = document.getElementById(sonicId) as HTMLStyleElement | null
       if (brand === 'sonic') {
-        if (!el) {
-          el = document.createElement('style')
-          el.id = id
-          document.head.appendChild(el)
+        if (!sonicEl) {
+          sonicEl = document.createElement('style')
+          sonicEl.id = sonicId
+          document.head.appendChild(sonicEl)
         }
-        el.textContent = sonicCss
+        sonicEl.textContent = sonicCss
       } else {
-        el?.remove()
+        sonicEl?.remove()
+      }
+
+      /* ── Wireframe theme — scoped to [data-theme="wireframe"] ─────────────
+       * Rules are scoped so they only activate when `<html>` carries the
+       * `data-theme="wireframe"` attribute (set below). The <style> sheet
+       * is injected only when the theme is active so non-wireframe stories
+       * carry zero overhead.
+       *
+       * Each Storybook story renders in its own preview iframe with its
+       * own document, so flipping the attribute on `documentElement` is
+       * already scoped to a single iframe — there is no cross-story
+       * leakage to guard against. Mirrors the Sonic pattern above. */
+      const wireframeId = 'epds-wireframe-theme'
+      let wireframeEl = document.getElementById(wireframeId) as HTMLStyleElement | null
+      if (brand === 'wireframe') {
+        if (!wireframeEl) {
+          wireframeEl = document.createElement('style')
+          wireframeEl.id = wireframeId
+          document.head.appendChild(wireframeEl)
+        }
+        wireframeEl.textContent = wireframeCss
+      } else {
+        wireframeEl?.remove()
       }
 
       /* Surface the active brand on the root element so components can
        * apply brand-specific *structural* overrides via CSS selectors
-       * (e.g. `[data-brand="sonic"] .my-component`). Token-only brand
-       * differences still flow through sonic.css above — this hook is
-       * only for shape / layout changes that can't be expressed as
-       * custom-property swaps. */
-      document.documentElement.setAttribute('data-brand', brand)
+       * (e.g. `[data-brand="sonic"] .my-component`). Wireframe falls
+       * back to EchoPark structure so layout overrides (button radius,
+       * etc.) stay consistent — only colour and imagery change. */
+      const structuralBrand = brand === 'wireframe' ? 'echopark' : brand
+      document.documentElement.setAttribute('data-brand', structuralBrand)
+
+      /* Activate the wireframe theme by tagging `<html>` so the
+       * `[data-theme="wireframe"]` rules in wireframe.css take effect.
+       * Removed when any other brand is selected so EchoPark / Sonic
+       * render normally. */
+      if (brand === 'wireframe') {
+        document.documentElement.setAttribute('data-theme', 'wireframe')
+      } else {
+        document.documentElement.removeAttribute('data-theme')
+      }
 
       return story()
     },

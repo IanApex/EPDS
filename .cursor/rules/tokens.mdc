@@ -28,7 +28,16 @@ The TypeScript wrapper is `src/tokens/tokens.ts` (exports `tokens.semantic.*` an
 **To white-label for a new brand**: create `primitives/brand-b.css`, redefine the color vars and `--font-family-brand`, then point `src/epds.css` at that primitives file. `main.ts`, Storybook `preview.ts`, and library consumers all pull tokens through `epds.css`. No component changes needed.
 
 ### Storybook brand toggle
-A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches between EchoPark and Sonic at dev time. The decorator injects the Sonic primitives CSS as a runtime override — no rebuild needed. Both brand fonts are loaded in `.storybook/preview-head.html`.
+A **Brand** dropdown in the Storybook toolbar (`.storybook/preview.ts`) switches between EchoPark, Sonic, and the Wireframe viewing theme at dev time. The decorator injects the Sonic primitives CSS as a runtime override — no rebuild needed. Both brand fonts are loaded in `.storybook/preview-head.html`.
+
+### Wireframe theme
+**`primitives/wireframe.css`** — viewing theme (not a real brand) for layout / anatomy reviews. Selectable from the same Storybook **Brand** toolbar as a third option ("Wireframe"). Implementation notes:
+- **Scoping**: all rules scoped to `[data-theme="wireframe"]` (NOT `:root`). The Storybook decorator sets `data-theme="wireframe"` on `<html>` so every descendant inherits the override cascade — same shape as the existing `data-brand` attribute toggle for Sonic.
+- **CSS injection**: imported via `?raw` in `preview.ts` and injected into a single `<style id="epds-wireframe-theme">` only when the theme is active. Same lifecycle pattern as `sonic.css`.
+- **Structural fallback**: when Wireframe is active, `data-brand` is forced to `echopark` so brand-shape overrides (Sonic button radius, etc.) don't apply — only colour and imagery change.
+- **What it overrides**: brand primary / accent palettes → neutral greys; feedback warning / alert / system surfaces → neutral greys; `--shadow-level-1..4` → `none`; `<img>` → `opacity: 0` with hatched fill on the immediate parent via `:has(> img)` plus class-pattern matches for `[class*="photo|image-area|hero|gallery|showcase"]`.
+- **What it preserves**: neutral palette, focus ring (darker), spacing, radius, typography (Roboto), and the entire structural cascade.
+- **Not bundled into the library**: `wireframe.css` is consumed only by `preview.ts` via `?raw`. It is NOT imported in `src/epds.css`, so library consumers don't ship it. If a consumer needs wireframe mode at runtime, import the file in their own app + set `data-theme="wireframe"` on `<html>` (or any wrapping element).
 
 ### Semantic token groups
 - `--color-action-primary[-hover|-press|-vivid|-subtle]` — primary brand CTA color
